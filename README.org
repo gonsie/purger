@@ -1,5 +1,5 @@
 * Parser for Gate Project
-  This project contains ply-based parsers for [[http://www.opensourceliberty.org/opensourceliberty.html][Liberty]] gate libraries and Verilog netlists.
+  This project contains ply-based parsers for [[http://www.opensourceliberty.org/opensourceliberty.html][Liberty]] gate libraries and Verilog netlists. Note that these are not tested. They may only work for a subset of general grammars.
   
 ** Dependencies
 
