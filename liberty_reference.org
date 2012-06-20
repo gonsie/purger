@@ -1,0 +1,833 @@
+* Library
+** Simple Attributes
+  - bus_naming_style
+  - comment
+  - current_unit
+  - date
+  - default_fpga_is
+  - default_threshold_voltage
+  - delay_model
+  - em_temp_degradation_factor
+  - fpga_domain_style
+  - fpga_technology
+  - in_place_sjap_mode
+  - input_threshold_pct_fall
+  - input_threshold_pct_rise
+  - leakage_power_unit
+  - nom_calc_mode
+  - nom_process
+  - nom_temperature
+  - nom_voltage
+  - output_theshold_pct_fall
+  - output_thershold_pct_rise
+  - piece_type
+  - power_model
+  - preferred_output_pad_slew_rate_control
+  - preferred_input_pad_voltage
+  - preferred_output_pad_voltage
+  - pulling_resistance_unit
+  - revision
+  - simulation
+  - slew_derate_from_library
+  - slew_lower_threshold_pct_fall
+  - slew_lower_threshold_pct_rise
+  - slew_upper_threshold_pct_fall
+  - slew_upper_threshold_pct_rise
+  - time_unit
+  - voltage_unit
+
+** Complex Attributes
+   - capacitive_load_unit
+   - default_part
+   - define
+   - define_cell_area
+   - define_group
+   - library_features
+   - piece_define
+   - routing_layers
+   - technology
+   - voltage_unit
+** Group Statements
+   - base_curves
+   - compact_lut_template
+   - dc_current_template
+   - em_lut_template
+   - fall_net_delay
+   - fall_transition_degradation
+   - faults_lut_template
+   - input_voltage
+   - fpga_isd
+   - iv_lut_template
+   - lu_table_template
+   - maxcap_lut_template
+   - maxtrans_lut_template
+   - noise_lut_template
+   - normalized_driver_waveform
+   - operating_conditions
+   - output_current_template
+   - output_voltage
+   - part
+   - pg_current_template
+   - poly_template
+   - power_lut_template
+   - power_poly_template
+   - power_supply
+   - propagation_lut_template
+   - rise_net_delay
+   - rise_transition_degradation
+   - scaled_cell
+   - sensitization
+   - scaling_factors
+   - timing
+   - timing_range
+   - type
+   - user_parameters
+   - wire_load
+   - wire_load_selection
+   - wire_load_table
+** Other
+*** Simple Attrubute Attributes
+    - distance_unit
+    - dist_conversion_factor
+*** Simple Attribute Groups
+    - device_layer
+    - poly_layer
+    - routing_layer
+    - cont_layer
+    - critical_area_lut_template
+*** Group Complex Attributes
+   - base_curve_type
+   - curve_x
+   - curve_y
+   - index_1
+   - index_2
+   - index_3
+   - pin_names
+   - vector
+*** Group Simple Attributes
+    - base_curves_group
+    - variable_1
+    - variable_2
+    - variabse_3
+
+* Cell
+** Simple Attribute
+   - area : float ;
+   - auxiliary_pad_cell : true | false ;
+   - base_name : cell_base_name__string ;
+   - bus_naming_style : "string" ;
+   - cell_footprint : footprint_type__string ;
+   - cell_leakage_power : float ;
+   - clock_gating_integrated_cell : string_value ;
+   - contention_condition : "Boolean expression" ;
+   - dont_fault : sa0 | sa1 | sa01 ;
+   - dont_touch : true | false ;
+   - dont_use : true | false ;
+   - driver_type : name__id ;
+   - edif_name : name__id ;
+   - em_temp_degradation_factor : value__float ;
+   - fpga_domain_style : name__id ;
+   - handle_negative_constraint : true | false ;
+   - interface_timing : true | false ;
+   - io_type : name__id ;
+   - is_clock_gating_cell : true | false ;
+   - map_only : true | false ;
+   - pad_cell : true | false ;
+   - pad_type : clock ;
+   - power_cell_type : ;
+   - preferred : true | false ;
+   - scaling_factors : group_name ;
+   - single_bit_degenerate : string ;
+** Complex Attributes
+   - pin_equal ( "name_list__string" ) ;
+   - pin_opposite ( "name_list1__string", "name_list2__string" ) ;
+   - rail_connection ( connection_name__string, power_supply_name__string ) ;
+   - resource_usage ( resource_name__id, number_of_resources__id ) ;
+** Group Statements
+   - bundle ( name__string ) { }
+     - pin group simple attributes
+     - members (name__id ) ;
+     - pin group group statements
+   - bus ( name__string ) { }
+     - pin group simple statements
+     - bus_type : name ;
+     - pin ( name__string | name_list__string ) { }
+     - pin group group statements
+   - dynamnic_current ( ) { }
+     - related_inputs : <input_pin_name> ;
+     - related_outputs : <output_pin_name> ;
+     - typical_capacitances ( "<float>, ..." ) ;
+     - when : <bolean expression>
+     - switching_group ( ) { }
+       - input_switching_condition ( <enum(rise, fall)> ) ;
+       - ouput_switching_condition ( <enum(rise, fall)> ) ;
+       - min_input_switching_count : integer ;
+       - max_input_switching_count : integer ;
+       - pg_current ( ) { }
+         - compact_ccs_power ( <template_name> ) { } ??
+           - base_curves_group : <bc_name> ;
+           - index_output : <pin_name> ;
+           - index_1 ( "float, ..., float" ) ;
+           - index_2 ( "float, ..., float" ) ;
+           - index_3 ( "float, ..., float" ) ;
+           - index_4 ( "string, ..., string" ) ;
+           - values ( "float/integer, ..., float/integer" ) ;
+         - vector ( ) { }
+           - index_1 ( <float> ) ;
+           - index_2 ( <float> ) ;
+           - index_3 ( <float> ) ;
+           - index_4 ( <float> ) ;
+           - index_output : <output_pin_name> ;
+           - reference_time : <float> ;
+           - values ( "<float>, ..." ) ;
+   - ff ( variable1__string, variable2__string ) { }
+     - clear : "Boolean expression" ;
+     - clear_preset_var1 : L | H | N | T | X ;
+     - clear_preset_var2 : L | H | N | T | X ;
+     - clocked_on : "Boolean expression" ;
+     - clocked_on_also : "Boolean expression" ;
+     - next_state : "Booloan expression" ;
+     - preset : "Boolean expression" ;
+   - ff_bank ( variable1__sting, variable2__string, bits__integer ) { }
+     - clocked_on : "Boolean expression" ;
+     - next_state : "Booloan expression" ;
+     - clear : "Boolean expression" ;
+     - preset : "Boolean expression" ;
+     - clear_preset_var1 : L | H | N | T | X ;
+     - clear_preset_var2 : L | H | N | T | X ;
+     - clocked_on_also : "Boolean expression" ;
+   - functional_yield_metric ( ) { }
+   - fpga ????
+   - generated_clock ( name__string ) { }
+     - clock_pin : "name1 [name2 name3 ...]" ;
+     - master_pin : name ;
+     - divided_by : integer ;
+     - multiplied_by : integer ;
+     - invert : Boolean ;
+     - duty_cycle : float ;
+     - edges ( edge1, edge2, edge3 ) ;
+     - shifts ( shift1, shift2, shift3 ) ;
+   - intrinsic_parasitic ( name__string ) { }
+     - when : <boolean expression> ;
+     - intrinsic_capacitance ( <pg_pin_name> ) { }
+       - value : <float> ;
+     - intrinsic_resistance ( <pg_pin_name> ) { }
+       - related_output : <output_pin_name> ;
+       - value : <float> ;
+     - total_capacitance ( <pg_pin_name> ) { }
+       - value : <float> ;
+   - latch ( variable1__string, variable2__string ) { }
+     - clear : "Boolean expression" ;
+     - clear_preset_var1 : L | H | N | T | X ;
+     - clear_preset_var2 : L | H | N | T | X ;
+     - data_in : "Boolean expression" ;
+     - enable : "Boolean expression" ;
+     - enable_also : "Boolean expression" ;
+     - preset : "Boolean expression" ;
+   - latch_bank ( variable1__string, varibale2__string, bits__integer ) { }
+     - enable : "Boolean expression" ;
+     - enable_also : "Boolean expression" ;
+     - data_in : "Boolean expression" ;
+     - clear : "Boolean expression" ;
+     - preset : "Boolean expression" ;
+     - clear_preset_var1 : L | H | N | T | X ;
+     - clear_preset_var2 : L | H | N | T | X ;
+   - leakage_current ( ) { }
+     - when : "Boolean expression" ;
+     - value : value__float ;
+     - pg_current ( <pg_pin_name> ) { }
+       - value : <float> ;
+     - gate_leakage ( <an input pin name> ) { } ??
+       - input_low_value : <float> ;
+       - input_high_value : <float> ;
+   - leakage_power ( ) { }
+     - power_level : "name" ;
+     - related_pg_pin : pg_pin__id ;
+     - when : "Boolean expression"
+     - value : value__float ;
+   - lut ( name__stringe ) { }
+     - input_pins : "name1 [name2 name3 ...]" ;
+   - mode_definition ( name__string ) { }
+     - mode_value (name__string ) { }
+       - when : "Boolean expression" ;
+       - sdf_cond : sdf_expression__string ;
+   - pg_pin ( pg_pin_name__string ) { }
+     - voltage_name : value__id ;
+     - pg_type : value__enum(primary_power, primary_ground, backup_power, backup_ground, internal_power, internal_ground) ;
+     - user_pg_type : user_pg_type_name ;
+     - physical_connection : device_layer | routing_pin ;
+     - related_bias_pin "<bias_pin_name> <bias_pin_name> ..." ;
+   - pin ( name__string | name_list__string ) { }
+   - routing_track ( routing_layer_name__string ) { }
+     - tracks : integer ;
+     - total_track_area : float ;
+     - short *model group only*
+   - statetable ( "input node names", "internal node names" ) { }
+     - table : "input node values : current internal values : next internal values, \
+                input node values : current internal values : next internal values" ;
+   - test_cell ( ) { }
+     - ff ( variable1__string, variable2__string ) { }
+       - clear : "Boolean expression" ;
+       - clear_preset_var1 : L | H | N | T | X ;
+       - clear_preset_var2 : L | H | N | T | X ;
+       - clocked_on : "Boolean expression" ;
+       - clocked_on_also : "Boolean expression" ;
+       - next_state : "Booloan expression" ;
+       - preset : "Boolean expression" ;
+     - ff_bank ( variable1__sting, variable2__string, bits__integer ) { }
+       - clocked_on : "Boolean expression" ;
+       - next_state : "Booloan expression" ;
+       - clear : "Boolean expression" ;
+       - preset : "Boolean expression" ;
+       - clear_preset_var1 : L | H | N | T | X ;
+       - clear_preset_var2 : L | H | N | T | X ;
+       - clocked_on_also : "Boolean expression" ;
+     - latch ( variable1__string, variable2__string ) { }
+       - clear : "Boolean expression" ;
+       - clear_preset_var1 : L | H | N | T | X ;
+       - clear_preset_var2 : L | H | N | T | X ;
+       - data_in : "Boolean expression" ;
+       - enable : "Boolean expression" ;
+       - enable_also : "Boolean expression" ;
+       - preset : "Boolean expression" ;         
+     - latch_bank ( variable1__string, varibale2__string, bits__integer ) { }
+       - enable : "Boolean expression" ;
+       - enable_also : "Boolean expression" ;
+       - data_in : "Boolean expression" ;
+       - clear : "Boolean expression" ;
+       - preset : "Boolean expression" ;
+       - clear_preset_var1 : L | H | N | T | X ;
+       - clear_preset_var2 : L | H | N | T | X ;
+     - pin ( name__string | name_list__string ) { }
+       - direction : input | output | inout ;
+       - function : Boolean expression ;
+       - signal_type : test_scan_in | test_scan_in_inverted | test_scan_out | test_scan_out_inverted |
+                       test_scan_enable | test_scan_enable_inverted |
+                       test_scan_clock | test_scan_clock_a | test_scan_clock_b | test_clock ;
+       - test_output_only : true | false ;
+       - statetable ( "input node names", "internal node names" ) { }
+         - table : "input node values : current internal values : next internal values, \
+                    input node values : current internal values : next internal values" ;
+     - statetable ( "input node names", "internal node names" ) { }
+       - table : "input node values : current internal values : next internal values, \
+                  input node values : current internal values : next internal values" ;
+   - type ( name__string ) { }
+     - base_type : array ;
+     - bit_from : integer ;
+     - bit_to : integer ;
+     - bit_width : integer ;
+     - data_type : bit ;
+     - downto : true | fase ;
+** Other
+*** Simple Attribute Black box, bus, bundle cells only
+    - slew_type : name__id ;
+    - timing_model_type : "string" ;
+    - use_for_size_only : true | false ;
+    - vhdl_name : "string" ;
+* Model
+** All Cell attributes and
+   - cell_name : "name__string" ;
+   - short ( "name_list__string" ) ;
+* Pin
+  *within a cell, test_cell, scaled_cell, model, bus group*
+** Simple Attributes
+   - always_on : Boolean expression ;
+   - bit_width : integer ; /* bus cells */
+   - capacitance : float ;
+   - clock : true | false ;
+   - clock_gate_clock_pin : true | false ;
+   - clock_gate_enable_pin : true | false ;
+   - clock_gate_test_pin : true | false ;
+   - clock_gate_obs_pin : true | false ;
+   - clock_gate_out_pin : true | false ;
+   - complementary_pin : "string" ;
+   - connection_class : "name1 [name2 name3 ...]" ;
+   - direction : input | output | inout | internal ;
+   - dont_fault : sa0 | sa1 | sao1 ;
+   - drive_current : float ;
+   - driver_type : pull_up | pull_down | open_drain | open_source | bus_hold | resistive | resistive_0 | resistive_1 ;
+   - fall_capacitance : float ;
+   - fall_current_slope_after_threshold : float ;
+   - fall_current_slope_before_threshold : float ;
+   - fall_time_after_threshold : float ;
+   - fall_time_before_threshold : float ;
+   - fanout_load : float ;
+   - fault_model : "two-value string" ;
+   - function : "Boolean expression" ;
+   - has_builtin_pad : Boolean expression ;
+   - hysteresis : true | false ;
+   - input_map : "name__string | name_list" ;
+   - input_signal_level : string ;
+   - input_voltage : string ;
+   - internal_node : name__string ; /* Required in statetable cells */
+   - inverted_output : true | false ; /* Required in statetable cells */
+   - is_pad : true | false ;
+   - max_capacitance : float ;
+   - max_fanout : float ;
+   - max_input_noise_width : float ;
+   - max_transition : float ;
+   - min_capacitance : float ;
+   - min_fanout : float ;
+   - min_input_noise_width : float ;
+   - min_period : float ;
+   - min_pulse_width_high : float ;
+   - min_pulse_width_low : float ;
+   - min_transition : float ;
+   - multicell_pad_pin : true | false ;
+   - nextstate_type : data | preset | clear | load | scan_in | scan_enable ;
+   - output_signal_level : string ;
+   - output_voltage : string ;
+   - pin_func_type : clock_enable | active_high | active_low | active_rising | active_falling ;
+   - prefer_tied : "0" | "1" ;
+   - primary_output : true | false ;
+   - pulling_current : current_value ;
+   - pulling_resistance : resistance_value ;
+   - rise_capacitance : float ;
+   - rise_current_slope_after_threshold : float ;
+   - rise_current_slope_before_threshold : float ;
+   - rise_time_after_threshold : float ;
+   - rise_time_before_threshold : float ;
+   - signal_type : test_scan_in | test_scan_in_inverted | test_scan_out | test_scan_out_inverted |
+                   test_scan_enable | test_scan_enable_inverted | 
+                   test_scan_clock | test_scan_clock_a | test_scan_clock_b | test_scan_clock ;
+   - slew_control : low | medium | high | none ;
+   - slew_control_threshold_pct_fall : trip_point__value ; ??
+   - slew_lower_threshold_pct_rise : trip_point__value ; ??
+   - slew_lower_threshold_pct_fall : trip_point__value ; ??
+   - slew_upper_threshold_pct_rise : trip_point__value ; ??
+   - slew_upper_threshold_pct_fall : trip_point__value ; ??
+   - state_function : "Boolean expression" ;
+   - std_cell_main_rail : true | false ; /* primary_power pin */
+   - switch_function : function_string ; /* switch_pin */
+   - switch_pin : value__Boolean ; /* switch pin of a coarse-grain switch cell */
+   - test_output_only : true | false ;
+   - three_state : "Boolean expression" ;
+   - vdhl_name : "string" ;
+   - x_function : "Boolean expression" ;
+** Complex Attributes
+   - fall_capacitance_range ( float, float ) ;
+   - rise_capacitance_range ( float, float ) ;
+   - power_gating_pin ( "power_pin_<1-5>", <enumerated_type> ) ;
+   - retention_pin ( pin_class(restore, save, save_restore), disable_value(0,1) ) ;
+** Group Statements
+   - electromigration ( ) { }
+   - hyperbolic_noise_above_high ( ) { }
+   - hyperbolic_noise_below_low ( ) { }
+   - hyperbolic_noise_high ( ) { }
+   - hyperbolic_noise_low ( ) { }
+   - internal_power ( ) { }
+   - max_trans ( ) { }
+   - min_pulse_width ( ) { }
+   - minimum_period ( ) { }
+   - timing ( ) { }
+   - tlatch ( ) { }
+
+   - ccsn_first_stage ( ) { }
+     - is_inverting : value__Boolean ;
+     - is_needed : value__Boolean ;
+     - is_pass_gate : Boolean expression ;
+     - miller_cap_fall : value__float ;
+     - miller_cap_rise : value__float ;
+     - mode ??
+     - stage_type : value__enum(pull_up, pull_down, both) ;
+     - when : value__boolean ;
+     - dc_current ( dc_current_template__id ) { }
+       - index_1 ( "float, ..., float" ) ;
+       - index_2 ( "float, ..., float" ) ;
+       - values ( "float, ..., float" ) ;
+     - output_voltage_fall ( ) { }
+       - vector ( <output_voltage_template_name> ) { }
+         - index_1 ( float ) ;
+         - index_2 ( float ) ;
+         - index_3 ( "float, ..." ) ;
+         - values ( "float, ..." ) ;
+     - output_voltage_rise
+       - vector ( <output_voltage_template_name> ) { }
+         - index_1 ( float ) ;
+         - index_2 ( float ) ;
+         - index_3 ( "float, ..." ) ;
+         - values ( "float, ..." ) ;
+     - propagated_noise_low
+       - vector ( <output_voltage_template_name> ) { }
+         - index_1 ( float ) ;
+         - index_2 ( float ) ;
+         - index_3 ( float ) ;
+         - index_4 ( "float, ..." ) ;
+         - values ( "float, ..." ) ;
+     - propagated_noise_rise
+       - vector ( <output_voltage_template_name> ) { }
+         - index_1 ( float ) ;
+         - index_2 ( float ) ;
+         - index_3 ( float ) ;
+         - index_4 ( "float, ..." ) ;
+         - values ( "float, ..." ) ;
+   - ccsn_last_stage
+     - is_inverting : value__Boolean ;
+     - is_needed : value__Boolean ;
+     - is_pass_gate : Boolean expression ;
+     - miller_cap_fall : value__float ;
+     - miller_cap_rise : value__float ;
+     - mode ??
+     - stage_type : value__enum(pull_up, pull_down, both) ;
+     - when : value__boolean ;
+     - dc_current ( dc_current_template__id ) { }
+       - index_1 ( "float, ..., float" ) ;
+       - index_2 ( "float, ..., float" ) ;
+       - values ( "float, ..., float" ) ;
+     - output_voltage_fall ( ) { }
+       - vector ( <output_voltage_template_name> ) { }
+         - index_1 ( float ) ;
+         - index_2 ( float ) ;
+         - index_3 ( "float, ..." ) ;
+         - values ( "float, ..." ) ;
+     - output_voltage_rise
+       - vector ( <output_voltage_template_name> ) { }
+         - index_1 ( float ) ;
+         - index_2 ( float ) ;
+         - index_3 ( "float, ..." ) ;
+         - values ( "float, ..." ) ;
+     - propagated_noise_low
+       - vector ( <output_voltage_template_name> ) { }
+         - index_1 ( float ) ;
+         - index_2 ( float ) ;
+         - index_3 ( float ) ;
+         - index_4 ( "float, ..." ) ;
+         - values ( "float, ..." ) ;
+     - propagated_noise_rise
+       - vector ( <output_voltage_template_name> ) { }
+         - index_1 ( float ) ;
+         - index_2 ( float ) ;
+         - index_3 ( float ) ;
+         - index_4 ( "float, ..." ) ;
+         - values ( "float, ..." ) ;
+   - electromigration ( ) { }
+     - related_pin : "name | name_list" ; /* path dependency */
+     - related_bus_pins : "list of pins" ; /* list of pin names */
+     - when : Boolean expression ;
+     - index_1 ( "float, ..., float" ) ; /* optional */
+     - index_2 ( "float, ..., float" ) ; /* optional */
+     - values ( "float, ..., float" ) ;
+     - em_max_toggle_rate ( em_template_name ) { }
+   - hyperbolic_noise_above_high ( ) { }
+     - area_coefficient : value__float ;
+     - height_coefficient : value__float ;
+     - width_coefficient : value__float ;
+   - hyperbolic_noise_below_low ( ) { }
+     - area_coefficient : value__float ;
+     - height_coefficient : value__float ;
+     - width_coefficient : value__float ;
+   - hyprebolic_noise_high ( ) { }
+     - area_coefficient : value__float ;
+     - height_coefficient : value__float ;
+     - width_coefficient : value__float ;
+   - hyperbolic_noise_low ( ) { }
+     - area_coefficient : value__float ;
+     - height_coefficient : value__float ;
+     - width_coefficient : value__float ;
+   - internal_power ( ) { }
+     - equal_or_opposite_output : "name | name_list" ;
+     - falling_together_group : "list of pins" ;
+     - power_level : "name" ;
+     - related_pin : "name | name_list" ;
+     - rising_together_group : "list of pins" ;
+     - switching_interval : value__float ;
+     - switching_together_group : "list of pins" ;
+     - when : "Boolean expression" ;
+     - domain ( name ) { } 
+     - fall_power ( template name ) { }
+       - index_1 ( "float, ..., float" ) ; /* lookup table */
+       - index_2 ( "float, ..., float" ) ; /* lookup table */
+       - index_3 ( "float, ..., float" ) ; /* lookup table */
+       - values ( "float, ..., float" ) ; /* lookup table */
+       - orders ( "integer, ..., integer" ) ; /* polynomial */
+       - coefs ( "float, ..., float" ) ; /* polynomial */
+       - domain ( name ) { }
+     - power ( template name ) { }
+       - index_1 ( "float, ..., float" ) ; /* lookup table */
+       - index_2 ( "float, ..., float" ) ; /* lookup table */
+       - index_3 ( "float, ..., float" ) ; /* lookup table */
+       - values ( "float, ..., float" ) ; /* lookup table */
+       - orders ( "integer, ..., integer" ) ; /* polynomial */
+       - coefs ( "float, ..., float" ) ; /* polynomial */
+       - domain ( name ) { }
+     - rise_power ( template name ) { }
+       - index_1 ( "float, ..., float" ) ; /* lookup table */
+       - index_2 ( "float, ..., float" ) ; /* lookup table */
+       - index_3 ( "float, ..., float" ) ; /* lookup table */
+       - values ( "float, ..., float" ) ; /* lookup table */
+       - orders ( "integer, ..., integer" ) ; /* polynomial */
+       - coefs ( "float, ..., float" ) ; /* polynomial */
+       - domain ( name ) { }
+   - max_cap ( template_name ) { }
+     - values ( "float, ..., float" ) ;
+     - ??
+   - max_trans ( template_name__id ) { }
+     - variable_1_range
+     - variable_2_range
+     - variable_n_range
+     - orders
+     - coefs
+   - min_pulse_width ( ) { }
+     - constraint_high : value__float ;
+     - constraint_low : value__float ;
+     - when : "Boolean expression" ;
+     - sdf_cond : "Boolean expression" ;
+   - minimum_period ( ) { }
+     - constraint : value__float ;
+     - when : "Boolean expression" ;
+     - sdf_cond : "Boolean expression" ;
+   - pin_capacitance ( ) { }
+     - capacitance ( ) { }
+       - *polynomial equation modeling*
+     - rise_capacitance( ) { }
+       - *polynomial equation modeling*
+     - fall_capacitance( ) { }
+       - *polynomial equation modeling*
+     - fall_capacitance_range( ) { }
+       - *polynomial equation modeling*
+       - lower ( poly_template_name__id ) { }
+         - *polynomial equation modeling*
+       - upper ( poly_template_name__id ) { }
+         - *polynomial equation modeling*
+     - rise_capacitance_range( ) { }
+       - *polynomial equation modeling*
+       - lower ( poly_template_name__id ) { }
+         - *polynomial equation modeling*
+       - upper ( poly_template_name__id ) { }
+         - *polynomial equation modeling*
+   - receiver_capacitance ( ) { }
+     - receiver_capacitance1_fall ( lu_template_name__id ) { }
+       - values
+     - receiver_capacitance1_rise ( lu_template_name__id ) { }
+       - values
+     - receiver_capacitance2_fall ( lu_template_name__id ) { }
+       - values
+     - receiver_capacitance2_rise ( lu_template_name__id ) { }
+       - values
+     - when : boolean expression ?
+     - mode ?
+   - timing ( name__string ) { }
+     - clock_gating_flag : true | false ;
+     - default_timing : true | false ;
+     - fall_resistance : float ;
+     - fpga_arc_condition : "Boolean expression" ;
+     - fpga_domian_style : name ;
+     - interdependence_id : "name__enum(integer)" ;
+     - intrinsic_fall : float ;
+     - intrinsic_rise : float ;
+     - relate_bus_equivalent : "name1 [name2 name3 ...]" ;
+     - relate_bus_pins : "name1 [name2 name3 ...]"
+     - related_output_pin : name ;
+     - rise_resistance : float ;
+     - sdf_cond : "SDF expression" ;
+     - sdf_cond_end : "SDF expression" ;
+     - sdf_cond_start : "SDF expression" ;
+     - sdf_edges : SDF edge type ;
+     - slope_fall : float ;
+     - slope_rise : float ;
+     - steady_state_resistance_above_high : float ;
+     - steady_state_resistance_below_low : float ;
+     - steady_state_resistance_high : float ;
+     - steady_state_resistance_low : float ;
+     - tied_off : Boolean ;
+     - timing_sense : positive_unate | negative_unate | non_unate ;
+     - timing_type : combinational | combinational_rise | combinational_fall |
+                     three_state_disable | three_state_disable_rise | three_state_disable_fall | 
+                     three_state_enable | three_state_enable_rise | three_state_enable_fall |
+                     rising_edge | falling_edge | preset | clear | hold_rising | hold_falling |
+                     setup_rising | setup_falling | recovery_rising | recovery_falling |
+                     skew_rising | skew_falling | removal_rising | removal_falling |
+                     min_pulse_width | minimum_period | max_clock_tree_path | min_clock_tree_path |
+                     non_seq_setup_rising | non_seq_setup_falling | non_seq_hold_rising | non_seq_hold_falling |
+                     nochange_high_high | nochange_high_low | nochange_low_high | nochange_low_low ;
+     - when : "Boolean expression" ;
+     - when_end : "Boolean expression" ;
+     - when_start : "Boolean expression" ;
+     - fall_delay_intercept ( integer, float ) ; /* piecewise model only */
+     - fall_pin_resistance ( integer, float ) ; /* piecewise model only */
+     - mode
+     - rise_delay_intercept ( integer, float ) ; /* piecewise model only */
+     - rise_pin_resistance ( integer, float ) ; /* piecewise model only */
+     - cell_degradation ( ) { }
+       - coefs /* polynomial model */
+       - orders /* polynomial model */
+       - index_1 /* polynomial model */
+       - values /* polynomial model */
+       - variable_n_range /* polynomial model */
+       - domain ( name__string ) { }
+         - calc_mode
+         - coefs
+         - orders
+         - variable_n_range
+     - cell_fall ( ) { }
+       - index_1 ( "float, ..., float" ) ;
+       - index_2 ( "float, ..., float" ) ;
+       - index_3 ( "float, ..., float" ) ;
+       - values  ( "float, ..., float", ..., "float, ..., float" ) ;
+       - domain
+     - cell_rise ( ) { }
+       - index_1 ( "float, ..., float" ) ;
+       - index_2 ( "float, ..., float" ) ;
+       - index_3 ( "float, ..., float" ) ;
+       - values  ( "float, ..., float", ..., "float, ..., float" ) ;
+       - domain
+     - fall_constraint ( ) { }
+       - index_1 ( "float, ..., float" ) ;
+       - index_2 ( "float, ..., float" ) ;
+       - index_3 ( "float, ..., float" ) ;
+       - values  ( "float, ..., float", ..., "float, ..., float" ) ;
+       - domain
+     - fall_propagation ( ) { }
+       - index_1 ( "float, ..., float" ) ;
+       - index_2 ( "float, ..., float" ) ;
+       - index_3 ( "float, ..., float" ) ;
+       - values  ( "float, ..., float", ..., "float, ..., float" ) ;
+       - domain
+     - fall_transition ( ) { }
+       - index_1 ( "float, ..., float" ) ;
+       - index_2 ( "float, ..., float" ) ;
+       - index_3 ( "float, ..., float" ) ;
+       - values  ( "float, ..., float", ..., "float, ..., float" ) ;
+       - intermediate_values ("float, ..., float", ..., "float, ..., float" ) ;
+       - domain
+     - noise_immunity_above_high ( ) { }
+       - coefs /* scable polynomial only */
+       - orders /* scable polynomial only */
+       - values /* lookup table only */
+       - domain /* scalable polynomial only */
+     - noise_immunity_below_low ( ) { }
+       - coefs /* scable polynomial only */
+       - orders /* scable polynomial only */
+       - values /* lookup table only */
+       - domain /* scalable polynomial only */
+     - noise_immunity_high ( ) { }
+       - coefs /* scable polynomial only */
+       - orders /* scable polynomial only */
+       - values /* lookup table only */
+       - domain /* scalable polynomial only */
+     - noise_immunity_low ( ) { }
+       - coefs /* scable polynomial only */
+       - orders /* scable polynomial only */
+       - values /* lookup table only */
+       - domain /* scalable polynomial only */
+     - output_current_fall ( name__string ) { }
+       - vector ( ) { }
+         - reference_time : float ;
+     - output_current_rise ( ) { }
+       - vector ( ) { }
+         - reference_time : float ;
+     - propagated_noise_height_above_high ( ) { }
+       - coefs /* scable polynomial only */
+       - orders /* scable polynomial only */
+       - values /* lookup table only */
+       - domain /* scalable polynomial only */
+     - propagated_noise_height_below_low ( ) { }
+       - coefs /* scable polynomial only */
+       - orders /* scable polynomial only */
+       - values /* lookup table only */
+       - domain /* scalable polynomial only */
+     - propagated_noise_height_high ( ) { }
+       - coefs /* scable polynomial only */
+       - orders /* scable polynomial only */
+       - values /* lookup table only */
+       - domain /* scalable polynomial only */
+     - propagated_noise_height_low ( ) { }
+       - coefs /* scable polynomial only */
+       - orders /* scable polynomial only */
+       - values /* lookup table only */
+       - domain /* scalable polynomial only */
+     - propagated_noise_peak_time_ratio_above_high ( ) { }
+       - coefs /* scable polynomial only */
+       - orders /* scable polynomial only */
+       - values /* lookup table only */
+       - domain /* scalable polynomial only */
+     - propagated_noise_peak_time_ratio_below_low ( ) { }
+       - coefs /* scable polynomial only */
+       - orders /* scable polynomial only */
+       - values /* lookup table only */
+       - domain /* scalable polynomial only */
+     - propagated_noise_peak_time_ratio_high ( ) { }
+       - coefs /* scable polynomial only */
+       - orders /* scable polynomial only */
+       - values /* lookup table only */
+       - domain /* scalable polynomial only */
+     - propagated_noise_peak_time_ratio_low ( ) { }
+       - coefs /* scable polynomial only */
+       - orders /* scable polynomial only */
+       - values /* lookup table only */
+       - domain /* scalable polynomial only */
+     - propagated_noise_width_above_high ( ) { }
+       - coefs /* scable polynomial only */
+       - orders /* scable polynomial only */
+       - values /* lookup table only */
+       - domain /* scalable polynomial only */
+     - propagated_noise_width_below_low ( ) { }
+       - coefs /* scable polynomial only */
+       - orders /* scable polynomial only */
+       - values /* lookup table only */
+       - domain /* scalable polynomial only */
+     - propagated_noise_width_high ( ) { }
+       - coefs /* scable polynomial only */
+       - orders /* scable polynomial only */
+       - values /* lookup table only */
+       - domain /* scalable polynomial only */
+     - propagated_noise_width_low ( ) { }
+       - coefs /* scable polynomial only */
+       - orders /* scable polynomial only */
+       - values /* lookup table only */
+       - domain /* scalable polynomial only */
+     - receiver_capacitance1_fall ( value ) { }
+       - values
+     - receiver_capacitance1_rise ( value ) { }
+       - values
+     - receiver_capacitance2_fall ( value ) { }
+       - values
+     - receiver_capacitance2_rise ( value ) { }
+       - values
+     - retaining_fall ( name__string ) { }
+       - index_1 ( "float, ..., float" ) ;
+       - index_2 ( "float, ..., float" ) ;
+       - index_3 ( "float, ..., float" ) ;
+       - values  ( "float, ..., float", ..., "float, ..., float" ) ;
+       - domain
+     - retaining_rise ( name__string ) { }
+       - index_1 ( "float, ..., float" ) ;
+       - index_2 ( "float, ..., float" ) ;
+       - index_3 ( "float, ..., float" ) ;
+       - values  ( "float, ..., float", ..., "float, ..., float" ) ;
+       - domain
+     - retain_fall_slew ( retaining_time_template__string ) { }
+     - retain_rise_slew ( retaining_time_template__string ) { }
+     - rise_constraint ( ) { }
+       - index_1 ( "float, ..., float" ) ;
+       - index_2 ( "float, ..., float" ) ;
+       - index_3 ( "float, ..., float" ) ;
+       - values  ( "float, ..., float", ..., "float, ..., float" ) ;
+       - domain
+     - rise_propagation ( ) { }
+       - index_1 ( "float, ..., float" ) ;
+       - index_2 ( "float, ..., float" ) ;
+       - index_3 ( "float, ..., float" ) ;
+       - values  ( "float, ..., float", ..., "float, ..., float" ) ;
+       - domain
+     - rise_transition ( ) { }
+       - index_1 ( "float, ..., float" ) ;
+       - index_2 ( "float, ..., float" ) ;
+       - index_3 ( "float, ..., float" ) ;
+       - values  ( "float, ..., float", ..., "float, ..., float" ) ;
+       - domain
+     - steady_state_current_high ( ) { }
+       - coefs /* scable polynomial only */
+       - orders /* scable polynomial only */
+       - values /* lookup table only */
+       - domain /* scalable polynomial only */
+     - steady_state_current_low ( ) { }
+       - coefs /* scable polynomial only */
+       - orders /* scable polynomial only */
+       - values /* lookup table only */
+       - intermediate_values ()
+       - domain /* scalable polynomial only */
+     - steady_state_current_tristate ( ) { }
+   - tlatch ( enable_pin_name__string ) { }
+     - edge_type : name__id ;
+     - tdisable : value__Boolean ;
