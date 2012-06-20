@@ -1,0 +1,122 @@
+<source_text> ::= <description>
+<description> ::= <module>
+<module> ::= module <name_of_module> <list_of_ports>? ;
+                <module_item>*
+             endmodule
+<name_of_module> ::= <IDENTIFIER>
+<list_of_ports> ::= ( <port> <, <port>>* )
+<port> ::= <port_expression>?
+       ||= . <name_of_port> ( <port_expression>? )      => not in module's list of ports?
+<port_expression> ::= <port_reference>
+#                  ||= { <port_reference> <, <port_reference>>* }
+<port_reference> ::= <name_of_variable>
+                 ||= <name_of_variable> [ <constant_expression> ]
+                 ||= <name_of_variable> [ <constant_expression> : <constant_expression> ]
+<name_of_port> ::= <IDENTIFIER>
+<name_of_variable> ::= <IDENTIFIER>
+<module_item> 
+#              ::= <parameter_declaration>
+              ||= <input_declaration>
+              ||= <output_declaration>
+#              ||= <inout_declaration>
+              ||= <net_declaration>
+#              ||= <reg_declaration>
+#              ||= <time_declaration>
+#              ||= <integer_declaration>
+#              ||= <real_declaration>
+#              ||= <event_declaration>
+#              ||= <gate_declaration>
+?              ||= <UDP_instantiation>
+              ||= <module_instantiation>
+#              ||= <parameter_override>
+              ||= <continuous_assign>
+#              ||= <specify_block>
+#              ||= <initial_statement>
+#              ||= <always_statement>
+#              ||= <task>
+#              ||= <function>
+
+<input_declaration> ::= input <range>? <list_of_variables> ;
+<output_declaration> ::= output <range>? <list_of_variables> ;
+<inout_declaration> ::= inout <range>? <list_of_variables> ;
+
+<net_declaration> ::= <NETTYPE> <expand_range>? <list_of_variables> ;
+
+<expand_range> ::= <range>
+<range> ::= [ <constant_expression> : <constant_expression> ]
+<list_of_variables> ::= <name_of_variable> <, <name_of_variable>>*
+<name_of_variable> ::= <IDENTIFIER>
+
+<continuous_assign> ::= assign <list_of_assignments> ;
+<list_of_assignments> ::= <assignment> <, <assignment>>*
+<assignment> ::= <lvalue> = <expression>
+<lvalue> ::= <identifier>
+         ||= <identifier> [ <expression> ]
+         ||= <identifier> [ <constant_expression> : <constant_expression> ]
+#         ||= <concatenation>
+<constant_expression> ::= <expression>
+
+<module_instantiation> ::= <name_of_module> <module_instance> <, <module_instance>>* ;
+<module_instance> ::= <name_of_instance> ( <list_of_module_connections>? )
+<name_of_instance> ::= <IDENTIFIER>
+<list_of_module_connections> ::= <module_port_connection> <, <module_port_connection>>*
+                             ||= <named_port_connection> <, <name_port_connection>>*
+<module_port_connection> ::= <expression>
+                         ||= <NULL>
+<named_port_connection> ::= .<IDENTIFIER> ( <expression> )
+
+#<gate_declaration> ::= <GATETYPE> <gate_instance> <, <gate_instance>>* ;
+#<gate_instance> ::= <name_of_gate_instance>? ( <terminal> <, <terminal>>* )
+#<name_of_gate_instance> ::= <IDENTIFIER>
+#<terminal> ::= <expression>
+#           ||= <IDENTIFIER>
+
+<expression> ::= <primary>
+#             ||= <UNARY_OPERATOR> <primary>
+#             ||= <expression> <BINARY_OPERATOR> <expression>
+#             ||= <expression> <QUESTION_MARK> <expression> : <expression>
+#             ||= <STRING>
+<primary> ::= <number>
+          ||= <identifier>
+          ||= <identifier> [ <expression> ]
+          ||= <identifier> [ <constant_expression> : <constant_expression> ]
+#          ||= <concatenation>
+#          ||= <multiple_concatenation>
+?          ||= <function_call>
+?          ||= ( <mintypmax_expression> )
+
+#<concatenation> ::= { <expression> <, <expression>>* }
+
+
+<number> ::= <DECIMAL_NUMBER>
+         ||= <UNSIGNED_NUMBER>? <BASE> <UNSIGNED_NUMBER>
+         ||= <DECIMAL_NUMBER>.<UNSIGNED_NUMBER>
+#         ||= <DECIMAL_NUMBER><.<UNSIGNED_NUMBER>>? E<DECIMAL_NUMBER>
+#         ||= <DECIMAL_NUMBER><.<UNSIGNED_NUMBER>>? e<DECIMAL_NUMBER>
+<identifier> ::= <IDENTIFIER><.<IDENTIFIER>>*                                  *** !!! *** .ID happens, why??
+
+
+<NETTYPE> is wire
+<IDENTIFIER> An identifier is any sequence of letters, digits, dollar signs ($), and underscore (_) symbol, except that the first must be a letter or the underscore; the first character may not be a digit or $.
+             Upper and lower case letters are considered to be different.
+             Identifiers may be up to 1024 characters long.
+             Some Verilog-based tools do not recognize  identifier characters beyond the 1024th as a significant part of the identifier. 
+             Escaped identifiers start with the backslash character (\) and may include any printable ASCII character. 
+             An escaped identifier ends with white space. The leading backslash character is not considered to be part of the identifier.
+
+<UNARY_OPERATOR> is one of + - ! ~ & ~& | ^| ^ ~^
+<BINARY_OPERATOR> is one of + - * / % == != === !== && || < <= > >= & | ^ ^~ >> <<
+<QUESTION_MARK> in ? literal
+<STRING> is text enclosed in " and is one line
+
+<DECIMAL_NUMBER> contains any of 0 1 2 3 4 5 6 7 8 9 _, optionally preceeded by + or -
+<UNSIGNED_NUMBER> contains any of 0 1 2 3 4 5 6 7 8 9 _
+<BASE> is one of 'b 'B 'o 'O 'd 'D 'h 'H
+
+#<gate_declaration> ::= <GATETYPE> <gate_instance> <, <gate_instance>>* ;
+#<GATETYPE> is one of and nand or nor xor xnor buf bufif0 bufif1 not notif0 notif1 pulldown pullup nmos rnmos pmos rpmos cmos rcmos tran rtran tranif0 rtranif0 tranif1 rtranif0
+
+#<comment> ::= <short_comment>
+#          ||= <long_comment>
+#<short_comment> ::= // <comment_text> <END_OF_LINE>
+#<long_comment> ::= /* <comment_text> */
