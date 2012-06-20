@@ -1,0 +1,6 @@
+* Parser for Gate Project
+  This project contains ply-based parsers for [[http://www.opensourceliberty.org/opensourceliberty.html][Liberty]] gate libraries and Verilog netlists.
+  
+** Dependencies
+
+   [[https://github.com/dabeaz/ply][Python Lex-Yacc by dabeaz]]
