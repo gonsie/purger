@@ -2,6 +2,7 @@
 # Rensselaer Polytechnic Institute
 # June 8, 2012
 
+import datetime
 
 # Set up a logging object
 import logging
@@ -100,6 +101,45 @@ class Lib:
             for p in self.cells[a].pins:
                 output += "    - " + str(a.pins[p]) + "\n"
         return output
+    
+    def generate_c(self):
+        comments = "//Elsa Gonsiorowski\n"
+        comments += "//Automatically Generated on " + datetime.datetime.now().isoformat() + "\n"
+        comments += "//From Liberty Library " + self.name + ".lib\n\n"
+        hf = open('lib_'+self.name+'_gate.h', 'w')
+        hf.write(comments)
+        hf.write("#ifndef _gate_h\n#define _gate_h\n\n")
+        cf = open('lib_'+self.name+'_gate.c', 'w')
+        cf.write(comments)
+        cf.write("#include \"gates_model.h\"\n#include \"gate.h\"\n\n")
+        max_i = 0
+        max_o = 0
+        gate_count = 0
+        for c in self.cells:
+            cell = lib.cells[c]
+            ocount = 0
+            icount = 0
+            hf.write("#define " + c + "_GATE (" + str(gate_count) + ")\n")
+            gate_count += 1
+            for p in cell.pins:
+                pin = cell.pins[p]
+                if pin.atts['direction'].value == 'output':
+                    #print "\t", p, "\t", pin.atts['function']
+                    ocount += 1
+                else:
+                    icount += 1
+            cf.write(cell.generate_c())
+            cf.write("\n")
+            #print "\t", icount, "inputs and", ocount, "outputs"
+            max_i = max(max_i, icount)
+            max_o = max(max_o, ocount)
+        hf.write("\n#define MAX_GATE_INPUTS " + str(max_i))
+        hf.write("\n#define MAX_GATE_OUTPUTS " + str(max_o))
+        hf.write("\n#define GATE_TYPE_COUNT " + str(gate_count))
+        hf.write("\n#endif\n")
+        hf.close()
+        cf.write("\n")
+        cf.close()
 
 class Att:
     def __init__(self, name):
@@ -130,7 +170,36 @@ class Att:
             self.atts = dict()
             for i in v[0]:
                 self.atts[i.name] = i
-
+    
+    # ONLY FOR CELLS
+    def generate_c(self):
+        if self.name != "cell":
+            print "ERROR: generate_c() function undefined for type", self.name
+            return
+        output = "int " + self.label + "_func (vector input, vector output) {\n"
+#        output += "\tint change_flag = FALSE\n"
+        ocount = 0
+        icount = 0
+        for p in self.pins:
+            pin = self.pins[p]
+            if pin.atts['direction'].value == 'output':
+                output += "\t//" + pin.label + " = " + pin.atts['function'].value + "\n"
+                ocount += 1
+            else:
+                icount += 1
+        output += "\t//" + str(icount) + " inputs and " + str(ocount) + " outputs\n"
+        output += "}\n"
+        return output
+    
+    # ONLY FOR CELLS
+    def pins(self):
+        if self.name != "cell":
+            print "ERROR: pin() function undefined for type", self.name
+            return
+        l = self.pins.keys()
+        l.sort()
+        return l
+    
     def __repr__(self):
         output = ""
         if self.name == "cell" or self.name == "pin":
@@ -250,3 +319,4 @@ else:
             else:
                 icount += 1
         print "\t", icount, "inputs and", ocount, "outputs"
+    lib.generate_c()
