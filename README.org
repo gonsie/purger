@@ -4,3 +4,8 @@
 ** Dependencies
 
    [[https://github.com/dabeaz/ply][Python Lex-Yacc by dabeaz]]
+
+** Todo
+   - gate functions should take input, output, and current_state vectors
+   - ablity to print stats for gates/library
+
