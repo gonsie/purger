@@ -64,13 +64,6 @@ names = {}
 ### module & gate tracking
 from collections import defaultdict
 
-# note: the parser recurses first, so 'current module type' isn't know until end
-current_module_type = ""
-current_connection_set = set()
-current_module_instance_names = []
-module_type_instances = defaultdict(list)
-module_type_connections = defaultdict(set)
-
 def p_source_text(t):
     'source_text : description'
     t[0] = ('source_text', t[1])
@@ -160,23 +153,11 @@ def p_module_item_module(t):
     'module_item : ID module_instance more_modules SEMI'
     names[t[1]] = t[1]
     t[0] = ('module_item', names[t[1]], t[2], t[3], ';')
-    global current_module_type
-    global current_connection_set
-    global current_module_instance_names
-    global module_type_instances
-    global module_type_connections
-    current_module_type = t[1]
-    module_type_instances[current_module_type].extend(current_module_instance_names)
-    module_type_connections[current_module_type] |= current_connection_set
-    current_module_instance_names = []
-    current_connection_set = set()
 
 def p_module_instance(t):
     'module_instance : ID LPAREN list_of_module_connections RPAREN'
     names[t[1]] = t[1]
     t[0] = ('module_instance', names[t[1]], '(', t[3], ')')
-    global current_module_instance_names
-    current_module_instance_names.append(t[1])
 
 def p_more_modules(t):
     'more_modules : COMMA module_instance more_modules'
@@ -197,21 +178,15 @@ def p_list_of_module_connections_e(t):
 def p_port_connection(t):
     'port_connection : primary'
     t[0] = ('port_connection', t[1])
-    global current_connection_set
-    current_connection_set.add(t[1])
 
 def p_port_connection_dot(t):
     'port_connection : DOT ID LPAREN primary RPAREN'
     names[t[2]] = t[2]
     t[0] = ('port_connection', '.', names[t[2]], '(', t[4], ')')
-    global current_connection_set
-    current_connection_set.add('.'+names[t[2]])
 
 def p_port_connection_e(t):
     'port_connection :'
     t[0] = ('port_connection', 'EMPTY')
-    global current_connection_set
-    current_connection_set.add('EMPTY')
 
 def p_more_connections(t):
     'more_connections : COMMA port_connection more_connections'
@@ -370,9 +345,3 @@ else:
     tree = yacc.parse(a)
 #    print tree
 #    dot_convert(tree)
-    i = 1
-    for t in module_type_instances:
-        print t
-        for n in module_type_instances[t]:
-            print '\t', n
-        print '\t', module_type_connections[t]
