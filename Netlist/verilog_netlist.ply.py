@@ -64,6 +64,8 @@ names = {}
 ### module & gate tracking
 from collections import defaultdict
 
+mod_count = 0
+
 def p_source_text(t):
     'source_text : description'
     t[0] = ('source_text', t[1])
@@ -158,6 +160,8 @@ def p_module_instance(t):
     'module_instance : ID LPAREN list_of_module_connections RPAREN'
     names[t[1]] = t[1]
     t[0] = ('module_instance', names[t[1]], '(', t[3], ')')
+    global mod_count
+    mod_count += 1
 
 def p_more_modules(t):
     'more_modules : COMMA module_instance more_modules'
@@ -345,3 +349,4 @@ else:
     tree = yacc.parse(a)
 #    print tree
 #    dot_convert(tree)
+    print mod_count

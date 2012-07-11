@@ -188,6 +188,10 @@ class Att:
             else:
                 icount += 1
         output += "\t//" + str(icount) + " inputs and " + str(ocount) + " outputs\n"
+        if "ff" in self.atts:
+            print "testing FF:", self.atts["ff"]
+        if "statetable" in self.atts:
+            print "testing ST:", self.atts["statetable"]
         output += "}\n"
         return output
     
