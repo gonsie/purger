@@ -1,0 +1,16 @@
+Boolean Expression Parsing Rules
+
+expression  bool
+bool        bool OR join
+bool        join
+join        join AND expr
+join        expr
+expr        expr XOR unary
+expr        unary
+unary       unary NOT
+unary       NOT unary
+unary       factor
+factor      ONE
+factor	    ZERO
+facton	    PIN
+ 
