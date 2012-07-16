@@ -321,4 +321,4 @@ def create_parser():
     def p_error(t):
         print "Syntax error at", t.value, "type", t.type, "on line", t.lexer.lineno
     
-    return yacc.yacc()
+    return yacc.yacc(tabmodule='ply_verilog_netlist_parsetab')

@@ -6,7 +6,6 @@ import ply.lex as lex
 
 reserved = {
     'library' : 'LIBRARY',
-
     'define' : 'DEFINE',
     'define_group' : 'DEFINE_GROUP',
 }
@@ -16,7 +15,7 @@ tokens = [
     'COMMA', 'SEMI', 'COLON',
     'LPAR', 'RPAR', 'LCURLY', 'RCURLY', 
     'NUM', 'STR', 'ID',
-]
+] + list(reserved.values())
 
 def create_lexer():
 
@@ -97,7 +96,7 @@ def create_parser():
         '''simple_attribute : ID COLON STR
                             | ID COLON ID
                             | ID COLON NUM'''
-        t[0] = Att(t[1])
+        t[0] = liberty.Att(t[1])
         t[0].set_simple(t[3])
 
     def p_simple_attribute_semi(t):
@@ -112,7 +111,7 @@ def create_parser():
         a = [t[3]]
         if t[4] != None:
             a.extend(t[4])
-        t[0] = Att(t[1])
+        t[0] = liberty.Att(t[1])
         if t[6] != None:
             t[0].set_group(a, t[6])
         else:
@@ -149,4 +148,4 @@ def create_parser():
     def p_error(t):
         print "Syntax error at", t.value, "type", t.type, "on line", t.lexer.lineno
 
-    return yacc.yacc()
+    return yacc.yacc(tabmodule='ply_liberty_parsetab')
