@@ -59,7 +59,7 @@ def create_lexer(nets={}):
         print "Illegal character '%s'" % t.value[0]
         t.lexer.skip(1)
 
-    return lex.lex()
+    return lex.lex(errorlog=lex.NullLogger())
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
