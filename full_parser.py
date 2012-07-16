@@ -48,7 +48,10 @@ if __name__ == "__main__":
 		cell = l.result.get_cell(cell_name)
 		pd = l.result.pin_dict(cell_name)
 		pm = l.result.pin_map(cell_name)
+
+		# this only works because of introspection at runtime
 		ply_boolean_expressions.update(pd, pm)
+		
 		for p in pd:
 			print cell_name, ":", p
 			if cell.pins[p].name != 'internal':
