@@ -17,12 +17,12 @@ class PLYPair:
 
 		return self.parser.parse(a, lexer=self.lexer)
 
-from Netlist import verilog_netlist
+import Netlist.verilog_netlist as vn
 
 if __name__ == "__main__":
 		vn = PLYPair()
 		vn.set_lexer(verilog_netlist.create_lexer({'and':'CELL','or':'CELL'}))
 		vn.set_parser(verilog_netlist.create_parser())
-		vn.parse('example_netlist.v')
+		vn.parse('Netlist/example_netlist.v')
 
 
