@@ -3,6 +3,7 @@ class PLYPair:
 	def __init__(self, l=None, p=None):
 		self.lexer = l
 		self.parser = p
+		self.result = None
 
 	def set_lexer(self, l):
 		self.lexer = l
@@ -14,8 +15,7 @@ class PLYPair:
 		f = open(fname, 'r')
 		a = f.read()
 		f.close()
-
-		return self.parser.parse(a, lexer=self.lexer)
+		self.result = self.parser.parse(a, lexer=self.lexer)
 
 import ply_verilog_netlist
 import ply_liberty

@@ -9,14 +9,15 @@ re_tokens = [
 ]
 
 import ply.lex as lex
-def creat_lexer(pins={}, pin_map={}):
+def create_lexer(pins={}, pin_map={}):
 
 	global reserved
 	reserved.update(pins)
 
 	global tokens
 	tokens = re_tokens + list(reserved.values())
-
+	if len(pins) is 0:
+		tokens.append('PIN')
 
 	t_NOT_A = r'\''
 	t_NOT_B = r'\!'
