@@ -129,9 +129,9 @@ def create_parser():
 
     def p_args(t):
         'args : COMMA arg args'
-        t[0] = [t[1]]
-        if t[2] != None:
-            t[0].extend(t[2])
+        t[0] = [t[2]]
+        if t[3] != None:
+            t[0].extend(t[3])
 
     def p_args_e(t):
         'args :'
