@@ -1,4 +1,4 @@
 ply/
 parselog.txt
 parsetab.py
-parsetab.pyc
+*.pyc
