@@ -11,11 +11,14 @@ class PLYPair:
 	def set_parser(self, p):
 		self.parser = p
 
-	def parse(self, fname):
+	def parse_file(self, fname):
 		f = open(fname, 'r')
 		a = f.read()
 		f.close()
-		self.result = self.parser.parse(a, lexer=self.lexer)
+		return self.parse(a)
+
+	def parse(self, text):
+		self.result = self.parser.parse(text, lexer=self.lexer)
 		return self.result
 
 import ply_verilog_netlist
@@ -27,21 +30,30 @@ if __name__ == "__main__":
 	l = PLYPair()
 	l.set_lexer(ply_liberty.create_lexer())
 	l.set_parser(ply_liberty.create_parser())
-	l.parse('Examples/example_library.lib')
+	l.parse_file('Examples/example_library.lib')
 	cd = l.result.cell_dict()
-	pd = l.result.pin_dict('AND2')
-	pm = l.result.pin_map('AND2')
 
 	print "\n*** Verilog Netlist Parser"
 	vn = PLYPair()
 	vn.set_lexer(ply_verilog_netlist.create_lexer(cd))
 	vn.set_parser(ply_verilog_netlist.create_parser())
-	vn.parse('Examples/example_netlist.v')
+	vn.parse_file('Examples/example_netlist.v')
 
 	print "\n*** Boolean Expression Parser"
 	be = PLYPair()
-	be.set_lexer(ply_boolean_expressions.create_lexer(pd, pm))
+	be.set_lexer(ply_boolean_expressions.create_lexer())
 	be.set_parser(ply_boolean_expressions.create_parser())
-	be.parse('Examples/example_boolexp.txt')
+
+	for cell_name in cd:
+		cell = l.result.get_cell(cell_name)
+		pd = l.result.pin_dict(cell_name)
+		pm = l.result.pin_map(cell_name)
+		ply_boolean_expressions.update(pd, pm)
+		for p in pd:
+			print cell_name, ":", p
+			if cell.pins[p].name != 'internal':
+				if cell.pins[p].atts['direction'].value == 'output':
+					print "Parsing:", cell.pins[p].atts['function'].value, "=>", be.parse(cell.pins[p].atts['function'].value)
+	# be.parse_file('Examples/example_boolexp.txt')
 
 

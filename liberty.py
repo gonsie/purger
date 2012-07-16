@@ -21,6 +21,9 @@ class Lib:
             for p in self.cells[a].pins:
                 output += "    - " + str(a.pins[p]) + "\n"
         return output
+
+    def get_cell(self, cell_name):
+        return self.cells[cell_name]
     
     def cell_dict(self):
         cd = {}
@@ -32,23 +35,36 @@ class Lib:
         pd = {}
         for p in self.cells[cell_name].pins:
             pd[p] = 'PIN'
+        if 'ff' in self.cells[cell_name].atts:
+            for a in self.cells[cell_name].atts['ff'].args:
+                pd[a] = 'PIN'
         return pd
 
     def pin_map(self, cell_name):
         pm = {}
         i_count = 0
         o_count = 0
+        c_count = 0
         plist = []
         for p in self.cells[cell_name].pins:
             plist.append(p)
+        if 'ff' in self.cells[cell_name].atts:
+            for a in self.cells[cell_name].atts['ff'].args:
+                plist.append(a)
         plist.sort()
         for p in plist:
-            if self.cells[cell_name].pins[p].atts['direction'].value == 'output':
+            if self.cells[cell_name].pins[p].name == 'internal':
+                pm[p] = 'current[' + str(c_count) + ']'
+                c_count += 1
+            elif self.cells[cell_name].pins[p].atts['direction'].value == 'output':
                 pm[p] = 'output[' + str(o_count) + ']'
                 o_count += 1
-            else:
+            elif self.cells[cell_name].pins[p].atts['direction'].value == 'input':
                 pm[p] = 'input[' + str(i_count) + ']'
                 i_count += 1
+            else:
+                pm[p] = 'current[' + str(c_count) + ']'
+                c_count += 1
         return pm
 
 
@@ -114,6 +130,9 @@ class Att:
             for a in v[0]:
                 if a.name == "pin":
                     self.pins[a.label] = a
+                elif a.name == "ff":
+                    for internal in a.args:
+                        self.pins[internal] = Att('internal')
                 else:
                     self.atts[a.name] = a
         else:

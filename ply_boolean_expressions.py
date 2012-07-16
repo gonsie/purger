@@ -124,3 +124,15 @@ def create_parser():
 	    print "Syntax error at", t.value, "type", t.type, "on line", t.lexer.lineno
 
 	return yacc.yacc(tabmodule='ply_boolean_expressions_parsetab')
+
+def update(pins, pin_map):
+	global pinmap
+	pinmap = pin_map
+
+	global reserved
+	reserved.update(pins)
+
+	global tokens
+	tokens = re_tokens + list(reserved.values())
+	if len(pins) is 0:
+		tokens.append('PIN')
