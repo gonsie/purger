@@ -32,6 +32,9 @@ if __name__ == "__main__":
 	l.set_parser(ply_liberty.create_parser())
 	l.parse_file('Examples/example_library.lib')
 	cd = l.result.cell_dict()
+	print l.result.stats()
+	for c in cd:
+		print l.result.stats(c)
 
 	print "\n*** Verilog Netlist Parser"
 	vn = PLYPair()
@@ -51,7 +54,7 @@ if __name__ == "__main__":
 
 		# this only works because of introspection at runtime
 		ply_boolean_expressions.update(pd, pm)
-		
+
 		for p in pd:
 			print cell_name, ":", p
 			if cell.pins[p].name != 'internal':

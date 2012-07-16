@@ -67,7 +67,6 @@ class Lib:
                 c_count += 1
         return pm
 
-
     def generate_c(self):
         comments = "//Elsa Gonsiorowski\n"
         comments += "//Automatically Generated on " + datetime.datetime.now().isoformat() + "\n"
@@ -106,6 +105,15 @@ class Lib:
         hf.close()
         cf.write("\n")
         cf.close()
+
+    def stats(self, cell_name=None):
+        output = "Library " + self.name
+        if cell_name:
+            return self.cells[cell_name].stats()
+        output += "\n\t" + str(len(self.cells)) + " cells " + str(self.cells.keys())
+        return output
+
+
 
 class Att:
     def __init__(self, name):
@@ -172,6 +180,27 @@ class Att:
         l = self.pins.keys()
         l.sort()
         return l
+
+    # ONLY FOR CELLS
+    def stats(self):
+        output = self.label
+        c_count = []
+        i_count = []
+        o_count = []
+        for p in self.pins:
+            if self.pins[p].name == 'internal':
+                c_count.append(p)
+            elif self.pins[p].atts['direction'].value == 'output':
+                o_count.append(p)
+            else:
+                i_count.append(p)
+        i_count.sort()
+        o_count.sort()
+        c_count.sort()
+        output += "\n\t" + str(len(i_count)) + " input pins " + str(i_count)
+        output += "\n\t" + str(len(o_count)) + " output pins " + str(o_count)
+        output += "\n\t" + str(len(c_count)) + " internal pins " + str(c_count)
+        return output
     
     def __repr__(self):
         output = ""
