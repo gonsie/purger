@@ -19,6 +19,7 @@ class PLYPair:
 
 import ply_verilog_netlist
 import ply_liberty
+import ply_boolean_expressions
 
 if __name__ == "__main__":
 	print "\n*** Liberty Parser"
@@ -32,5 +33,11 @@ if __name__ == "__main__":
 	vn.set_lexer(ply_verilog_netlist.create_lexer({'and':'CELL','or':'CELL'}))
 	vn.set_parser(ply_verilog_netlist.create_parser())
 	vn.parse('Examples/example_netlist.v')
+
+	print "\n*** Boolean Expression Parser"
+	be = PLYPair()
+	be.set_lexer(ply_boolean_expressions.create_lexer())
+	be.set_parser(ply_boolean_expressions.create_parser())
+	be.parse('Examples/example_boolexp.txt')
 
 
