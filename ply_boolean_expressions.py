@@ -49,7 +49,7 @@ def create_lexer(pins={}, pin_map={}):
 	    print "Illegal character '", t.value[0], "' at", t.lexer.lineno
 	    t.lexer.skip(1)
 
-	return lex.lex()
+	return lex.lex(errorlog=lex.NullLogger())
 
 import ply.yacc as yacc
 def create_parser():
