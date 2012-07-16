@@ -5,7 +5,8 @@
 			"name" : "gate-parser",
 			"folder_exclude_patterns" : ["ply"],
 			"file_exclude_patterns" : [
-				"parselog.txt", "parsetab.py", "parser.out", //ply generated files
+				"parselog.txt", "*parsetab.py", "parser.out", //ply generated files
+                                "*.pyc",
 				"sublime-project", ".gitignore"
 			]
 		}
