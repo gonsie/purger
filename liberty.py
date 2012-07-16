@@ -22,6 +22,36 @@ class Lib:
                 output += "    - " + str(a.pins[p]) + "\n"
         return output
     
+    def cell_dict(self):
+        cd = {}
+        for c in self.cells:
+            cd[c] = 'CELL'
+        return cd
+
+    def pin_dict(self, cell_name):
+        pd = {}
+        for p in self.cells[cell_name].pins:
+            pd[p] = 'PIN'
+        return pd
+
+    def pin_map(self, cell_name):
+        pm = {}
+        i_count = 0
+        o_count = 0
+        plist = []
+        for p in self.cells[cell_name].pins:
+            plist.append(p)
+        plist.sort()
+        for p in plist:
+            if self.cells[cell_name].pins[p].atts['direction'].value == 'output':
+                pm[p] = 'output[' + str(o_count) + ']'
+                o_count += 1
+            else:
+                pm[p] = 'input[' + str(i_count) + ']'
+                i_count += 1
+        return pm
+
+
     def generate_c(self):
         comments = "//Elsa Gonsiorowski\n"
         comments += "//Automatically Generated on " + datetime.datetime.now().isoformat() + "\n"

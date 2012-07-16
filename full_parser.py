@@ -16,6 +16,7 @@ class PLYPair:
 		a = f.read()
 		f.close()
 		self.result = self.parser.parse(a, lexer=self.lexer)
+		return self.result
 
 import ply_verilog_netlist
 import ply_liberty
@@ -27,16 +28,19 @@ if __name__ == "__main__":
 	l.set_lexer(ply_liberty.create_lexer())
 	l.set_parser(ply_liberty.create_parser())
 	l.parse('Examples/example_library.lib')
+	cd = l.result.cell_dict()
+	pd = l.result.pin_dict('AND2')
+	pm = l.result.pin_map('AND2')
 
 	print "\n*** Verilog Netlist Parser"
 	vn = PLYPair()
-	vn.set_lexer(ply_verilog_netlist.create_lexer({'and':'CELL','or':'CELL'}))
+	vn.set_lexer(ply_verilog_netlist.create_lexer(cd))
 	vn.set_parser(ply_verilog_netlist.create_parser())
 	vn.parse('Examples/example_netlist.v')
 
 	print "\n*** Boolean Expression Parser"
 	be = PLYPair()
-	be.set_lexer(ply_boolean_expressions.create_lexer())
+	be.set_lexer(ply_boolean_expressions.create_lexer(pd, pm))
 	be.set_parser(ply_boolean_expressions.create_parser())
 	be.parse('Examples/example_boolexp.txt')
 

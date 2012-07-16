@@ -27,9 +27,6 @@ def create_lexer(nets={}):
 
     global tokens
     tokens = re_tokens + list(reserved.values())
-    
-
-    print tokens
 
     t_SEMI = r';'
     t_LPAREN = r'\('

@@ -8,8 +8,13 @@ re_tokens = [
 	'NOT_B', 'NOT_A', 'XOR', 'AND', 'OR', 'ONE', 'ZERO', 'ID',
 ]
 
+pinmap = {}
+
 import ply.lex as lex
 def create_lexer(pins={}, pin_map={}):
+
+	global pinmap
+	pinmap = pin_map
 
 	global reserved
 	reserved.update(pins)
@@ -113,7 +118,7 @@ def create_parser():
 
 	def p_factor_pin(t):
 		'factor : PIN'
-		t[0] = pin_map[t[1]]
+		t[0] = pinmap[t[1]]
 
 	def p_error(t):
 	    print "Syntax error at", t.value, "type", t.type, "on line", t.lexer.lineno
