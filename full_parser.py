@@ -31,10 +31,8 @@ if __name__ == "__main__":
 	l.set_lexer(ply_liberty.create_lexer())
 	l.set_parser(ply_liberty.create_parser())
 	l.parse_file('Examples/example_library.lib')
-	cd = l.result.cell_dict()
-	print l.result.stats()
-	for c in cd:
-		print l.result.stats(c)
+	cd = l.result.cell_tokens()
+	print l.result.stats
 
 	print "\n*** Verilog Netlist Parser"
 	vn = PLYPair()
@@ -49,17 +47,14 @@ if __name__ == "__main__":
 
 	for cell_name in cd:
 		cell = l.result.get_cell(cell_name)
-		pd = l.result.pin_dict(cell_name)
-		pm = l.result.pin_map(cell_name)
+		pd = cell.pin_tokens()
+		pm = cell.pin_map()
 
 		# this only works because of introspection at runtime
 		ply_boolean_expressions.update(pd, pm)
 
-		for p in pd:
-			print cell_name, ":", p
-			if cell.pins[p].name != 'internal':
-				if cell.pins[p].atts['direction'].value == 'output':
-					print "Parsing:", cell.pins[p].atts['function'].value, "=>", be.parse(cell.pins[p].atts['function'].value)
-	# be.parse_file('Examples/example_boolexp.txt')
+		print cell_name
+		for p in cell.boolexps():
+			print "\tPin", p.name, "=", p.function, "\t--> ", p.cstr, "=", be.parse(p.function)
 
 

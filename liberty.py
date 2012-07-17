@@ -1,3 +1,5 @@
+# Constructed when parsing is complete
+# Turns a heirarchy of Atts into Cell and Pin objects
 class Lib:
     def __init__(self, name, all_atts):
         self.name = name.lower()
@@ -5,10 +7,13 @@ class Lib:
         self.attributes = dict()
         for a in all_atts:
             if a.name == "cell":
-                self.cells[a.label] = a
+                self.cells[a.label] = Cell(a.label, a)
             else:
                 self.attributes[a.name] = a
-    
+        self.stats = self.gen_stats()
+        for c in self.cells:
+            self.stats += self.gen_stats(c)
+
     def __repr__(self):
         output = ""
         output += "* Library " + self.name + "\n"
@@ -22,99 +27,109 @@ class Lib:
                 output += "    - " + str(a.pins[p]) + "\n"
         return output
 
+    def get_cells(self):
+        return self.cells.values()
+    
     def get_cell(self, cell_name):
         return self.cells[cell_name]
     
-    def cell_dict(self):
+    def cell_tokens(self):
         cd = {}
         for c in self.cells:
             cd[c] = 'CELL'
         return cd
 
-    def pin_dict(self, cell_name):
-        pd = {}
-        for p in self.cells[cell_name].pins:
-            pd[p] = 'PIN'
-        if 'ff' in self.cells[cell_name].atts:
-            for a in self.cells[cell_name].atts['ff'].args:
-                pd[a] = 'PIN'
-        return pd
-
-    def pin_map(self, cell_name):
-        pm = {}
-        i_count = 0
-        o_count = 0
-        c_count = 0
-        plist = []
-        for p in self.cells[cell_name].pins:
-            plist.append(p)
-        if 'ff' in self.cells[cell_name].atts:
-            for a in self.cells[cell_name].atts['ff'].args:
-                plist.append(a)
-        plist.sort()
-        for p in plist:
-            if self.cells[cell_name].pins[p].name == 'internal':
-                pm[p] = 'current[' + str(c_count) + ']'
-                c_count += 1
-            elif self.cells[cell_name].pins[p].atts['direction'].value == 'output':
-                pm[p] = 'output[' + str(o_count) + ']'
-                o_count += 1
-            elif self.cells[cell_name].pins[p].atts['direction'].value == 'input':
-                pm[p] = 'input[' + str(i_count) + ']'
-                i_count += 1
-            else:
-                pm[p] = 'current[' + str(c_count) + ']'
-                c_count += 1
-        return pm
-
-    def generate_c(self):
-        comments = "//Elsa Gonsiorowski\n"
-        comments += "//Automatically Generated on " + datetime.datetime.now().isoformat() + "\n"
-        comments += "//From Liberty Library " + self.name + ".lib\n\n"
-        hf = open('lib_'+self.name+'_gate.h', 'w')
-        hf.write(comments)
-        hf.write("#ifndef _gate_h\n#define _gate_h\n\n")
-        cf = open('lib_'+self.name+'_gate.c', 'w')
-        cf.write(comments)
-        cf.write("#include \"gates_model.h\"\n#include \"gate.h\"\n\n")
-        max_i = 0
-        max_o = 0
-        gate_count = 0
-        for c in self.cells:
-            cell = lib.cells[c]
-            ocount = 0
-            icount = 0
-            hf.write("#define " + c + "_GATE (" + str(gate_count) + ")\n")
-            gate_count += 1
-            for p in cell.pins:
-                pin = cell.pins[p]
-                if pin.atts['direction'].value == 'output':
-                    #print "\t", p, "\t", pin.atts['function']
-                    ocount += 1
-                else:
-                    icount += 1
-            cf.write(cell.generate_c())
-            cf.write("\n")
-            #print "\t", icount, "inputs and", ocount, "outputs"
-            max_i = max(max_i, icount)
-            max_o = max(max_o, ocount)
-        hf.write("\n#define MAX_GATE_INPUTS " + str(max_i))
-        hf.write("\n#define MAX_GATE_OUTPUTS " + str(max_o))
-        hf.write("\n#define GATE_TYPE_COUNT " + str(gate_count))
-        hf.write("\n#endif\n")
-        hf.close()
-        cf.write("\n")
-        cf.close()
-
-    def stats(self, cell_name=None):
-        output = "Library " + self.name
+    def gen_stats(self, cell_name=None):
+        output = "Library " + self.name + ":\n"
         if cell_name:
-            return self.cells[cell_name].stats()
-        output += "\n\t" + str(len(self.cells)) + " cells " + str(self.cells.keys())
+            return self.cells[cell_name].stats
+        output += "\t" + str(len(self.cells)) + " cells " + str(self.cells.keys()) + "\n"
         return output
 
+class Pin:
+    def __init__(self, p_name, p):
+        self.name = p_name
+        if p.name == "internal":
+            self.direction = "internal"
+            self.vector = "current"
+            self.function = None
+        else:
+            self.direction = p.atts['direction'].value
+            self.vector = self.direction
+            if 'function' in p.atts:
+                self.function = p.atts['function'].value
+            else:
+                self.function = None
+        self.cstr = ""
+        self.original = p
 
+    def gen_c(self, index):
+        s = self.vector + "[" + str(index) + "]"
+        self.cstr = s
+        return s
 
+    def has_function(self):
+        return self.function != None
+
+class Cell:
+    def __init__(self, c_name, c):
+        self.name = c_name
+        if 'statetable' in c.atts:
+            self.statetable = c.atts['statetable']
+        else:
+            self.statetable = None
+        if 'ff' in c.atts:
+            self.ff = c.atts['ff']
+        else:
+            self.ff = None
+        self.pins = []
+        for p in c.pins:
+            self.pins.append(Pin(p, c.pins[p]))
+        self.pins.sort(key=lambda x: x.name)
+        self.stats = self.gen_stats()
+        self.original = c
+
+    def pin_map(self):
+        pm = {}
+        for p in self.pins:
+            pm[p.name] = p.cstr
+        return pm
+
+    def pin_tokens(self):
+        pt = {}
+        for p in self.pins:
+            pt[p.name] = 'PIN'
+        return pt
+
+    def boolexps(self):
+        be = []
+        for p in self.pins:
+            if p.has_function():
+                be.append(p)
+        return be
+
+    def gen_stats(self):
+        output = "Cell " + self.name + ":\n"
+        self.inputs = []
+        self.internals = []
+        self.outputs = []
+        for p in self.pins:
+            if p.direction == 'input':
+                p.gen_c(len(self.inputs))
+                self.inputs.append(p.name)
+            elif p.direction == 'internal':
+                p.gen_c(len(self.internals))
+                self.internals.append(p.name)
+            elif p.direction == 'output':
+                p.gen_c(len(self.outputs))
+                self.outputs.append(p.name)
+        output += "\t" + str(len(self.inputs)) + " input pins " + str(self.inputs) + "\n"
+        if len(self.internals) != 0:
+            output += "\t" + str(len(self.internals)) + " internal pins " + str(self.internals) + "\n"
+        output += "\t" + str(len(self.outputs)) + " output pins " + str(self.outputs) + "\n"
+        return output
+
+# This generic class is used during parsing, for simple object construction
 class Att:
     def __init__(self, name):
         self.name = name.lower()
@@ -147,61 +162,7 @@ class Att:
             self.atts = dict()
             for i in v[0]:
                 self.atts[i.name] = i
-    
-    # ONLY FOR CELLS
-    def generate_c(self):
-        if self.name != "cell":
-            print "ERROR: generate_c() function undefined for type", self.name
-            return
-        output = "int " + self.label + "_func (vector input, vector output) {\n"
-#        output += "\tint change_flag = FALSE\n"
-        ocount = 0
-        icount = 0
-        for p in self.pins:
-            pin = self.pins[p]
-            if pin.atts['direction'].value == 'output':
-                output += "\t//" + pin.label + " = " + pin.atts['function'].value + "\n"
-                ocount += 1
-            else:
-                icount += 1
-        output += "\t//" + str(icount) + " inputs and " + str(ocount) + " outputs\n"
-        if "ff" in self.atts:
-            print "testing FF:", self.atts["ff"]
-        if "statetable" in self.atts:
-            print "testing ST:", self.atts["statetable"]
-        output += "}\n"
-        return output
-    
-    # ONLY FOR CELLS
-    def pins(self):
-        if self.name != "cell":
-            print "ERROR: pin() function undefined for type", self.name
-            return
-        l = self.pins.keys()
-        l.sort()
-        return l
-
-    # ONLY FOR CELLS
-    def stats(self):
-        output = self.label
-        c_count = []
-        i_count = []
-        o_count = []
-        for p in self.pins:
-            if self.pins[p].name == 'internal':
-                c_count.append(p)
-            elif self.pins[p].atts['direction'].value == 'output':
-                o_count.append(p)
-            else:
-                i_count.append(p)
-        i_count.sort()
-        o_count.sort()
-        c_count.sort()
-        output += "\n\t" + str(len(i_count)) + " input pins " + str(i_count)
-        output += "\n\t" + str(len(o_count)) + " output pins " + str(o_count)
-        output += "\n\t" + str(len(c_count)) + " internal pins " + str(c_count)
-        return output
-    
+        
     def __repr__(self):
         output = ""
         if self.name == "cell" or self.name == "pin":
