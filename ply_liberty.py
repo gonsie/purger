@@ -69,9 +69,6 @@ import liberty
 def create_parser():
     precedence = ()
 
-    # all used IDs
-    names = {}
-
     def p_library(t):
         'library : LIBRARY LPAR ID RPAR LCURLY attributes RCURLY'
         #t[0] = ('library', 'library', '(', t[3], ')', '{', t[6], '}')
