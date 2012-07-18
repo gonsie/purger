@@ -58,7 +58,7 @@ if __name__ == "__main__":
 			print cell_name
 			for p in cell.boolexps():
 				print "\tPin", p.name, "=", p.function, "\t--> ", p.cstr, "=", be.parse(p.function)
-				
+
 	# lsi_10k example
 	lsi_lib = PLYPair()
 	lsi_lib.set_lexer(ply_liberty.create_lexer())
@@ -71,6 +71,7 @@ if __name__ == "__main__":
 	ccx.set_lexer(ply_verilog_netlist.create_lexer(cd))
 	ccx.set_parser(ply_verilog_netlist.create_parser())
 	ccx.parse_file('Examples/ccx_lsi.vSyn')
+	print ccx.result
 
 
 

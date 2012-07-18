@@ -170,13 +170,14 @@ def create_parser():
         'module_item : CELL module_instance more_modules SEMI'
         t[2].set_type(t[1])
         t[0] = [t[2]]
-        for m in t[3]:
-            m.set_type(t[1])
-            t[0].append(m)
+        if t[3] != None:
+            for m in t[3]:
+                m.set_type(t[1])
+                t[0].append(m)
 
     def p_module_instance(t):
         'module_instance : ID LPAREN list_of_module_connections RPAREN'
-        t[0] = netlist.Module(t[1], t[3])
+        t[0] = netlist.Net(t[1], t[3])
 
     def p_more_modules(t):
         'more_modules : COMMA module_instance more_modules'
