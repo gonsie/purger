@@ -1,0 +1,1186 @@
+library (gtech) {
+	date : "July 17, 2012" ;
+	revision : 0.1;
+
+	cell (GTECH_NOT) {
+		pin (A) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "A'"
+		}
+	}
+	cell (GTECH_BUF) {
+		pin (A) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "A"
+		}
+	}
+
+	cell (GTECH_AND2) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "A B"
+		}
+	}
+	cell (GTECH_AND3) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "A B C"
+		}
+	}
+	cell (GTECH_AND4) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (D) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "A B C D"
+		}
+	}	
+	cell (GTECH_AND5) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (D) {
+			direction : input;
+		}
+		pin (E) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "A B C D E"
+		}
+	}
+	cell (GTECH_AND8) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (D) {
+			direction : input;
+		}
+		pin (E) {
+			direction : input;
+		}
+		pin (F) {
+			direction : input;
+		}
+		pin (G) {
+			direction : input;
+		}
+		pin (H) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "A B C D E F G H"
+		}
+	}
+
+	cell (GTECH_NAND2) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "(A B)'"
+		}
+	}
+	cell (GTECH_NAND3) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "(A B C)'"
+		}
+	}
+	cell (GTECH_NAND4) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (D) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "(A B C D)'"
+		}
+	}	
+	cell (GTECH_NAND5) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (D) {
+			direction : input;
+		}
+		pin (E) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "(A B C D E)'"
+		}
+	}
+	cell (GTECH_NAND8) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (D) {
+			direction : input;
+		}
+		pin (E) {
+			direction : input;
+		}
+		pin (F) {
+			direction : input;
+		}
+		pin (G) {
+			direction : input;
+		}
+		pin (H) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "(A B C D E F G H)'"
+		}
+	}
+
+	cell (GTECH_OR2) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "A+B"
+		}
+	}
+	cell (GTECH_OR3) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "A+B+C"
+		}
+	}
+	cell (GTECH_OR4) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (D) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "A+B+C+D"
+		}
+	}
+	cell (GTECH_OR5) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (D) {
+			direction : input;
+		}
+		pin (E) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "A+B+C+D+E"
+		}
+	}
+	cell (GTECH_OR8) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (D) {
+			direction : input;
+		}
+		pin (E) {
+			direction : input;
+		}
+		pin (F) {
+			direction : input;
+		}
+		pin (G) {
+			direction : input;
+		}
+		pin (H) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "A+B+C+D+E+F+G+H"
+		}
+	}
+
+	cell (GTECH_NOR2) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "(A+B)'"
+		}
+	}
+	cell (GTECH_NOR3) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "(A+B+C)'"
+		}
+	}
+	cell (GTECH_NOR4) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (D) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "(A+B+C+D)'"
+		}
+	}	
+	cell (GTECH_NOR5) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (D) {
+			direction : input;
+		}
+		pin (E) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "(A+B+C+D+E)'"
+		}
+	}
+	cell (GTECH_NOR8) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (D) {
+			direction : input;
+		}
+		pin (E) {
+			direction : input;
+		}
+		pin (F) {
+			direction : input;
+		}
+		pin (G) {
+			direction : input;
+		}
+		pin (H) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "(A+B+C+D+E+F+G+H)'"
+		}
+	}
+
+	cell (GTECH_XOR2) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "A^B"
+		}
+	}
+	cell (GTECH_XOR3) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "A^B^C"
+		}
+	}
+	cell (GTECH_XOR4) {	
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (D) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "A^B^C^D"
+		}
+	}
+
+	cell (GTECH_XNOR2) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "(A^B)'"
+		}
+	}
+	cell (GTECH_XNOR3) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "(A^B^C)'"
+		}
+	}
+	cell (GTECH_XNOR4) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (D) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "(A^B^C^D)'"
+		}
+	}	
+
+	cell (GTECH_AND_NOT) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "A B'"
+		}
+	}
+	cell (GTECH_OR_NOT) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "A+B'"
+		}
+	}
+
+	cell (GTECH_AO21) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "(A B)+C"
+		}
+	}
+	cell (GTECH_OA21) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "(A+B) C"
+		}
+	}
+	cell (GTECH_AO22) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (D) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "(A B)+(C D)"
+		}
+	}
+	cell (GTECH_OA22) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (D) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "(A+B) (C+D)"
+		}
+	}
+
+	cell (GTECH_AOI21) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "((A B)+C)'"
+		}
+	}
+	cell (GTECH_OAI21) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "((A+B) C)'"
+		}
+	}
+	cell (GTECH_AOI22) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (D) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "((A B)+(C D))'"
+		}
+	}
+	cell (GTECH_OAI22) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (D) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "((A+B) (C+D))'"
+		}
+	}
+
+	cell (GTECH_AOI222) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (D) {
+			direction : input;
+		}
+		pin (E) {
+			direction : input;
+		}
+		pin (F) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "((A B)+(C D)+(E F))'"
+		}
+	}
+
+	cell (GTECH_AOI2N2) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (D) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "((A B)+(C+D)')'"
+		}
+	}
+	cell (GTECH_OAI2N2) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (D) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "((A+B) (C D)')'"
+		}
+	}
+
+	cell (GTECH_MAJ23) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "(A B)+(A C)+(B C)"
+		}
+	}
+
+	cell (GTECH_MUX2) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (S) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "(S'A+S B)"
+		}
+	}
+	cell (GTECH_MUXI2) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (S) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "(S'A+S B)'"
+		}
+	}
+	cell(GTECH_MUX4) {
+  		pin(D0) {
+  			direction : input;
+	    }
+  		pin(D1) {
+  			direction : input;
+  		}
+		pin(D2) {
+			direction : input;
+		}
+		pin(D3) {
+			direction : input;
+		}
+		pin(A) {
+			direction : input;
+		}
+		pin(B) {
+			direction : input;
+		}
+		pin(Z) {
+			direction : output;
+			function : "((D0 A'B')+(D1 A B')+(D2 A'B)+(D3 A B))";
+		}
+	}
+	cell(GTECH_MUX8) {
+  		pin(D0) {
+  			direction : input;
+	    }
+  		pin(D1) {
+  			direction : input;
+  		}
+		pin(D2) {
+			direction : input;
+		}
+		pin(D3) {
+			direction : input;
+		}
+		pin (D4) {
+			direction : input;
+		}
+		pin (D5) {
+			direction : input;
+		}
+		pin (D6) {
+			direction : input;
+		}
+		pin (D7) {
+			direction : input;
+		}
+		pin(A) {
+			direction : input;
+		}
+		pin(B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin(Z) {
+			direction : output;
+			function : "((D0 A'B'C')+(D1 A B'C')+(D2 A'B C')+(D3 A B C')+(D0 A'B'C)+(D1 A B'C)+(D2 A'B C)+(D3 A B C))";
+		}
+	}
+
+	cell (GTECH_ADD_AB) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (S) {
+			direction : output;
+			function : "A^B"
+		}
+		pin (COUT) {
+			direction : output;
+			function : "A B"
+		}
+	}
+	cell (GTECH_ADD_ABC) {
+		pin (A) {
+			direction : input;
+		}
+		pin (B) {
+			direction : input;
+		}
+		pin (C) {
+			direction : input;
+		}
+		pin (S) {
+			direction : output;
+			function : "A^B^C"
+		}
+		pin (COUT) {
+			direction : output;
+			function : "(A B)+(A C)+(B C)"
+		}
+	}
+
+	cell (GTECH_TBUF) {
+		pin (A) {
+			direction : input;
+		}
+		pin (E) {
+			direction : input;
+		}
+		pin (Z) {
+			direction : output;
+			function : "A";
+			three-state : "E'";
+		}		
+	}
+
+	cell (GTECH_INBUF) {
+		pin (PAD_IN) {
+			direction : input;
+		}
+		pin (DATA_IN) {
+			direction : output;
+		}
+	}
+	cell (GTECH_OUTBUF) {
+		pin (DATA_OUT) {
+			direction : input;
+		}
+		pin (OE) {
+			direction : input;
+		}
+		pin (PAD_OUT) {
+			direction : output;
+		}
+	}
+	cell (GTECH_INUOTBUF) {
+		pin (DATA_OUT) {
+			direction : input;
+		}
+		pin (OE) {
+			direction : input;
+		}
+		pin (DATA_IN) {
+			direction : output;
+		}
+		pin (PAD_INOUT) {
+			direction : input/output;
+		}
+	}
+	
+	cell (GTECH_FD1) {
+		pin(D) {
+			direction : input;
+			capacitance : 1;
+			timing() {
+				timing_type : setup_rising;
+				intrinsic_rise : 0.8;
+				intrinsic_fall : 0.8;
+				related_pin : "CP";
+			}
+			timing() {
+				timing_type : hold_rising;
+				intrinsic_rise : 0.4;
+				intrinsic_fall : 0.4;
+				related_pin : "CP";
+			}
+		}
+		pin(CP) {
+			direction : input;
+			capacitance : 1;
+			min_pulse_width_high : 1.5;
+			min_pulse_width_low : 1.5;
+		}
+		/*
+		state("IQ","IQN") {
+		next_state : "D";
+		clocked_on : "CP";
+		}
+		*/
+		ff(IQ, IQN) {
+			next_state : "D";
+			clocked_on : "CP";
+		}
+		statetable ( "  D   CP ", " Q  QN") {
+			table  : "  -  ~R  : - - :  N   N, \
+						H/L  R  : - - : H/L L/H";
+		}
+
+		pin(Q) {
+			direction : output;
+			function : "IQ"
+			internal_node : "Q";
+			timing() {
+				timing_type : rising_edge;
+				intrinsic_rise : 1.09;
+				intrinsic_fall : 1.37;
+				rise_resistance : 0.1458;
+				fall_resistance : 0.0523;
+				related_pin : "CP";
+			}
+		}
+		pin(QN) {
+			direction : output;
+			function : "IQN"
+			internal_node : "QN";
+			timing() {
+				timing_type : rising_edge;
+				intrinsic_rise : 1.59;
+				intrinsic_fall : 1.57;
+				rise_resistance : 0.1458;
+				fall_resistance : 0.0523;
+				related_pin : "CP";
+			}
+		}
+	}
+	cell(FD1S) {
+		area : 9;
+		pin(D) {
+			direction : input;
+			capacitance : 1;
+			timing() {
+				timing_type : setup_rising;
+				intrinsic_rise : 1.3;
+				intrinsic_fall : 1.3;
+				related_pin : "CP";
+			}
+			timing() {
+				timing_type : hold_rising;
+				intrinsic_rise : 0.3;
+				intrinsic_fall : 0.3;
+				related_pin : "CP";
+			}
+		}
+		pin(CP) {
+			direction : input;
+			capacitance : 1;
+			min_pulse_width_high : 1.5;
+			min_pulse_width_low : 1.5;
+		}
+		pin(TI) {
+			direction : input;
+			capacitance : 1;
+			timing() {
+				timing_type : setup_rising;
+				intrinsic_rise : 1.3;
+				intrinsic_fall : 1.3;
+				related_pin : "CP";
+			}
+			timing() {
+				timing_type : hold_rising;
+				intrinsic_rise : 0.3;
+				intrinsic_fall : 0.3;
+				related_pin : "CP";
+			}
+		}
+		pin(TE) {
+			direction : input;
+			capacitance : 2;
+			timing() {
+				timing_type : setup_rising;
+				intrinsic_rise : 1.3;
+				intrinsic_fall : 1.3;
+				related_pin : "CP";
+			}
+			timing() {
+				timing_type : hold_rising;
+				intrinsic_rise : 0.3;
+				intrinsic_fall : 0.3;
+				related_pin : "CP";
+			}
+		}
+		/*
+		state("IQ","IQN") {
+			next_state : " D TE' + TI TE ";
+			clocked_on : "CP";
+		}
+		*/
+		ff("IQ","IQN") {
+			next_state : " D TE' + TI TE ";
+			clocked_on : "CP";
+		}
+		statetable ( "  D   CP  TI   TE  ", " Q   QN") {
+			table  : "  -  ~R   -    -   : - - :  N    N , \
+					-   R  H/L   H   : - - : H/L  L/H, \
+					H/L  R   -    L   : - - : H/L  L/H" ;
+		}
+
+		pin(Q) {
+			direction : output;
+			function : "IQ";
+			internal_node : "Q";
+			timing() {
+				timing_type : rising_edge;
+				intrinsic_rise : 1.09;
+				intrinsic_fall : 1.37;
+				rise_resistance : 0.1458;
+				fall_resistance : 0.0523;
+				related_pin : "CP";
+			}
+		}
+		pin(QN) {
+			direction : output;
+			function : "IQN";
+			internal_node : "QN";
+			timing() {
+				timing_type : rising_edge;
+				intrinsic_rise : 1.59;
+				intrinsic_fall : 1.57;
+				rise_resistance : 0.1458;
+				fall_resistance : 0.0523;
+				related_pin : "CP";
+			}
+		}
+		test_cell() { /* Test cell description for FD1S */
+			pin(D) {
+				direction : input;
+			}
+			pin(CP) {
+				direction : input;
+			}
+			pin(TI) {
+				direction : input;
+				signal_type : "test_scan_in";
+			}
+			pin(TE) {
+				direction : input;
+				signal_type : "test_scan_enable";
+			}
+			/*
+			state("IQ","IQN") { *//* Description of D-FF with out test pins *//*
+				next_state : "D";
+				clocked_on : "CP";
+			}
+			*/
+			ff("IQ","IQN") {  /* Description of D-FF with out test pins */
+				next_state : "D";
+				clocked_on : "CP";
+			}
+			pin(Q) {
+				direction : output;
+				function : "IQ";
+				signal_type : "test_scan_out";
+			}
+			pin(QN) {
+				direction : output;
+				function : "IQN";
+				signal_type : "test_scan_out_inverted";
+			}
+		}
+	}
+	cell (GTECH_) {
+		
+	}
+	cell (GTECH_) {
+		
+	}
+	cell (GTECH_) {
+		
+	}
+	cell (GTECH_) {
+		
+	}
+	cell (GTECH_) {
+		
+	}
+	cell (GTECH_) {
+		
+	}
+	cell (GTECH_) {
+		
+	}
+	cell (GTECH_) {
+		
+	}
+	cell (GTECH_) {
+		
+	}
+	cell (GTECH_) {
+		
+	}
+	cell (GTECH_) {
+		
+	}
+	cell (GTECH_) {
+		
+	}
+	cell (GTECH_) {
+		
+	}cell (GTECH_) {
+		
+	}cell (GTECH_) {
+		
+	}cell (GTECH_) {
+		
+	}cell (GTECH_) {
+		
+	}cell (GTECH_) {
+		
+	}cell (GTECH_) {
+		
+	}cell (GTECH_) {
+		
+	}cell (GTECH_) {
+		
+	}cell (GTECH_) {
+		
+	}cell (GTECH_) {
+		
+	}cell (GTECH_) {
+		
+	}cell (GTECH_) {
+		
+	}cell (GTECH_) {
+		
+	}
+
+
+}
