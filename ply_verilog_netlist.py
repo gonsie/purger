@@ -12,12 +12,12 @@ reserved = {
     'wire' : 'WIRE',
     'assign' : 'ASSIGN',
 }
-    
+
 re_tokens = [
     'SEMI', 'COMMA', 'DOT', 'COLON',
     'EQ', 'BASE', 'SIGN',
     'LPAREN', 'RPAREN',  'LSQUARE', 'RSQUARE',
-    'SFLOAT', 'UNSIGNED', 'ID', 
+    'SFLOAT', 'UNSIGNED', 'ID',
 ]
 
 def create_lexer(nets={}):
@@ -70,10 +70,14 @@ import netlist
 def create_parser():
 
     precedence = ()
-    
+
     def p_module(t):
         'module : MODULE ID list_of_ports SEMI module_items ENDMODULE'
         t[0] = netlist.Module(t[2], t[3], t[5])
+
+    def p_list_of_ports_e(t):
+        'list_of_ports :'
+        pass
 
     def p_list_of_ports(t):
         'list_of_ports : LPAREN port more_ports RPAREN'
@@ -81,16 +85,13 @@ def create_parser():
         if t[3] != None:
             t[0].extend(t[3])
 
-    def p_list_of_ports_e(t):
-        'list_of_ports :'
-        pass
-
     def p_port(t):
         'port : port_expression'
         t[0] = t[1]
 
     def p_port_dot(t):
         'port : DOT ID LPAREN port_expression RPAREN'
+        print "ALERT: using rule p_port_dot"
         t[0] = ('.'+t[2], t[4])
 
     def p_more_ports(t):
@@ -111,17 +112,9 @@ def create_parser():
         'port_expression :'
         pass
 
-    def p_port_reference_1(t):
-        'port_reference : ID'
-        t[0] = t[1]
-
-    def p_port_reference_2(t):
-        'port_reference : ID LSQUARE primary RSQUARE'
-        t[0] = t[1] + "[" + str(t[3]) + "]"
-
-    def p_port_reference_3(t):
-        'port_reference : ID LSQUARE primary COLON primary RSQUARE'
-        t[0] = t[1] + "[" + str(t[3]) + ":" + str(t[5]) + "]"
+    def p_port_reference(t):
+        'port_reference : ID range'
+        t[0] = netlist.Wire(t[1], t[2])
 
     def p_module_items(t):
         'module_items : module_item module_items'
@@ -133,32 +126,14 @@ def create_parser():
         'module_items :'
         pass
 
-    def p_module_item_input(t):
-        'module_item : INPUT range list_of_variables SEMI'
+    def p_module_item_vars(t):
+        '''module_item : INPUT range list_of_variables SEMI
+                       | OUTPUT range list_of_variables SEMI
+                       | WIRE range list_of_variables SEMI'''
         t[0] = []
-        if t[2] == None:
-            t[2] = ""
         for v in t[3]:
             if v != None:
-                t[0].append(('INPUT', t[2] + v))
-
-    def p_module_item_output(t):
-        'module_item : OUTPUT range list_of_variables SEMI'
-        t[0] = []
-        if t[2] == None:
-            t[2] = ""
-        for v in t[3]:
-            if v != None:
-                t[0].append(('OUTPUT', t[2] + v))
-
-    def p_module_item_wire(t):
-        'module_item : WIRE range list_of_variables SEMI'
-        t[0] = []
-        if t[2] == None:
-            t[2] = ""
-        for v in t[3]:
-            if v != None:
-                t[0].append(('WIRE', t[2] + v))
+                t[0].append((t[1], netlist.Wire(v, t[2])))
 
     def p_module_item_assign(t):
         'module_item : ASSIGN list_of_assignments SEMI'
@@ -223,14 +198,6 @@ def create_parser():
         'more_connections :'
         pass
 
-    def p_range(t):
-        'range : LSQUARE primary COLON primary RSQUARE'
-        t[0] = "[" + str(t[2]) + ":" + str(t[4]) + "]"
-
-    def p_range_e(t):
-        'range :'
-        pass
-
     def p_list_of_variables(t):
         'list_of_variables : ID more_vars'
         t[0] = [t[1]]
@@ -264,46 +231,28 @@ def create_parser():
         pass
 
     def p_assignment(t):
-        'assignment : lvalue EQ primary'
-        t[0] = []
-        for i in t[1]:
-            t[0].append({i : t[3]})
-
-    def p_lvalue_1(t):
-        'lvalue : identifier'
-        t[0] = t[1]
-
-    def p_lvalue_2(t):
-        'lvalue : identifier LSQUARE primary RSQUARE'
-        t[0] = []
-        for i in t[1]:
-            t[0].append(i + "[" + str(t[3]) + "]")
-
-    def p_lvalue_3(t):
-        'lvalue : identifier LSQUARE primary COLON primary RSQUARE'
-        t[0] = []
-        for i in t[1]:
-            t[0].append(i + "[" + str(t[3]) + ":" + str(t[5]) + "]")
+        'assignment : primary EQ primary'
+        t[0] = {t[1] : t[3]}
 
     def p_primary_num(t):
         'primary : number'
         t[0] = t[1]
 
-    def p_primary_1(t):
-        'primary : identifier'
-        t[0] = t[1]
+    def p_primary(t):
+        'primary : identifier range'
+        t[0] = netlist.Wire(t[1], t[2])
 
-    def p_primary_2(t):
-        'primary : identifier LSQUARE primary RSQUARE'
-        t[0] = []
-        for i in t[1]:
-            t[0].append(i + "[" + str(t[3]) + "]")
+    def p_range_r(t):
+        'range : LSQUARE number COLON number RSQUARE'
+        t[0] = netlist.Range(t[2], t[4])
 
-    def p_primary_3(t):
-        'primary : identifier LSQUARE primary COLON primary RSQUARE'
-        t[0] = []
-        for i in t[1]:
-            t[0].append(i + "[" + str(t[3]) + ":" + str(t[5]) + "]")
+    def p_range_s(t):
+        'range : LSQUARE number RSQUARE'
+        t[0] = netlist.Range(t[2])
+
+    def p_range_e(t):
+        'range :'
+        t[0] = netlist.Range()
 
     def p_number_1(t):
         'number : SFLOAT'
@@ -330,21 +279,18 @@ def create_parser():
         'number : BASE UNSIGNED'
         t[0] = int(t[2], base(t[1]))
 
+    # the 'more_ids' are continuation of same identifier
     def p_identifier(t):
         'identifier : ID more_ids'
-        t[0] = [t[1]]
-        if t[2] != None:
-            t[0].extend(t[2])
+        t[0] = t[1] + t[2]
 
     def p_more_ids(t):
         'more_ids : DOT ID more_ids'
-        t[0] = [t[1]+t[2]]
-        if t[3] != None:
-            t[0].extend(t[3])
+        t[0] = "." + t[2] + t[3]
 
     def p_more_ids_e(t):
         'more_ids :'
-        pass
+        t[0] = ""
 
     def p_error(t):
         print "Syntax error at", t.value, "type", t.type, "on line", t.lexer.lineno

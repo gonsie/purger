@@ -70,7 +70,7 @@ if __name__ == "__main__":
 	ccx = PLYPair()
 	ccx.set_lexer(ply_verilog_netlist.create_lexer(cd))
 	ccx.set_parser(ply_verilog_netlist.create_parser())
-	ccx.parse_file('Examples/ccx_lsi.vSyn')
+	ccx.parse_file('Examples/ccx_lsi_small.vSyn')
 	print ccx.result
 
 
