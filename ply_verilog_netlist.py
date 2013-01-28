@@ -307,4 +307,8 @@ def create_parser():
             base = 16
         return base
 
+    # def explode_range(r):
+    #     [a, b] = r.strip('[]').split(':')
+        # for 
+
     return yacc.yacc(tabmodule='ply_verilog_netlist_parsetab')
