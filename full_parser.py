@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 # Encapsulation of lexer/parser pair
 class PLYPair:
 	def __init__(self, l=None, p=None):
