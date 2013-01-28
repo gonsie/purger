@@ -75,6 +75,8 @@ def create_parser():
         'module : MODULE ID list_of_ports SEMI module_items ENDMODULE'
         t[0] = netlist.Module(t[2], t[3], t[5])
 
+# LIST_OF_PORTS
+
     def p_list_of_ports_e(t):
         'list_of_ports :'
         pass
@@ -116,6 +118,8 @@ def create_parser():
         'port_reference : ID range'
         t[0] = netlist.Wire(t[1], t[2])
 
+# MODULE_ITEMS
+
     def p_module_items(t):
         'module_items : module_item module_items'
         t[0] = t[1]
@@ -149,6 +153,8 @@ def create_parser():
             for m in t[3]:
                 m.set_type(t[1])
                 t[0].append(m)
+
+# MORE_MODULES / CELLS / CONNECTING PORTS
 
     def p_module_instance(t):
         'module_instance : ID LPAREN list_of_module_connections RPAREN'
@@ -214,6 +220,8 @@ def create_parser():
         'more_vars :'
         pass
 
+# ASSIGNMENTS
+
     def p_list_of_assignments(t):
         'list_of_assignments : assignment more_assignments'
         t[0] = [t[1]]
@@ -233,6 +241,8 @@ def create_parser():
     def p_assignment(t):
         'assignment : primary EQ primary'
         t[0] = {t[1] : t[3]}
+
+# NUMBERS
 
     def p_primary_num(t):
         'primary : number'
@@ -279,6 +289,8 @@ def create_parser():
         'number : BASE UNSIGNED'
         t[0] = int(t[2], base(t[1]))
 
+# IDENTIFIERS
+
     # the 'more_ids' are continuation of same identifier
     def p_identifier(t):
         'identifier : ID more_ids'
@@ -291,6 +303,8 @@ def create_parser():
     def p_more_ids_e(t):
         'more_ids :'
         t[0] = ""
+
+# OTHER FUNCTIONS
 
     def p_error(t):
         print "Syntax error at", t.value, "type", t.type, "on line", t.lexer.lineno
