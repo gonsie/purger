@@ -133,32 +133,43 @@ def create_parser():
         'module_items :'
         pass
 
-    def p_module_item_input(t):
-        'module_item : INPUT range list_of_variables SEMI'
-        t[0] = []
-        if t[2] == None:
-            t[2] = ""
-        for v in t[3]:
-            if v != None:
-                t[0].append(('INPUT', t[2] + v))
+    # def p_module_item_input(t):
+    #     'module_item : INPUT range list_of_variables SEMI'
+    #     t[0] = []
+    #     if t[2] == None:
+    #         t[2] = ""
+    #     for v in t[3]:
+    #         if v != None:
+    #             t[0].append(('INPUT', t[2] + v))
 
-    def p_module_item_output(t):
-        'module_item : OUTPUT range list_of_variables SEMI'
-        t[0] = []
-        if t[2] == None:
-            t[2] = ""
-        for v in t[3]:
-            if v != None:
-                t[0].append(('OUTPUT', t[2] + v))
+    # def p_module_item_output(t):
+    #     'module_item : OUTPUT range list_of_variables SEMI'
+    #     t[0] = []
+    #     if t[2] == None:
+    #         t[2] = ""
+    #     for v in t[3]:
+    #         if v != None:
+    #             t[0].append(('OUTPUT', t[2] + v))
 
-    def p_module_item_wire(t):
-        'module_item : WIRE range list_of_variables SEMI'
+    # def p_module_item_wire(t):
+    #     'module_item : WIRE range list_of_variables SEMI'
+    #     t[0] = []
+    #     if t[2] == None:
+    #         t[2] = ""
+    #     for v in t[3]:
+    #         if v != None:
+    #             t[0].append(('WIRE', t[2] + v))
+
+    def p_module_item_item(t):
+        '''module_item : INPUT  range list_of_variables SEMI 
+                       | OUTPUT range list_of_variables SEMI 
+                       | WIRE   range list_of_variables SEMI'''
         t[0] = []
-        if t[2] == None:
-            t[2] = ""
         for v in t[3]:
-            if v != None:
-                t[0].append(('WIRE', t[2] + v))
+            for n in t[2]:
+                if v != None:
+                    t[0].append(netlist.Wire(v+n, t[1]))
+
 
     def p_module_item_assign(t):
         'module_item : ASSIGN list_of_assignments SEMI'
@@ -225,11 +236,15 @@ def create_parser():
 
     def p_range(t):
         'range : LSQUARE primary COLON primary RSQUARE'
-        t[0] = "[" + str(t[2]) + ":" + str(t[4]) + "]"
+        # t[0] = "[" + str(t[2]) + ":" + str(t[4]) + "]"
+        # range is a list of all the numbers in the range
+        t[0] = []
+        for i in range(t[2], t[4]+1):
+            t[0].append(str(i))
 
     def p_range_e(t):
         'range :'
-        pass
+        t[0] = [""]
 
     def p_list_of_variables(t):
         'list_of_variables : ID more_vars'
@@ -267,7 +282,7 @@ def create_parser():
         'assignment : lvalue EQ primary'
         t[0] = []
         for i in t[1]:
-            t[0].append({i : t[3]})
+            t[0].append(i)
 
     def p_lvalue_1(t):
         'lvalue : identifier'
@@ -360,5 +375,9 @@ def create_parser():
         elif s == "'h" or s == "'H":
             base = 16
         return base
+
+    # def explode_range(r):
+    #     [a, b] = r.strip('[]').split(':')
+        # for 
 
     return yacc.yacc(tabmodule='ply_verilog_netlist_parsetab')
