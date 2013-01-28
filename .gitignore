@@ -3,3 +3,4 @@ parselog.txt
 *parsetab.py
 *.pyc
 sublime-project.sublime-workspace
+pypy-1.9/
