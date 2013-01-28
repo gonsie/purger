@@ -33,6 +33,13 @@ class Lib:
     def get_cell(self, cell_name):
         return self.cells[cell_name]
     
+    def get_direction(self, cell_name, pin_name):
+        c = self.cells[cell_name]
+        p = c.get_pin(pin_name)
+        if p:
+            return p.direction
+        return ""
+
     def cell_tokens(self):
         cd = {}
         for c in self.cells:
@@ -88,6 +95,11 @@ class Cell:
         self.pins.sort(key=lambda x: x.name)
         self.stats = self.gen_stats()
         self.original = c
+
+    def get_pin(self, pin_name):
+        for p in self.pins:
+            if p.name == pin_name:
+                return p
 
     def pin_map(self):
         pm = {}
