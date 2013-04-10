@@ -69,9 +69,9 @@ class Module:
 			if w in self.assigns.values():
 				wd[w][3] += 1
 		for n in self.nets:
-			for conx in n.connections:
-				name = conx.keys()[0]
-	 			wire = conx.values()[0]
+			for conx in range(n.connections):
+				name = n.wires[conx]
+	 			wire = n.pins[conx]
 				d = lib.get_direction(n.type, name)
 				if d == 'input':
 					wd[w][4] += 1
@@ -93,6 +93,10 @@ class Module:
 		for a in self.assigns:
 			output += "\"" + str(a.keys()[0]) + "\" -> \"" + str(a.values()[0]) + "\"\n\t"
 		output += "}"
+		return output
+
+	def generate_init_file(self):
+		output = ""
 		return output
 
 # 		self.ports = list_of_ports
@@ -130,7 +134,7 @@ class Module:
 # 	def add_output(self, ref_obj):
 # 		self.outputs.append(ref_obj)
 
-class Net(Item):
+class Net:
 	def __init__(self, name, t):
 		self.name = name
 		self.type = t

@@ -77,16 +77,15 @@ def create_parser():
 
 # LIST_OF_PORTS
 
-    def p_list_of_ports_e(t):
-        'list_of_ports :'
-        pass
-
     def p_list_of_ports(t):
         'list_of_ports : LPAREN port more_ports RPAREN'
         t[0] = [t[2]]
-        if t[3] != None:
-            t[0].extend(t[3])
+        if t[3] != None: t[0].extend(t[3])
 
+    def p_list_of_ports_e(t):
+        'list_of_ports :'
+        pass
+    
     def p_port(t):
         'port : port_expression'
         t[0] = t[1]
@@ -99,8 +98,7 @@ def create_parser():
     def p_more_ports(t):
         'more_ports : COMMA port more_ports'
         t[0] = [t[2]]
-        if t[3] != None:
-            t[0].extend(t[3])
+        if t[3] != None: t[0].extend(t[3])
 
     def p_more_ports_e(t):
         'more_ports :'
@@ -123,8 +121,7 @@ def create_parser():
     def p_module_items(t):
         'module_items : module_item module_items'
         t[0] = t[1]
-        if t[2] != None:
-            t[0].extend(t[2])
+        if t[2] != None: t[0].extend(t[2])
 
     def p_module_items_e(t):
         'module_items :'
@@ -136,8 +133,7 @@ def create_parser():
                        | WIRE range list_of_variables SEMI'''
         t[0] = []
         for v in t[3]:
-            if v != None:
-                t[0].append((t[1], netlist.Wire(v, t[2])))
+            if v != None: t[0].append((t[1], netlist.Wire(v, t[2])))
 
     def p_module_item_assign(t):
         'module_item : ASSIGN list_of_assignments SEMI'
@@ -163,8 +159,7 @@ def create_parser():
     def p_more_modules(t):
         'more_modules : COMMA module_instance more_modules'
         t[0] = [t[2]]
-        if t[3] != None:
-            t[0].extend(t[3])
+        if t[3] != None: t[0].extend(t[3])
 
     def p_more_modules_e(t):
         'more_modules :'
@@ -174,8 +169,7 @@ def create_parser():
         'list_of_module_connections : port_connection more_connections'
         if t[1] != None:
             t[0] = [t[1]]
-            if t[2] != None:
-                t[0].extend(t[2])
+            if t[2] != None: t[0].extend(t[2])
 
     def p_list_of_module_connections_e(t):
         'list_of_module_connections :'
@@ -197,8 +191,7 @@ def create_parser():
         'more_connections : COMMA port_connection more_connections'
         if t[2] != None:
             t[0] = [t[2]]
-            if t[3] != None:
-                t[0].extend(t[3])
+            if t[3] != None: t[0].extend(t[3])
 
     def p_more_connections_e(t):
         'more_connections :'
@@ -207,14 +200,12 @@ def create_parser():
     def p_list_of_variables(t):
         'list_of_variables : ID more_vars'
         t[0] = [t[1]]
-        if t[2] != None:
-            t[0].extend(t[2]) 
+        if t[2] != None: t[0].extend(t[2]) 
 
     def p_more_vars(t):
         'more_vars : COMMA ID more_vars'
         t[0] = [t[2]]
-        if t[3] != None:
-            t[0].extend(t[3])
+        if t[3] != None: t[0].extend(t[3])
 
     def p_more_vars_e(t):
         'more_vars :'
@@ -225,14 +216,12 @@ def create_parser():
     def p_list_of_assignments(t):
         'list_of_assignments : assignment more_assignments'
         t[0] = [t[1]]
-        if t[2] != None:
-            t[0].extend(t[2])
+        if t[2] != None: t[0].extend(t[2])
 
     def p_more_assignments(t):
         'more_assignments : COMMA assignment more_assignments'
         t[0] = [t[2]]
-        if t[3] != None:
-            t[0].extend(t[3])
+        if t[3] != None: t[0].extend(t[3])
 
     def p_more_assignments_e(t):
         'more_assignments :'
