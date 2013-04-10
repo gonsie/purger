@@ -53,7 +53,47 @@ import ply_liberty
 import ply_boolean_expressions
 from time import time
 
+def workflow():
+	print "*** Step 1: Library File ***"
+	lf = raw_input("Library File: ")
+	l = PLYPair()
+	l.set_lexer(ply_liberty.create_lexer())
+	l.set_parser(ply_liberty.create_parser())
+	l.parse_file(lf)
+	l.stats()
+	## set up database
+	print "*** Step 2: Netlist File ***"
+	vnf = raw_input("Verilog Netlist File: ")
+	vn = PLYPair()
+	# pass tokens from library to netlist parser
+	cell_tokens = l.result.cell_tokens()
+	vn.set_lexer(ply_verilog_netlist.create_lexer(cell_tokens))
+	vn.set_parser(ply_verilog_netlist.create_parser())
+	vn.parse_file(vnf)
+	## fill database
+
+
+def prompt(vars=None):
+    prompt_message = "Brama Front End"
+    try:
+        from IPython.Shell import IPShellEmbed
+        ipshell = IPShellEmbed(argv=[''],banner=prompt_message,exit_msg="Goodbye")
+        return  ipshell
+    except ImportError:
+        if vars is None:  vars=globals()
+        import code
+        import rlcompleter
+        import readline
+        readline.parse_and_bind("tab: complete")
+        # calling this with globals ensures we can see the environment
+        print prompt_message
+        shell = code.InteractiveConsole(vars)
+        return shell.interact
+
 if __name__ == "__main__":
+
+	p = prompt()
+	p()
 
 	if False:
 		print "\n*** Liberty Parser"
@@ -140,6 +180,7 @@ if __name__ == "__main__":
 	# f = open('super_graph.gv', 'w')
 	# f.write(g)
 	# f.close()
+
 	
 
 
