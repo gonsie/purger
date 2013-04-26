@@ -92,9 +92,6 @@ def prompt(vars=None):
 
 if __name__ == "__main__":
 
-	p = prompt()
-	p()
-
 	if False:
 		print "\n*** Liberty Parser"
 		l = PLYPair()
@@ -134,7 +131,7 @@ if __name__ == "__main__":
 	lsi_lib.set_parser(ply_liberty.create_parser())
 	lsi_lib.parse_file('Examples/lsi_10k.lib')
 	cd = lsi_lib.result.cell_tokens()
-	#print lsi_lib.result.stats
+	print lsi_lib.result.stats
 
 	print "Parsing CCX"
 	ccx = PLYPair()
@@ -149,6 +146,9 @@ if __name__ == "__main__":
 	ccx.result.stats()
 	ccx.result.net_stats()
 	ccx.result.wire_stats(lsi_lib.result)
+
+	p = prompt()
+	p()
 
 	# fan out
 	# arangement and gid assignment

@@ -34,6 +34,10 @@ class Module:
 	def __repr__(self):
 		return self.name 
 
+
+	def build_database(self):
+		pass
+
 	def stats(self):
 		print "Module", self.name
 		print "\t", len(self.ports), "ports"
@@ -135,12 +139,13 @@ class Module:
 # 		self.outputs.append(ref_obj)
 
 class Net:
-	def __init__(self, name, t):
+	def __init__(self, name, connections_dic_list):
+		connections_dic = connections_dic_list[0]
 		self.name = name
-		self.type = t
-		self.wires = []
-		self.pins = []
-		self.connections = 0
+		self.type = None
+		self.wires = connections_dic.values()
+		self.pins = connections_dic.keys()
+		self.connections = len(connections_dic)
 
 	def set_type(self, t):
 		self.type = t
@@ -153,8 +158,9 @@ class Net:
 	def __repr__(self):
 		output = self.type + " " + self.name + " ("
 		for i in range(self.connections):
-			output += self.pins[i] + "(" + self.wires[i] + "), "
+			output += self.pins[i] + "(" + str(self.wires[i]) + "), "
 		output = output[:-2] + ");"
+		return output
 
 	def set_type(self, cell_type):
 		self.type = cell_type

@@ -169,7 +169,7 @@ def create_parser():
         'list_of_module_connections : port_connection more_connections'
         if t[1] != None:
             t[0] = [t[1]]
-            if t[2] != None: t[0].extend(t[2])
+            if t[2] != None: t[0][0].update(t[2])
 
     def p_list_of_module_connections_e(t):
         'list_of_module_connections :'
@@ -177,6 +177,7 @@ def create_parser():
 
     def p_port_connection(t):
         'port_connection : primary'
+        print "Warning: Weird primary port connection"
         t[0] = t[1]
 
     def p_port_connection_dot(t):
@@ -190,8 +191,8 @@ def create_parser():
     def p_more_connections(t):
         'more_connections : COMMA port_connection more_connections'
         if t[2] != None:
-            t[0] = [t[2]]
-            if t[3] != None: t[0].extend(t[3])
+            t[0] = t[2]
+            if t[3] != None: t[0].update(t[3])
 
     def p_more_connections_e(t):
         'more_connections :'
