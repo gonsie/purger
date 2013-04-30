@@ -9,3 +9,7 @@
    - gate functions should take input, output, and current_state vectors
    - ablity to print stats for gates/library
 
+** Branches
+  - Master: this represents the branch currently integrated with the [[https://github.com/gonsie/gates][ROSS/gates]] project
+  - sql: utilizes an SQL database to store the object model
+  - py_classes: utilizes python classes to store the object model
