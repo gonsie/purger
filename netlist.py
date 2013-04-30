@@ -1,6 +1,6 @@
 
 class Module:
-	def __init__(self, name, list_of_ports, module_items):
+	def __init__(self, name, list_of_ports, module_items, wire_names):
 		# module ccx (scan_in, scan_out);
 		# input scan_in
 		# output scan_out
@@ -30,6 +30,7 @@ class Module:
 				self.assigns.update(item)
 			else:
 				self.nets.append(item)
+		self.wire_db = wire_names
 
 	def __repr__(self):
 		return self.name 

@@ -69,11 +69,13 @@ import netlist
 
 def create_parser():
 
+    wire_names = {}
+
     precedence = ()
 
     def p_module(t):
         'module : MODULE ID list_of_ports SEMI module_items ENDMODULE'
-        t[0] = netlist.Module(t[2], t[3], t[5])
+        t[0] = netlist.Module(t[2], t[3], t[5], wire_names)
 
 # LIST_OF_PORTS
 
@@ -133,7 +135,9 @@ def create_parser():
                        | WIRE range list_of_variables SEMI'''
         t[0] = []
         for v in t[3]:
-            if v != None: t[0].append((t[1], netlist.Wire(v, t[2])))
+            if v != None: 
+                t[0].append((t[1], netlist.Wire(v, t[2])))
+                if t[1] == 'wire': wire_names[t[0][-1][1].name] = []
 
     def p_module_item_assign(t):
         'module_item : ASSIGN list_of_assignments SEMI'
@@ -155,6 +159,10 @@ def create_parser():
     def p_module_instance(t):
         'module_instance : ID LPAREN list_of_module_connections RPAREN'
         t[0] = netlist.Net(t[1], t[3])
+        for c in t[3][0]:
+            # import pdb; pdb.set_trace()
+            if type(t[3][0][c]) is not int and t[3][0][c].name in wire_names:
+                wire_names[t[3][0][c].name].append(t[1])
 
     def p_more_modules(t):
         'more_modules : COMMA module_instance more_modules'
