@@ -77,7 +77,17 @@ def create_parser():
         'library : LIBRARY LPAR ID RPAR LCURLY attributes RCURLY'
         t[0] = {}
         t[0]['sql'] = "CREATE DATABASE " + t[3] + ";\nUSE " + t[3] + ";\n" + t[6]
+        t[0]['sql'] += additional_tables()
         t[0]['cells'] = cell_tokens
+
+    def additional_tables():
+        stmts = "CREATE TABLE input (\n"
+        stmts += "\tfk_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\n"
+        stmts += "\twire_name VARCHAR(100),\n);\n"
+        stmts += "CREATE TABLE output (\n"
+        stmts += "\tfk_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\n"
+        stmts += "\twire_name VARCHAR(100),\n);\n"
+        return stmts
 
     def p_attributes(t):
         'attributes : attribute attributes'

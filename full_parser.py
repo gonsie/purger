@@ -132,9 +132,9 @@ if __name__ == "__main__":
 	lsi_lib.parse_file('Examples/lsi_10k.lib')
 	# print lsi_lib.result['sql']
 	# print lsi_lib.result['cells']
-	exit()
 
 	print "Parsing CCX"
+	cd = lsi_lib.result['cells']
 	ccx = PLYPair()
 	ccx.set_lexer(ply_verilog_netlist.create_lexer(cd))
 	ccx.set_parser(ply_verilog_netlist.create_parser())
