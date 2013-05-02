@@ -8,6 +8,8 @@ reserved = {
     'library' : 'LIBRARY',
     'define' : 'DEFINE',
     'define_group' : 'DEFINE_GROUP',
+    'cell' : 'CELL',
+    'pin' : 'PIN',
 }
 
 tokens = [
@@ -69,50 +71,54 @@ import liberty
 def create_parser():
     precedence = ()
 
+    cell_tokens = {}
+
     def p_library(t):
         'library : LIBRARY LPAR ID RPAR LCURLY attributes RCURLY'
-        #t[0] = ('library', 'library', '(', t[3], ')', '{', t[6], '}')
-        t[0] = liberty.Lib(t[3], t[6])
+        t[0] = {}
+        t[0]['sql'] = "CREATE DATABASE " + t[3] + ";\nUSE " + t[3] + ";\n" + t[6]
+        t[0]['cells'] = cell_tokens
 
     def p_attributes(t):
         'attributes : attribute attributes'
-        t[0] = [t[1]]
-        if t[2] != None:
-            t[0].extend(t[2])
+        t[0] = t[1] + t[2]
 
     def p_attributes_e(t):
         'attributes :'
-        pass
+        t[0] = ""
 
     def p_attribute(t):
         '''attribute : simple_attribute
-                     | complex_attribute'''
+                     | complex_attribute
+                     | named_attribute'''
         t[0] = t[1]
 
     def p_simple_attribute(t):
         '''simple_attribute : ID COLON STR
                             | ID COLON ID
                             | ID COLON NUM'''
-        t[0] = liberty.Att(t[1])
-        t[0].set_simple(t[3])
+        t[0] = ""
 
     def p_simple_attribute_semi(t):
         '''simple_attribute : ID COLON STR SEMI
                             | ID COLON ID SEMI
                             | ID COLON NUM SEMI'''
-        t[0] = liberty.Att(t[1])
-        t[0].set_simple(t[3])
+        t[0] = ""
 
     def p_complex_attribute(t):
         'complex_attribute : ID LPAR arg args RPAR group_or_not'
-        a = [t[3]]
-        if t[4] != None:
-            a.extend(t[4])
-        t[0] = liberty.Att(t[1])
-        if t[6] != None:
-            t[0].set_group(a, t[6])
-        else:
-            t[0].set_complex(a)
+        t[0] = ""
+
+    def p_named_attribute_cell(t):
+        'named_attribute : CELL LPAR ID RPAR LCURLY attributes RCURLY'
+        t[0] = "CREATE TABLE " + t[3] + " (\n"
+        t[0] += "\tfk_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\n"
+        t[0] += "\tcell_name VARCHAR(100),\n" + t[6] + ");\n"
+        cell_tokens[t[3]] = 'CELL'
+
+    def p_named_attribute_pin(t):
+        'named_attribute : PIN LPAR ID RPAR LCURLY attributes RCURLY'
+        t[0] = "\tpin_" + t[3] + " VARCHAR(100),\n"
 
     def p_arg(t):
         '''arg : STR
@@ -122,25 +128,23 @@ def create_parser():
 
     def p_arg_e(t):
         'arg :'
-        pass
+        t[0] = ""
 
     def p_args(t):
         'args : COMMA arg args'
-        t[0] = [t[2]]
-        if t[3] != None:
-            t[0].extend(t[3])
+        t[0] = ", " + t[2] + t[3]
 
     def p_args_e(t):
         'args :'
-        pass
+        t[0] = ""
 
     def p_group_or_not_not(t):
         'group_or_not : SEMI'
-        t[0] = None
+        t[0] = ""
 
     def p_group_or_not_group(t):
         'group_or_not : LCURLY attributes RCURLY'
-        t[0] = [t[2]]
+        t[0] = t[2]
 
     def p_error(t):
         print "Syntax error at", t.value, "type", t.type, "on line", t.lexer.lineno
