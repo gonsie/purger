@@ -75,18 +75,19 @@ def create_parser():
 
     def p_module(t):
         'module : MODULE ID list_of_ports SEMI module_items ENDMODULE'
-        t[0] = netlist.Module(t[2], t[3], t[5], wire_names)
+        t[0] = {}
+        t[0]['sql'] = t[5]
+        t[0]['wires'] = wire_names
 
 # LIST_OF_PORTS
 
     def p_list_of_ports(t):
         'list_of_ports : LPAREN port more_ports RPAREN'
-        t[0] = [t[2]]
-        if t[3] != None: t[0].extend(t[3])
+        t[0] = ""
 
     def p_list_of_ports_e(t):
         'list_of_ports :'
-        pass
+        t[0] = ""
     
     def p_port(t):
         'port : port_expression'
@@ -104,7 +105,7 @@ def create_parser():
 
     def p_more_ports_e(t):
         'more_ports :'
-        pass
+        t[0] = ""
 
     def p_port_expression(t):
         'port_expression : port_reference'
@@ -112,76 +113,88 @@ def create_parser():
 
     def p_port_expression_e(t):
         'port_expression :'
-        pass
+        t[0] = ""
 
     def p_port_reference(t):
         'port_reference : ID range'
-        t[0] = netlist.Wire(t[1], t[2])
+        t[0] = ""
 
 # MODULE_ITEMS
 
     def p_module_items(t):
         'module_items : module_item module_items'
-        t[0] = t[1]
-        if t[2] != None: t[0].extend(t[2])
+        t[0] = t[1] + t[2]
 
     def p_module_items_e(t):
         'module_items :'
-        pass
+        t[0] = ""
 
-    def p_module_item_vars(t):
+    def wire_enumeration(range_obj, list_of_variables):
+        if range_obj.type is 'None':
+            return list_of_variables
+        output = []
+        for i in range_obj.enumeration():
+            for v in list_of_variables:
+                output.append(v + "[" + str(i) + "]")
+        return output        
+
+    def p_module_item_inout(t):
         '''module_item : INPUT range list_of_variables SEMI
-                       | OUTPUT range list_of_variables SEMI
-                       | WIRE range list_of_variables SEMI'''
-        t[0] = []
-        for v in t[3]:
-            if v != None: 
-                t[0].append((t[1], netlist.Wire(v, t[2])))
-                if t[1] == 'wire': wire_names[t[0][-1][1].name] = []
+                       | OUTPUT range list_of_variables SEMI'''
+        wl = wire_enumeration(t[2], t[3])
+        t[0] = "INSERT INTO " + t[1] + " (wire_name) VALUES " 
+        for w in wl:
+            t[0] += "(" + w + "), "
+            wire_names[w] = []
+        t[0] += ";\n"
+
+    def p_module_item_wire(t):
+        'module_item : WIRE range list_of_variables SEMI'
+        wl = wire_enumeration(t[2], t[3])
+        for w in wl:
+            wire_names[w] = []
+        t[0] = ""
 
     def p_module_item_assign(t):
         'module_item : ASSIGN list_of_assignments SEMI'
-        t[0] = []
-        for v in t[2]:
-            t[0].append(v)
+        t[0] = ""
 
     def p_module_item_module(t):
         'module_item : CELL module_instance more_modules SEMI'
-        t[2].set_type(t[1])
-        t[0] = [t[2]]
-        if t[3] != None:
-            for m in t[3]:
-                m.set_type(t[1])
-                t[0].append(m)
+        t[0] = "INSERT INTO " + t[1] + t[2]
 
 # MORE_MODULES / CELLS / CONNECTING PORTS
 
     def p_module_instance(t):
         'module_instance : ID LPAREN list_of_module_connections RPAREN'
-        t[0] = netlist.Net(t[1], t[3])
-        for c in t[3][0]:
-            # import pdb; pdb.set_trace()
-            if type(t[3][0][c]) is not int and t[3][0][c].name in wire_names:
-                wire_names[t[3][0][c].name].append(t[1])
+        pairs = [('cell_name', t[1])] + t[3]
+        cols = "("
+        vals = "("
+        for p in pairs:
+            cols += p[0] + ", "
+            vals += "\"" + str(p[1]) + "\", "
+        cols += ")"
+        vals += ")"
+        t[0] = cols + " VALUES " + vals + ";\n"
+        for p in t[3]:
+            if type(p[1]) is str: wire_names[p[1]].append(t[1])
 
     def p_more_modules(t):
         'more_modules : COMMA module_instance more_modules'
-        t[0] = [t[2]]
-        if t[3] != None: t[0].extend(t[3])
+        t[0] = ""
+        print "ERROR: using list of module instances"
 
     def p_more_modules_e(t):
         'more_modules :'
-        pass
+        t[0] = ""
 
     def p_list_of_module_connections(t):
         'list_of_module_connections : port_connection more_connections'
-        if t[1] != None:
-            t[0] = [t[1]]
-            if t[2] != None: t[0][0].update(t[2])
+        t[0] = t[1] + t[2]
 
     def p_list_of_module_connections_e(t):
         'list_of_module_connections :'
-        pass
+        t[0] = []
 
     def p_port_connection(t):
         'port_connection : primary'
@@ -190,35 +203,31 @@ def create_parser():
 
     def p_port_connection_dot(t):
         'port_connection : DOT ID LPAREN primary RPAREN'
-        t[0] = {t[1]+t[2] : t[4]}
+        t[0] = [('pin_' + t[2], t[4])]
 
     def p_port_connection_e(t):
         'port_connection :'
-        pass
+        t[0] = []
 
     def p_more_connections(t):
         'more_connections : COMMA port_connection more_connections'
-        if t[2] != None:
-            t[0] = t[2]
-            if t[3] != None: t[0].update(t[3])
+        t[0] = t[2] + t[3]
 
     def p_more_connections_e(t):
         'more_connections :'
-        pass
+        t[0] = []
 
     def p_list_of_variables(t):
         'list_of_variables : ID more_vars'
-        t[0] = [t[1]]
-        if t[2] != None: t[0].extend(t[2]) 
+        t[0] = [t[1]] + t[2]
 
     def p_more_vars(t):
         'more_vars : COMMA ID more_vars'
-        t[0] = [t[2]]
-        if t[3] != None: t[0].extend(t[3])
+        t[0] = [t[2]] + t[3]
 
     def p_more_vars_e(t):
         'more_vars :'
-        pass
+        t[0] = []
 
 # ASSIGNMENTS
 
@@ -248,7 +257,7 @@ def create_parser():
 
     def p_primary(t):
         'primary : identifier range'
-        t[0] = netlist.Wire(t[1], t[2])
+        t[0] = t[1] + str(t[2])
 
     def p_range_r(t):
         'range : LSQUARE number COLON number RSQUARE'

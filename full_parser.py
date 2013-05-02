@@ -90,6 +90,16 @@ def prompt(vars=None):
         shell = code.InteractiveConsole(vars)
         return shell.interact
 
+def dict_stats(d):
+	total = 0
+	max_len = 0
+	for k in d:
+		total += len(d[k])
+		max_len = max(max_len, len(d[k]))
+	print "Average Length =", total, "/", len(d), "=", total / float(len(d))
+	print "Max = ", max_len
+
+
 if __name__ == "__main__":
 
 	if False:
@@ -139,10 +149,11 @@ if __name__ == "__main__":
 	ccx.set_lexer(ply_verilog_netlist.create_lexer(cd))
 	ccx.set_parser(ply_verilog_netlist.create_parser())
 	start = time()
-	ccx.parse_file('Examples/ccx_lsi_small.vSyn')
+	ccx.parse_file('Examples/ccx_lsi.vSyn')
 	total = time() - start
 	print "Total Time:", total, "s"
-	print ccx.result
+	# print ccx.result
+	import pdb; pdb.set_trace()
 
 	ccx.result.stats()
 	ccx.result.net_stats()

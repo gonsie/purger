@@ -87,6 +87,9 @@ def create_parser():
         stmts += "CREATE TABLE output (\n"
         stmts += "\tfk_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\n"
         stmts += "\twire_name VARCHAR(100),\n);\n"
+        stmts += "CREATE TABLE gids (\n"
+        stmts += "\tfk_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\n"
+        stmts += "\tgate VARCHAR(100),\n);\n"
         return stmts
 
     def p_attributes(t):
