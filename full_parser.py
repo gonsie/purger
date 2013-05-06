@@ -52,6 +52,7 @@ import ply_verilog_netlist
 import ply_liberty
 import ply_boolean_expressions
 from time import time
+import os
 
 def workflow():
 	print "*** Step 1: Library File ***"
@@ -134,14 +135,19 @@ if __name__ == "__main__":
 			for p in cell.boolexps():
 				print "\tPin", p.name, "=", p.function, "\t--> ", p.cstr, "=", be.parse(p.function)
 
+	# create the database
+	dbname = 'test.db'
+	if os.path.exists(dbname): os.remove(dbname)
+
 	# lsi_10k example
 	print "Parsing Library"
 	lsi_lib = PLYPair()
 	lsi_lib.set_lexer(ply_liberty.create_lexer())
-	lsi_lib.set_parser(ply_liberty.create_parser())
+	lsi_lib.set_parser(ply_liberty.create_parser(dbname))
 	lsi_lib.parse_file('Examples/lsi_10k.lib')
 	# print lsi_lib.result['sql']
 	# print lsi_lib.result['cells']
+	import pdb; pdb.set_trace()
 
 	print "Parsing CCX"
 	cd = lsi_lib.result['cells']
@@ -153,7 +159,7 @@ if __name__ == "__main__":
 	total = time() - start
 	print "Total Time:", total, "s"
 	# print ccx.result
-	import pdb; pdb.set_trace()
+	# import pdb; pdb.set_trace()
 
 	ccx.result.stats()
 	ccx.result.net_stats()

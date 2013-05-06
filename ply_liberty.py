@@ -67,8 +67,12 @@ def create_lexer():
 
 import ply.yacc as yacc
 import liberty
+import sqlite3 as lite
 
-def create_parser():
+def create_parser(dbname):
+
+    dbcur = lite.connect(dbname).cursor()
+
     precedence = ()
 
     cell_tokens = {}
@@ -76,21 +80,19 @@ def create_parser():
     def p_library(t):
         'library : LIBRARY LPAR ID RPAR LCURLY attributes RCURLY'
         t[0] = {}
-        t[0]['sql'] = "CREATE DATABASE " + t[3] + ";\nUSE " + t[3] + ";\n" + t[6]
+        # t[0]['sql'] = "CREATE DATABASE " + t[3] + ";\nUSE " + t[3] + ";\n" + t[6] # mysql commands
+        t[0]['sql'] = t[6]
         t[0]['sql'] += additional_tables()
         t[0]['cells'] = cell_tokens
+        dbcur.close()
 
     def additional_tables():
-        stmts = "CREATE TABLE input (\n"
-        stmts += "\tfk_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\n"
-        stmts += "\twire_name VARCHAR(100),\n);\n"
-        stmts += "CREATE TABLE output (\n"
-        stmts += "\tfk_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\n"
-        stmts += "\twire_name VARCHAR(100),\n);\n"
-        stmts += "CREATE TABLE gids (\n"
-        stmts += "\tfk_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\n"
-        stmts += "\tgate VARCHAR(100),\n);\n"
-        return stmts
+        stmt = ["" * 3]
+        stmt.append("CREATE TABLE input (fk_id INTEGER PRIMARY KEY, wire_name TEXT);")
+        stmt.append("CREATE TABLE output (fk_id INTEGER PRIMARY KEY, wire_name TEXT);")
+        stmt.append("CREATE TABLE gids (fk_id INTEGER PRIMARY KEY, gate TEXT);")
+        for s in stmt: dbcur.execute(s)
+        return ' '.join(stmt)
 
     def p_attributes(t):
         'attributes : attribute attributes'
@@ -124,14 +126,15 @@ def create_parser():
 
     def p_named_attribute_cell(t):
         'named_attribute : CELL LPAR ID RPAR LCURLY attributes RCURLY'
-        t[0] = "CREATE TABLE " + t[3] + " (\n"
-        t[0] += "\tfk_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\n"
-        t[0] += "\tcell_name VARCHAR(100),\n" + t[6] + ");\n"
+        t[0] = "CREATE TABLE " + t[3] + " ("
+        t[0] += "fk_id INTEGER PRIMARY KEY, "
+        t[0] += "cell_name TEXT, " + t[6][:-2] + ");"
         cell_tokens[t[3]] = 'CELL'
+        dbcur.execute(t[0])
 
     def p_named_attribute_pin(t):
         'named_attribute : PIN LPAR ID RPAR LCURLY attributes RCURLY'
-        t[0] = "\tpin_" + t[3] + " VARCHAR(100),\n"
+        t[0] = "pin_" + t[3] + " TEXT, "
 
     def p_arg(t):
         '''arg : STR
