@@ -10,6 +10,9 @@ reserved = {
     'define_group' : 'DEFINE_GROUP',
     'cell' : 'CELL',
     'pin' : 'PIN',
+    'direction' : 'DIRECTION',
+    'input' : 'IO_DIR',
+    'output' : 'IO_DIR',
 }
 
 tokens = [
@@ -77,6 +80,7 @@ def create_parser(dbname):
     precedence = ()
 
     cell_tokens = {}
+    pin_directions = {}
 
     def p_library(t):
         'library : LIBRARY LPAR ID RPAR LCURLY attributes RCURLY'
@@ -85,6 +89,7 @@ def create_parser(dbname):
         t[0]['sql'] = t[6]
         t[0]['sql'] += additional_tables()
         t[0]['cells'] = cell_tokens
+        t[0]['pins'] = pin_directions
         dbcon.commit()
         dbcon.close()
 
@@ -102,7 +107,7 @@ def create_parser(dbname):
 
     def p_attributes_e(t):
         'attributes :'
-        t[0] = ""
+        t[0] = []
 
     def p_attribute(t):
         '''attribute : simple_attribute
@@ -114,29 +119,38 @@ def create_parser(dbname):
         '''simple_attribute : ID COLON STR
                             | ID COLON ID
                             | ID COLON NUM'''
-        t[0] = ""
+        t[0] = []
 
     def p_simple_attribute_semi(t):
         '''simple_attribute : ID COLON STR SEMI
                             | ID COLON ID SEMI
                             | ID COLON NUM SEMI'''
-        t[0] = ""
+        t[0] = []
 
     def p_complex_attribute(t):
         'complex_attribute : ID LPAR arg args RPAR group_or_not'
-        t[0] = ""
+        t[0] = []
 
     def p_named_attribute_cell(t):
         'named_attribute : CELL LPAR ID RPAR LCURLY attributes RCURLY'
-        t[0] = "CREATE TABLE " + t[3] + " ("
-        t[0] += "fk_id INTEGER PRIMARY KEY, "
-        t[0] += "cell_name TEXT, " + t[6][:-2] + ");"
+        t[0] = []
         cell_tokens[t[3]] = 'CELL'
-        dbcur.execute(t[0])
+        pin_directions[t[3]] = {}
+        s = "CREATE TABLE " + t[3] + " (fk_id INTEGER PRIMARY KEY, cell_name TEXT, "
+        for p in t[6]:
+            s += "pin_" + p[0] + " TEXT, "
+            pin_directions[t[3]][p[0]] = p[1]
+        s = s[:-2] + ");"
+        dbcur.execute(s)
 
     def p_named_attribute_pin(t):
         'named_attribute : PIN LPAR ID RPAR LCURLY attributes RCURLY'
-        t[0] = "pin_" + t[3] + " TEXT, "
+        t[0] = [(t[3], t[6][0])]
+
+    def p_named_attribute_direction(t):
+        '''named_attribute : DIRECTION COLON IO_DIR
+                           | DIRECTION COLON IO_DIR SEMI'''
+        t[0] = [t[3]]
 
     def p_arg(t):
         '''arg : STR
