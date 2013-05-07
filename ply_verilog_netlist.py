@@ -67,12 +67,14 @@ def create_lexer(nets={}):
 import ply.yacc as yacc
 import netlist
 from time import time
+import sqlite3 as lite
 
-def create_parser():
+def create_parser(dbname):
+
+    dbcon = lite.connect(dbname)
+    dbcur = dbcon.cursor()
 
     wire_names = {}
-
-    wire_time = [0]
 
     precedence = ()
 
@@ -81,7 +83,8 @@ def create_parser():
         t[0] = {}
         t[0]['sql'] = t[5]
         t[0]['wires'] = wire_names
-        t[0]['time'] = wire_time
+        dbcon.commit()
+        dbcon.close()
 
 # LIST_OF_PORTS
 
@@ -145,23 +148,21 @@ def create_parser():
     def p_module_item_inout(t):
         '''module_item : INPUT range list_of_variables SEMI
                        | OUTPUT range list_of_variables SEMI'''
-        s = time()
         wl = wire_enumeration(t[2], t[3])
         t[0] = "INSERT INTO " + t[1] + " (wire_name) VALUES " 
         for w in wl:
-            t[0] += "(" + w + "), "
+            t[0] += "(\"" + w + "\"), "
             wire_names[w] = []
-        t[0] = t[0][:-2] + ";\n"
-        wire_time[0] += time() - s
+        t[0] = t[0][:-2] + "; "
+        dbcur.execute(t[0])
+        t[0] = ""
 
     def p_module_item_wire(t):
         'module_item : WIRE range list_of_variables SEMI'
-        s = time()
         wl = wire_enumeration(t[2], t[3])
         for w in wl:
             wire_names[w] = []
         t[0] = ""
-        wire_time[0] += time() - s
 
     def p_module_item_assign(t):
         'module_item : ASSIGN list_of_assignments SEMI'
@@ -170,6 +171,8 @@ def create_parser():
     def p_module_item_module(t):
         'module_item : CELL module_instance more_modules SEMI'
         t[0] = "INSERT INTO " + t[1] + t[2]
+        dbcur.execute(t[0])
+        t[0] = ""
 
 # MORE_MODULES / CELLS / CONNECTING PORTS
 
@@ -183,11 +186,9 @@ def create_parser():
             vals += "\"" + str(p[1]) + "\", "
         cols = cols[:-2] + ")"
         vals = vals[:-2] + ")"
-        t[0] = cols + " VALUES " + vals + ";\n"
-        s = time()
+        t[0] = cols + " VALUES " + vals + "; "
         for p in t[3]:
             if type(p[1]) is str: wire_names[p[1]].append(t[1])
-        wire_time[0] += time() - s
 
     def p_more_modules(t):
         'more_modules : COMMA module_instance more_modules'

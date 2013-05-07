@@ -71,7 +71,8 @@ import sqlite3 as lite
 
 def create_parser(dbname):
 
-    dbcur = lite.connect(dbname).cursor()
+    dbcon = lite.connect(dbname)
+    dbcur = dbcon.cursor()
 
     precedence = ()
 
@@ -84,7 +85,8 @@ def create_parser(dbname):
         t[0]['sql'] = t[6]
         t[0]['sql'] += additional_tables()
         t[0]['cells'] = cell_tokens
-        dbcur.close()
+        dbcon.commit()
+        dbcon.close()
 
     def additional_tables():
         stmt = ["" * 3]
