@@ -160,6 +160,13 @@ if __name__ == "__main__":
 	# print ccx.result
 	# import pdb; pdb.set_trace()
 
+	print "Removing Wires from database"
+	start = time()
+	import wire_remover
+	wire_remover.main(dbname, ccx.result['wires'], ccx.result['gates'], lsi_lib.result['pins'])
+	total = time() - start
+	print "Total Time:", total, "s"
+
 	ccx.result.stats()
 	ccx.result.net_stats()
 	ccx.result.wire_stats(lsi_lib.result)

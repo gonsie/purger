@@ -79,10 +79,11 @@ def create_parser(dbname):
 
     precedence = ()
 
+    gid = 0
+
     def p_module(t):
         'module : MODULE ID list_of_ports SEMI module_items ENDMODULE'
         t[0] = {}
-        t[0]['sql'] = t[5]
         t[0]['wires'] = wire_names
         t[0]['gates'] = gate_names
         dbcon.commit()
@@ -151,10 +152,11 @@ def create_parser(dbname):
         '''module_item : INPUT range list_of_variables SEMI
                        | OUTPUT range list_of_variables SEMI'''
         wl = wire_enumeration(t[2], t[3])
-        t[0] = "INSERT INTO " + t[1] + " (wire_name) VALUES " 
+        t[0] = "INSERT INTO " + t[1] + " (gid, wire_name) VALUES " 
         for w in wl:
-            t[0] += "(\"" + w + "\"), "
+            t[0] += "(" + str(gid) + ", \"" + w + "\"), "
             wire_names[w] = []
+            gid += 1
         t[0] = t[0][:-2] + "; "
         dbcur.execute(t[0])
         t[0] = ""
@@ -185,8 +187,9 @@ def create_parser(dbname):
     def p_module_instance(t):
         'module_instance : ID LPAREN list_of_module_connections RPAREN'
         pairs = [('cell_name', t[1])] + t[3]
-        cols = "("
-        vals = "("
+        cols = "(gid, "
+        vals = "(" + str(gid) + ", "
+        gid += 1
         for p in pairs:
             cols += p[0] + ", "
             vals += "\"" + str(p[1]) + "\", "

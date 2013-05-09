@@ -85,9 +85,7 @@ def create_parser(dbname):
     def p_library(t):
         'library : LIBRARY LPAR ID RPAR LCURLY attributes RCURLY'
         t[0] = {}
-        # t[0]['sql'] = "CREATE DATABASE " + t[3] + ";\nUSE " + t[3] + ";\n" + t[6] # mysql commands
-        t[0]['sql'] = t[6]
-        t[0]['sql'] += additional_tables()
+        additional_tables()
         t[0]['cells'] = cell_tokens
         t[0]['pins'] = pin_directions
         dbcon.commit()
@@ -95,9 +93,9 @@ def create_parser(dbname):
 
     def additional_tables():
         stmt = ["" * 3]
-        stmt.append("CREATE TABLE input (fk_id INTEGER PRIMARY KEY, wire_name TEXT);")
-        stmt.append("CREATE TABLE output (fk_id INTEGER PRIMARY KEY, wire_name TEXT);")
-        stmt.append("CREATE TABLE gids (fk_id INTEGER PRIMARY KEY, gate TEXT);")
+        stmt.append("CREATE TABLE input (gid INTEGER PRIMARY KEY, wire_name TEXT);")
+        stmt.append("CREATE TABLE output (gid INTEGER PRIMARY KEY, wire_name TEXT);")
+        stmt.append("CREATE TABLE gids (gid INTEGER PRIMARY KEY, gate TEXT);")
         for s in stmt: dbcur.execute(s)
         return ' '.join(stmt)
 
@@ -136,7 +134,7 @@ def create_parser(dbname):
         t[0] = []
         cell_tokens[t[3]] = 'CELL'
         pin_directions[t[3]] = {}
-        s = "CREATE TABLE " + t[3] + " (fk_id INTEGER PRIMARY KEY, cell_name TEXT, "
+        s = "CREATE TABLE " + t[3] + " (gid INTEGER PRIMARY KEY, cell_name TEXT, "
         for p in t[6]:
             s += "pin_" + p[0] + " TEXT, "
             pin_directions[t[3]][p[0]] = p[1]
