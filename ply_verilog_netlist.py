@@ -172,7 +172,23 @@ def create_parser(dbname):
         'module_item : ASSIGN list_of_assignments SEMI'
         t[0] = ""
 
-    def p_module_item_module(t):
+    def p_module_item_module_single(t):
+        'module_item : CELL ID LPAREN list_of_module_connections RPAREN SEMI'
+        t[0] = "INSERT INTO " + t[1]
+        pairs = [('cell_name', t[2])] + t[4]
+        cols = "(gid, "
+        vals = "(" + str(gid) + ", "
+        gid += 1
+        for p in pairs:
+            cols += p[0] + ", "
+            vals += "\"" + str(p[1]) + "\", "
+        cols = cols[:-2] + ")"
+        vals = vals[:-2] + ")"
+        t[0] += cols + " VALUES " + vals + "; "
+        for p in t[3]:
+            if type(p[1]) is str: wire_names[p[1]].append(t[1])
+
+    def p_module_item_module_list(t):
         'module_item : CELL module_instance more_modules SEMI'
         if len(t[3]) > 0: print "ERROR: multiple module definitions for one cell type"
         t[0] = "INSERT INTO " + t[1] + t[2]
