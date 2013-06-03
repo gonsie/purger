@@ -69,7 +69,6 @@ def create_lexer():
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 import ply.yacc as yacc
-import liberty
 import sqlite3 as lite
 
 def create_parser(dbname):
