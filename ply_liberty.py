@@ -69,12 +69,8 @@ def create_lexer():
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 import ply.yacc as yacc
-import sqlite3 as lite
 
 def create_parser(dbname):
-
-    dbcon = lite.connect(dbname)
-    dbcur = dbcon.cursor()
 
     precedence = ()
 
@@ -87,15 +83,13 @@ def create_parser(dbname):
         additional_tables()
         t[0]['cells'] = cell_tokens
         t[0]['pins'] = pin_directions
-        dbcon.commit()
-        dbcon.close()
 
     def additional_tables():
         stmt = ["" * 3]
         stmt.append("CREATE TABLE input (gid INTEGER PRIMARY KEY, wire_name TEXT);")
         stmt.append("CREATE TABLE output (gid INTEGER PRIMARY KEY, wire_name TEXT);")
         stmt.append("CREATE TABLE gids (gid INTEGER PRIMARY KEY, gate TEXT);")
-        for s in stmt: dbcur.execute(s)
+        # for s in stmt: dbcur.execute(s)
         return ' '.join(stmt)
 
     def p_attributes(t):
@@ -138,7 +132,7 @@ def create_parser(dbname):
             s += "pin_" + p[0] + " TEXT, "
             pin_directions[t[3]][p[0]] = p[1]
         s = s[:-2] + ");"
-        dbcur.execute(s)
+        # dbcur.execute(s)
 
     def p_named_attribute_pin(t):
         'named_attribute : PIN LPAR ID RPAR LCURLY attributes RCURLY'

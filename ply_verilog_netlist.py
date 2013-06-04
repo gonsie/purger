@@ -67,12 +67,8 @@ def create_lexer(nets={}):
 import ply.yacc as yacc
 import netlist
 from time import time
-import sqlite3 as lite
 
 def create_parser(dbname):
-
-    dbcon = lite.connect(dbname)
-    dbcur = dbcon.cursor()
 
     wire_names = {}
     gate_names = {}
@@ -86,8 +82,6 @@ def create_parser(dbname):
         t[0] = {}
         t[0]['wires'] = wire_names
         t[0]['gates'] = gate_names
-        dbcon.commit()
-        dbcon.close()
 
 # LIST_OF_PORTS
 
@@ -158,7 +152,7 @@ def create_parser(dbname):
             wire_names[w] = []
             gid += 1
         t[0] = t[0][:-2] + "; "
-        dbcur.execute(t[0])
+        # dbcur.execute(t[0])
         t[0] = ""
 
     def p_module_item_wire(t):
@@ -192,7 +186,7 @@ def create_parser(dbname):
         'module_item : CELL module_instance more_modules SEMI'
         if len(t[3]) > 0: print "ERROR: multiple module definitions for one cell type"
         t[0] = "INSERT INTO " + t[1] + t[2]
-        dbcur.execute(t[0])
+        # dbcur.execute(t[0])
         # get cell name to type map
         gname = t[2].split("(")[2].split(" ")[0].strip("\",")
         gate_names[gname] = t[1]
