@@ -67,21 +67,22 @@ def create_lexer(nets={}):
 import ply.yacc as yacc
 import netlist
 from time import time
+import classes
 
-def create_parser(dbname):
+def create_parser(gate_types, gid=0):
 
-    wire_names = {}
-    gate_names = {}
+    all_wires = {}
+    all_cells = {}
 
     precedence = ()
 
-    gid = 0
+    # gid = 0
 
     def p_module(t):
         'module : MODULE ID list_of_ports SEMI module_items ENDMODULE'
         t[0] = {}
-        t[0]['wires'] = wire_names
-        t[0]['gates'] = gate_names
+        t[0]['wires'] = all_wires
+        t[0]['gates'] = all_cells
 
 # LIST_OF_PORTS
 
@@ -145,22 +146,22 @@ def create_parser(dbname):
     def p_module_item_inout(t):
         '''module_item : INPUT range list_of_variables SEMI
                        | OUTPUT range list_of_variables SEMI'''
-        wl = wire_enumeration(t[2], t[3])
-        t[0] = "INSERT INTO " + t[1] + " (gid, wire_name) VALUES " 
-        for w in wl:
-            t[0] += "(" + str(gid) + ", \"" + w + "\"), "
-            wire_names[w] = []
-            gid += 1
-        t[0] = t[0][:-2] + "; "
-        # dbcur.execute(t[0])
         t[0] = ""
+        wl = wire_enumeration(t[2], t[3])
+        for w in wl:
+            g = classes.gate("io_cell_" + w)
+            g.setType(gate_types[t[1]+"_gate"])
+            p = "out" if t[1] is "input" else "in"
+            g.addWire(p, w)
+            all_cells[g.name] = g
+            all_wires[w] = [g]
 
     def p_module_item_wire(t):
         'module_item : WIRE range list_of_variables SEMI'
+        t[0] = ""
         wl = wire_enumeration(t[2], t[3])
         for w in wl:
-            wire_names[w] = []
-        t[0] = ""
+            all_wires[w] = []
 
     def p_module_item_assign(t):
         'module_item : ASSIGN list_of_assignments SEMI'
@@ -168,46 +169,27 @@ def create_parser(dbname):
 
     def p_module_item_module_single(t):
         'module_item : CELL ID LPAREN list_of_module_connections RPAREN SEMI'
-        t[0] = "INSERT INTO " + t[1]
-        pairs = [('cell_name', t[2])] + t[4]
-        cols = "(gid, "
-        vals = "(" + str(gid) + ", "
-        gid += 1
-        for p in pairs:
-            cols += p[0] + ", "
-            vals += "\"" + str(p[1]) + "\", "
-        cols = cols[:-2] + ")"
-        vals = vals[:-2] + ")"
-        t[0] += cols + " VALUES " + vals + "; "
-        for p in t[3]:
-            if type(p[1]) is str: wire_names[p[1]].append(t[1])
+        t[0] = ""
+        g = classes.gate(t[2])
+        g.setType(gate_types[t[1]])
+        for p in t[4]:
+            if type(p[1]) is str:
+                g.addWire(p[0], p[1])
+                all_wires[p[1]].append(g)
+        all_cells[g.name] = g
 
     def p_module_item_module_list(t):
         'module_item : CELL module_instance more_modules SEMI'
-        if len(t[3]) > 0: print "ERROR: multiple module definitions for one cell type"
-        t[0] = "INSERT INTO " + t[1] + t[2]
-        # dbcur.execute(t[0])
-        # get cell name to type map
-        gname = t[2].split("(")[2].split(" ")[0].strip("\",")
-        gate_names[gname] = t[1]
         t[0] = ""
+        if len(t[3]) > 0: print "ERROR: multiple module definitions for one cell type"
+        print "ERROR: multiple module definiton rule for no reason"
 
 # MORE_MODULES / CELLS / CONNECTING PORTS
 
     def p_module_instance(t):
         'module_instance : ID LPAREN list_of_module_connections RPAREN'
-        pairs = [('cell_name', t[1])] + t[3]
-        cols = "(gid, "
-        vals = "(" + str(gid) + ", "
-        gid += 1
-        for p in pairs:
-            cols += p[0] + ", "
-            vals += "\"" + str(p[1]) + "\", "
-        cols = cols[:-2] + ")"
-        vals = vals[:-2] + ")"
-        t[0] = cols + " VALUES " + vals + "; "
-        for p in t[3]:
-            if type(p[1]) is str: wire_names[p[1]].append(t[1])
+        t[0] = ""
+        print "ERROR: module_instance rule being called"
 
     def p_more_modules(t):
         'more_modules : COMMA module_instance more_modules'
@@ -233,7 +215,7 @@ def create_parser(dbname):
 
     def p_port_connection_dot(t):
         'port_connection : DOT ID LPAREN primary RPAREN'
-        t[0] = [('pin_' + t[2], t[4])]
+        t[0] = [(t[2], t[4])]
 
     def p_port_connection_e(t):
         'port_connection :'

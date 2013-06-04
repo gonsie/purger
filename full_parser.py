@@ -63,19 +63,19 @@ if __name__ == "__main__":
 	lsi_lib.set_lexer(ply_liberty.create_lexer())
 	lsi_lib.set_parser(ply_liberty.create_parser())
 	lsi_lib.parse_file('Examples/lsi_10k.lib')
-	import pdb; pdb.set_trace()
+	# import pdb; pdb.set_trace()
 
 	print "Parsing CCX"
 	cd = {key : "CELL" for key in lsi_lib.result.keys()}
 	ccx = PLYPair()
 	ccx.set_lexer(ply_verilog_netlist.create_lexer(cd))
-	ccx.set_parser(ply_verilog_netlist.create_parser(dbname))
+	ccx.set_parser(ply_verilog_netlist.create_parser(lsi_lib.result))
 	start = time()
 	ccx.parse_file('Examples/ccx_lsi.vSyn')
 	total = time() - start
 	print "Total Time:", total, "s"
 	# print ccx.result
-	# import pdb; pdb.set_trace()
+	import pdb; pdb.set_trace()
 
 	print "Removing Wires from database"
 	start = time()
