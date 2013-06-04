@@ -71,19 +71,17 @@ def create_lexer():
 import ply.yacc as yacc
 import classes
 
-def create_parser(dbname):
+def create_parser():
 
     precedence = ()
 
-    cell_tokens = {}
     gate_types = {}
 
     def p_library(t):
         'library : LIBRARY LPAR ID RPAR LCURLY attributes RCURLY'
         t[0] = {}
         additional_types()
-        t[0]['tokens'] = cell_tokens
-        t[0]['types'] = gate_types
+        t[0] = gate_types
 
     def additional_types():
         gi = classes.gate_type("INPUT")
@@ -127,7 +125,6 @@ def create_parser(dbname):
         'named_attribute : CELL LPAR ID RPAR LCURLY attributes RCURLY'
         t[0] = []
         print "Gate Type", t[3]
-        cell_tokens[t[3]] = 'CELL'
         g = classes.gate_type(t[3])
         for p in t[6]:
             g.addPin(p[0], p[1])

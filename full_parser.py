@@ -27,7 +27,6 @@ import ply_verilog_netlist
 import ply_liberty
 import ply_boolean_expressions
 from time import time
-import os
 
 def prompt(vars=None):
     prompt_message = "Brama Front End"
@@ -58,20 +57,16 @@ def dict_stats(d):
 
 if __name__ == "__main__":
 
-	# create the database
-	dbname = 'test.db'
-	if os.path.exists(dbname): os.remove(dbname)
-
 	# lsi_10k example
 	print "Parsing Library"
 	lsi_lib = PLYPair()
 	lsi_lib.set_lexer(ply_liberty.create_lexer())
-	lsi_lib.set_parser(ply_liberty.create_parser(dbname))
+	lsi_lib.set_parser(ply_liberty.create_parser())
 	lsi_lib.parse_file('Examples/lsi_10k.lib')
 	import pdb; pdb.set_trace()
 
 	print "Parsing CCX"
-	cd = lsi_lib.result['cells']
+	cd = {key : "CELL" for key in lsi_lib.result.keys()}
 	ccx = PLYPair()
 	ccx.set_lexer(ply_verilog_netlist.create_lexer(cd))
 	ccx.set_parser(ply_verilog_netlist.create_parser(dbname))
