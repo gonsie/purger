@@ -24,12 +24,15 @@ class gate:
         self.ref_pin[ref] = [pin, self.pin_direction[pin]]
 
     def updateRef(self, old_ref, new_ref):
+        if old_ref not in self.ref_pin: self.ref_pin[new_ref] = []; return
         self.ref_pin[new_ref] = self.ref_pin.pop(old_ref)
 
     def getRefPin(self, ref):
+        if ref not in self.ref_pin: return None
         return self.ref_pin[ref][0]
 
     def getRefDirection(self, ref):
+        if ref not in self.ref_pin: return None
         return self.ref_pin[ref][1]
 
     def addFanOut(self, g):

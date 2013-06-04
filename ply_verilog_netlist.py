@@ -148,10 +148,11 @@ def create_parser(gate_types, gid=0):
                        | OUTPUT range list_of_variables SEMI'''
         t[0] = ""
         wl = wire_enumeration(t[2], t[3])
+        # import pdb; pdb.set_trace()
         for w in wl:
             g = classes.gate("io_cell_" + w)
             g.setType(gate_types[t[1]+"_gate"])
-            p = "out" if t[1] is "input" else "in"
+            p = "out" if t[1] == "input" else "in"
             g.addRef(p, w)
             all_cells[g.name] = g
             all_wires[w] = [g]

@@ -75,7 +75,7 @@ if __name__ == "__main__":
 	total = time() - start
 	print "Total Time:", total, "s"
 	# print ccx.result
-	import pdb; pdb.set_trace()
+	# import pdb; pdb.set_trace()
 
 	print "Removing Wires from database"
 	start = time()
@@ -83,6 +83,7 @@ if __name__ == "__main__":
 	wire_remover.main(ccx.result['wires'], ccx.result['gates'], lsi_lib.result)
 	total = time() - start
 	print "Total Time:", total, "s"
+	import pdb; pdb.set_trace()
 
 	ccx.result.stats()
 	ccx.result.net_stats()
