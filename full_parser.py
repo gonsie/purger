@@ -68,8 +68,7 @@ if __name__ == "__main__":
 	lsi_lib.set_lexer(ply_liberty.create_lexer())
 	lsi_lib.set_parser(ply_liberty.create_parser(dbname))
 	lsi_lib.parse_file('Examples/lsi_10k.lib')
-	# print lsi_lib.result['sql']
-	# print lsi_lib.result['cells']
+	import pdb; pdb.set_trace()
 
 	print "Parsing CCX"
 	cd = lsi_lib.result['cells']

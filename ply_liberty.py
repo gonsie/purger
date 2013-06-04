@@ -69,28 +69,29 @@ def create_lexer():
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 import ply.yacc as yacc
+import classes
 
 def create_parser(dbname):
 
     precedence = ()
 
     cell_tokens = {}
-    pin_directions = {}
+    gate_types = {}
 
     def p_library(t):
         'library : LIBRARY LPAR ID RPAR LCURLY attributes RCURLY'
         t[0] = {}
-        additional_tables()
-        t[0]['cells'] = cell_tokens
-        t[0]['pins'] = pin_directions
+        additional_types()
+        t[0]['tokens'] = cell_tokens
+        t[0]['types'] = gate_types
 
-    def additional_tables():
-        stmt = ["" * 3]
-        stmt.append("CREATE TABLE input (gid INTEGER PRIMARY KEY, wire_name TEXT);")
-        stmt.append("CREATE TABLE output (gid INTEGER PRIMARY KEY, wire_name TEXT);")
-        stmt.append("CREATE TABLE gids (gid INTEGER PRIMARY KEY, gate TEXT);")
-        # for s in stmt: dbcur.execute(s)
-        return ' '.join(stmt)
+    def additional_types():
+        gi = classes.gate_type("INPUT")
+        gi.addPin("OUT", "output")
+        go = classes.gate_type("OUTPUT")
+        go.addPin("IN", "input")
+        gate_types[gi.name] = gi
+        gate_types[go.name] = go
 
     def p_attributes(t):
         'attributes : attribute attributes'
@@ -125,14 +126,12 @@ def create_parser(dbname):
     def p_named_attribute_cell(t):
         'named_attribute : CELL LPAR ID RPAR LCURLY attributes RCURLY'
         t[0] = []
+        print "Gate Type", t[3]
         cell_tokens[t[3]] = 'CELL'
-        pin_directions[t[3]] = {}
-        s = "CREATE TABLE " + t[3] + " (gid INTEGER PRIMARY KEY, cell_name TEXT, "
+        g = classes.gate_type(t[3])
         for p in t[6]:
-            s += "pin_" + p[0] + " TEXT, "
-            pin_directions[t[3]][p[0]] = p[1]
-        s = s[:-2] + ");"
-        # dbcur.execute(s)
+            g.addPin(p[0], p[1])
+        gate_types[g.name] = g
 
     def p_named_attribute_pin(t):
         'named_attribute : PIN LPAR ID RPAR LCURLY attributes RCURLY'
