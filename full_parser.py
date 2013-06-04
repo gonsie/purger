@@ -80,7 +80,7 @@ if __name__ == "__main__":
 	print "Removing Wires from database"
 	start = time()
 	import wire_remover
-	wire_remover.main(dbname, ccx.result['wires'], ccx.result['gates'], lsi_lib.result['pins'])
+	wire_remover.main(ccx.result['wires'], ccx.result['gates'], lsi_lib.result)
 	total = time() - start
 	print "Total Time:", total, "s"
 

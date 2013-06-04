@@ -88,8 +88,12 @@ def create_parser():
         gi.addPin("out", "output")
         go = classes.gate_type("output_gate")
         go.addPin("in", "input")
+        gw = classes.gate_type("fanout")
+        gw.addPin("in", "input")
+        gw.addPin("out", "output")
         gate_types[gi.name] = gi
         gate_types[go.name] = go
+        gate_types[gw.name] = gw
 
     def p_attributes(t):
         'attributes : attribute attributes'

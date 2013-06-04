@@ -2,28 +2,32 @@
 # Rensselaer Polytechnic Institute
 # May 7, 2013
 
-import sqlite3
-
-def main(dbname, wire_dic, gate_types, pin_dir):
-	con = sqlite3.connect(dbname)
-	cur = con.cursor()
-	count = len(wire_dic)
-	for w in wire_dic:
-		if len(wire_dic[w]) != 2:
-			# create a branching wire entry
-			pass
+def main(all_wires, all_gates, gate_types):
+	for w in all_wires:
+		# all_wires[w] is a list of gate objects
+		inputs = 0
+		inref = ""
+		outputs = 0
+		for g in all_wires[w]:
+			d = g.getRefDirection(w)
+			if d is "input": inputs += 1; inref = g
+			if d is "output": outputs += 1
+		if inputs is 0 or outputs is 0 or inputs > 1:
+			print "ERROR: wrong number of inputs (", inputs, ") or outputs (", outputs, ") on wire", w
+			break
+		if outputs > 1:
+			# print "WARNING: wire", w, "has fannout", outputs
+			fan = classes.gate(w)
+			fan.setType(gate_types["fanout"])
+			for g in all_wires[w]:
+				if g.getRefDirection(w) is "input":
+					fan.addRef("in", inref)
+				else:
+					fan.addFanOut(g)
+				g.updateRef(w, fan)
+			all_gates[fan.name] = fan
 		else:
-			results = []
-			for g in wire_dic[w]:
-				cur.execute("SELECT * FROM " + gate_types[g] + " WHERE cell_name = \"" + g + "\";")
-				res = cur.fetchone()
-				c = [cn[0] for cn in cur.description]
-				results.append([g, c[res.index(w)], res[0]])
-			for i in range(2):
-				cur.execute("UPDATE " + gate_types[results[i][0]] + " SET " + results[i][1] + " = " + str(results[i-1][2]) + " WHERE cell_name = \"" + results[i][0] + "\";")
-			con.commit()
-		count -= 1
-		if (count % 1000) == 0:
-			print count
-	con.commit()
-	con.close()
+			g0 = all_wires[w][0]
+			g1 = all_wires[w][1]
+			g0.updateRef(w, g1)
+			g1.updateRef(w, g0)

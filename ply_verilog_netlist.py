@@ -152,7 +152,7 @@ def create_parser(gate_types, gid=0):
             g = classes.gate("io_cell_" + w)
             g.setType(gate_types[t[1]+"_gate"])
             p = "out" if t[1] is "input" else "in"
-            g.addWire(p, w)
+            g.addRef(p, w)
             all_cells[g.name] = g
             all_wires[w] = [g]
 
@@ -174,7 +174,7 @@ def create_parser(gate_types, gid=0):
         g.setType(gate_types[t[1]])
         for p in t[4]:
             if type(p[1]) is str:
-                g.addWire(p[0], p[1])
+                g.addRef(p[0], p[1])
                 all_wires[p[1]].append(g)
         all_cells[g.name] = g
 
