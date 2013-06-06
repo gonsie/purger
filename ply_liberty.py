@@ -128,7 +128,7 @@ def create_parser():
     def p_named_attribute_cell(t):
         'named_attribute : CELL LPAR ID RPAR LCURLY attributes RCURLY'
         t[0] = []
-        g = classes.gate_type(t[3])
+        g = classes.Gate_Type(t[3])
         for p in t[6]:
             g.addPin(p[0], p[1])
         gate_types[g.name] = g

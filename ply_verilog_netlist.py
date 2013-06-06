@@ -65,7 +65,6 @@ def create_lexer(nets={}):
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 import ply.yacc as yacc
-import netlist
 from time import time
 import classes
 
@@ -150,7 +149,7 @@ def create_parser(gate_types, gid=0):
         wl = wire_enumeration(t[2], t[3])
         # import pdb; pdb.set_trace()
         for w in wl:
-            g = classes.gate("io_cell_" + w)
+            g = classes.Gate("io_cell_" + w)
             g.setType(gate_types[t[1]+"_gate"])
             p = "out" if t[1] == "input" else "in"
             g.addRef(p, w)
@@ -171,7 +170,7 @@ def create_parser(gate_types, gid=0):
     def p_module_item_module_single(t):
         'module_item : CELL ID LPAREN list_of_module_connections RPAREN SEMI'
         t[0] = ""
-        g = classes.gate(t[2])
+        g = classes.Gate(t[2])
         g.setType(gate_types[t[1]])
         for p in t[4]:
             if type(p[1]) is str:
@@ -260,7 +259,19 @@ def create_parser(gate_types, gid=0):
 
     def p_assignment(t):
         'assignment : primary EQ primary'
-        t[0] = {t[1] : t[3]}
+        if t[1] in all_wires and t[3] in all_wires:
+            flag = 0
+            if "io_cell_"+t[3] in all_cells:
+                flag += 1
+                all_wires[t[1]].append(all_cells["io_cell_"+t[3]])
+                all_cells["io_cell_"+t[3]].addIORef(t[1])
+                all_wires.pop(t[3])
+            if "io_cell"+t[1] in all_cells:
+                if flag != 0: print "ALERT: io_cell assigned to io_cell"
+                all_wires[t[3]].append(all_cells["io_cell_"+t[1]])
+                all_cells["io_cell_"+t[1]].addIORef(t[3])
+                all_wires.pop(t[1])
+        t[0] = ""
 
 # NUMBERS
 
@@ -274,15 +285,15 @@ def create_parser(gate_types, gid=0):
 
     def p_range_r(t):
         'range : LSQUARE number COLON number RSQUARE'
-        t[0] = netlist.Range(t[2], t[4])
+        t[0] = classes.Range(t[2], t[4])
 
     def p_range_s(t):
         'range : LSQUARE number RSQUARE'
-        t[0] = netlist.Range(t[2])
+        t[0] = classes.Range(t[2])
 
     def p_range_e(t):
         'range :'
-        t[0] = netlist.Range()
+        t[0] = classes.Range()
 
     def p_number_1(t):
         'number : SFLOAT'
