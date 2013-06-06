@@ -1,52 +1,141 @@
 class Gate_Type:
     def __init__(self, name):
         self.name = name
-        self.pins = {}
+        self.pin_direction = {}
+        self.out_order = []
+        self.in_order = []
     
     def addPin(self, name, direction):
-        self.pins[name] = direction
+        self.pin_direction[name] = direction
+        if direction == "output":
+            self.out_order.append(name)
+            self.out_order.sort()
+        elif direction == "input":
+            self.in_order.append(name)
+            self.in_order.sort()
+        else:
+            print "WARNING: unsupported pin direction:", direction, "for pin", name, "on gate type", self.name
 
 # TODO: number/order the pins
 
+import itertools
+
 class Gate:
+    
+    newid = itertools.count().next
+
     def __init__(self, name):
+        self.gid = Gate.newid()
         self.name = name
         self.type = None
-        self.pin_direction = {}
         self.ref_pin = {}
+        self.in_pins = []
+        self.out_pins = []
+
+    def __repr__(self):
+        return self.name+"_gate"
 
     def setType(self, t):
-        self.type = t.name
-        self.pin_direction = t.pins.copy()
-        if self.type is "fanout": self.outputs = []
+        self.type = t
+        self.in_pins = [0] * len(t.in_order)
+        self.out_pins = [0] * len(t.out_order)
+        if self.type.name == "fanout": 
+            self.fan_out = []
 
     def addIORef(self, ref):
-        if len(self.pin_direction) > 1:
-            print "ERROR: expecting one pin"
+        if self.type.name == "fanout":
+            print "ERROR(g1): don't use .addIORef on a fanout gate"
             return
-        p = self.pin_direction.keys()[0]
-        self.ref_pin[ref] = [p, self.pin_direction[p]]
+        if len(self.in_pins) + len(self.out_pins) > 1:
+            print "ERROR(g2): expecting one IO pin"
+            return
+        self.ref_pin[ref] = "out" if self.type.name == "input" else "in"
 
     def addRef(self, pin, ref):
-        self.ref_pin[ref] = [pin, self.pin_direction[pin]]
+        self.ref_pin[ref] = pin
+        if self.type.name == "fanout" and pin != "in":
+            print "ERROR(g3): don't use .addRef on a fanout gate"
+            return
+        if self.type.pin_direction[pin] == "input":
+            self.in_pins[self.type.in_order.index(pin)] = ref
+        else:
+            self.out_pins[self.type.out_order.index(pin)] = ref
 
     def updateRef(self, old_ref, new_ref):
-        if old_ref not in self.ref_pin: self.ref_pin[new_ref] = []; return
+        if new_ref in self.ref_pin:
+            return
+        if old_ref not in self.ref_pin:
+            for r in self.ref_pin:
+                if isinstance(r, Gate):
+                    if r.name == ref:
+                        ref = r
+                        break
+        if old_ref not in self.ref_pin:
+            print "ERROR(g4): updating", old_ref, "with", new_ref, "but it doesn't exist in", self.name
+            print self.ref_pin
+            self.ref_pin[new_ref] = []
+            return
         self.ref_pin[new_ref] = self.ref_pin.pop(old_ref)
+        if old_ref in self.in_pins:
+            self.in_pins[self.in_pins.index(old_ref)] = new_ref
+        elif old_ref in self.out_pins:
+            self.out_pins[self.out_pins.index(old_ref)] = new_ref
+        elif self.type.name == "fanout" and old_ref in self.fan_out:
+            print "ALERT: Updating ref in a fanout"
+            self.fan_out[self.fan_out.index(old_ref)] = new_ref
+            return
 
     def getRefPin(self, ref):
-        if ref not in self.ref_pin: return None
-        return self.ref_pin[ref][0]
+        if ref not in self.ref_pin:
+            for r in self.ref_pin:
+                if isinstance(r, Gate):
+                    if r.name == ref:
+                        ref = r
+                        break
+        if ref not in self.ref_pin: 
+            print "ERROR(g5): unknown reference", ref, "for", self.name
+            print self.ref_pin
+            return None
+        return self.ref_pin[ref]
 
     def getRefDirection(self, ref):
-        if ref not in self.ref_pin: return None
-        return self.ref_pin[ref][1]
+        if ref not in self.ref_pin:
+            for r in self.ref_pin:
+                if isinstance(r, Gate):
+                    if r.name == ref:
+                        ref = r
+                        break
+        if ref not in self.ref_pin:
+            print "ERROR(g6): unknown reference", ref, "for", self.name
+            print self.ref_pin
+            return None
+        return "input" if ref in self.in_pins else "output"
+        # return self.type.pin_direction[self.ref_pin[ref]]
 
-    def addFanOut(self, g):
-        if self.type is not "fanout":
-            print "ERROR: fanout gate type expected"
+    def addFanOut(self, ref):
+        if self.type.name is not "fanout":
+            print "ERROR(g7): fanout gate type expected"
             return
-        self.outputs.append(g)
+        self.ref_pin[ref] = "out"
+        self.fan_out.append(ref)
+
+    def getOutIndex(self, ref):
+        if ref not in self.ref_pin:
+            for r in self.ref_pin:
+                if isinstance(r, Gate):
+                    if r.name == ref:
+                        ref = r
+                        break
+        if ref not in self.ref_pin: 
+            print "ERROR(g8): unknown reference", ref, "for", self.name
+            print self.ref_pin
+            return None
+        if self.type.name == "fanout":
+            if ref in self.fan_out:
+                return 0
+        if ref in self.out_pins:
+            return self.out_pins.index(ref)
+        return -1
 
 # TODO: auto-increment gid's
 

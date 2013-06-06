@@ -84,11 +84,11 @@ def create_parser():
         t[0] = gate_types
 
     def additional_types():
-        gi = classes.gate_type("input_gate")
+        gi = classes.Gate_Type("input_gate")
         gi.addPin("out", "output")
-        go = classes.gate_type("output_gate")
+        go = classes.Gate_Type("output_gate")
         go.addPin("in", "input")
-        gw = classes.gate_type("fanout")
+        gw = classes.Gate_Type("fanout")
         gw.addPin("in", "input")
         gw.addPin("out", "output")
         gate_types[gi.name] = gi
