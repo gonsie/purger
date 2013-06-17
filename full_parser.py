@@ -81,7 +81,8 @@ if __name__ == "__main__":
 	start = time()
 	import wire_remover
 	wire_remover.main(ccx.result['wires'], ccx.result['gates'], lsi_lib.result)
-	wire_remover.out_files(ccx.result['gates'], lsi_lib.result, "test_ccx_ross")
+	import file_writer
+	file_writer.out_files(ccx.result['gates'], lsi_lib.result, "test_ccx_ross")
 	total = time() - start
 	print "Total Time:", total, "s"
 	import pdb; pdb.set_trace()
