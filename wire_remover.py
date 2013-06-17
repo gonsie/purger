@@ -51,7 +51,16 @@ def main(all_wires, all_gates, gate_types):
 			g1.updateRef(w, g0)
 	for w in pop_list:
 		all_wires.pop(w)
-	print "Total of", error_count, "errors"
+	print "Total of", error_count, "wire errors"
+	# gate checker
+	error_count = 0
+	for g in all_gates:
+		g = all_gates[g]
+		for k in g.ref_pin:
+			if type(k) is str and g.type.name.find("put_gate") == -1:
+				print "ERROR(w4): Gate", g.name, "references wire", k
+				error_count += 1
+	print "Total of", error_count, "gate errors"
 
 def out_files(all_gates, gate_types, filename_prefix):
 	f = open(filename_prefix+"_types.txt", "w")
@@ -78,6 +87,7 @@ def out_files(all_gates, gate_types, filename_prefix):
 		inlist = []
 		for r in g.ref_pin:
 			if type(r) is str:
+				# always strings for io_cells
 				# print "ERROR(w3): ref is string:", r, "for", g.name
 				continue
 			if g.getRefDirection(r) == "output":

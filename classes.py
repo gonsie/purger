@@ -42,6 +42,18 @@ class Gate:
         if self.type.name == "fanout": 
             self.fan_out = []
 
+    def validateRef(self, ref):
+        if ref not in self.ref_pin:
+            for r in self.ref_pin:
+                if type(ref) is str and isinstance(r, Gate) and r.name == ref:
+                    return r 
+                if isinstance(ref, Gate) and type(r) is str and ref.name == r:
+                    return r
+            print "==> ERROR: could not find", ref, "in", self.name
+            return None
+        else:
+            return ref
+
     def addIORef(self, ref):
         if self.type.name == "fanout":
             print "ERROR(g1): don't use .addIORef on a fanout gate"
@@ -49,7 +61,14 @@ class Gate:
         if len(self.in_pins) + len(self.out_pins) > 1:
             print "ERROR(g2): expecting one IO pin"
             return
-        self.ref_pin[ref] = "out" if self.type.name == "input" else "in"
+        if self.type.name == "input_gate":
+            self.ref_pin[ref] = "out"
+            self.out_pins[0] = ref
+        elif self.type.name == "output_gate":
+            self.ref_pin[ref] = "in"
+            self.in_pins[0] = ref
+        else:
+            print "ERROR(io): IOref for unknown type:", self.type.name
 
     def addRef(self, pin, ref):
         self.ref_pin[ref] = pin
@@ -62,14 +81,7 @@ class Gate:
             self.out_pins[self.type.out_order.index(pin)] = ref
 
     def updateRef(self, old_ref, new_ref):
-        if new_ref in self.ref_pin:
-            return
-        if old_ref not in self.ref_pin:
-            for r in self.ref_pin:
-                if isinstance(r, Gate):
-                    if r.name == ref:
-                        ref = r
-                        break
+        old_ref = self.validateRef(old_ref)
         if old_ref not in self.ref_pin:
             print "ERROR(g4): updating", old_ref, "with", new_ref, "but it doesn't exist in", self.name
             print self.ref_pin
@@ -86,12 +98,7 @@ class Gate:
             return
 
     def getRefPin(self, ref):
-        if ref not in self.ref_pin:
-            for r in self.ref_pin:
-                if isinstance(r, Gate):
-                    if r.name == ref:
-                        ref = r
-                        break
+        ref = self.validateRef(ref)
         if ref not in self.ref_pin: 
             print "ERROR(g5): unknown reference", ref, "for", self.name
             print self.ref_pin
@@ -99,12 +106,7 @@ class Gate:
         return self.ref_pin[ref]
 
     def getRefDirection(self, ref):
-        if ref not in self.ref_pin:
-            for r in self.ref_pin:
-                if isinstance(r, Gate):
-                    if r.name == ref:
-                        ref = r
-                        break
+        ref = self.validateRef(ref)
         if ref not in self.ref_pin:
             print "ERROR(g6): unknown reference", ref, "for", self.name
             print self.ref_pin
@@ -120,12 +122,7 @@ class Gate:
         self.fan_out.append(ref)
 
     def getOutIndex(self, ref):
-        if ref not in self.ref_pin:
-            for r in self.ref_pin:
-                if isinstance(r, Gate):
-                    if r.name == ref:
-                        ref = r
-                        break
+        ref = self.validateRef(ref)
         if ref not in self.ref_pin: 
             print "ERROR(g8): unknown reference", ref, "for", self.name
             print self.ref_pin
