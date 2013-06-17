@@ -86,12 +86,12 @@ def create_parser():
 
     def additional_types():
         gi = classes.Gate_Type("input_gate")
-        gi.addPin("out", "output")
+        gi.addPin("out", ["output"])
         go = classes.Gate_Type("output_gate")
-        go.addPin("in", "input")
+        go.addPin("in", ["input"])
         gw = classes.Gate_Type("fanout")
-        gw.addPin("in", "input")
-        gw.addPin("out", "output")
+        gw.addPin("in", ["input"])
+        gw.addPin("out", ["output"])
         gate_types[gi.name] = gi
         gate_types[go.name] = go
         gate_types[gw.name] = gw
@@ -131,7 +131,7 @@ def create_parser():
         t[0] = []
         g = classes.Gate_Type(t[3])
         for p in t[6]:
-            g.addPin(p[0], p[1:])
+            g.addPin(p[0], p[1])
         gate_types[g.name] = g
 
     def p_named_attribute_pin(t):
@@ -144,8 +144,8 @@ def create_parser():
         t[0] = [t[3]]
 
     def p_named_attribute_function(t):
-        '''named_attribute : FUNCITON COLON bool_exp
-                           | FUNCITON COLON bool_exp SEMI'''
+        '''named_attribute : FUNCTION COLON arg
+                           | FUNCTION COLON arg SEMI'''
         t[0] = [t[3]]
 
     def p_arg(t):

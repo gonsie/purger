@@ -7,15 +7,10 @@ class Gate_Type:
         self.pin_function = {}
     
     def addPin(self, name, atts):
+        direction = atts[0]
         if len(atts) > 1:
-            # needs to be output pin
-            direction = "output"
-            if atts[0] == "output":
-                function = atts[1]
-            else:
-                function = atts[0]
+            function = atts[1]
         else:
-            direction = atts[0] # should be input
             function = ""
         self.pin_direction[name] = direction
         self.pin_function[name] = function

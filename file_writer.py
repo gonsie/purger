@@ -47,17 +47,25 @@ def write_gate_h(dir_prefix, types_list):
 	f = open(dir_prefix+"gate.h", "w")
 	f.write(header_generic+"\n")
 	f.write(header_gate_h+"\n")
+	# total gate count def
 	f.write("#define GATE_TYPE_COUNT (" + str(len(types_list)) + ")\n\n")
+	# defs with gate types
 	for index, t in enumerate(types_list):
 		f.write("#define " + t + "_TYPE (" + str(index) + ")\n")
 	f.write("\n"+footer_gate_h+"\n")
 	f.close()
 
-def write_gate_c(dir_prefix):
+def write_gate_c(dir_prefix, types_list):
 	f = open(dir_prefix+"gate.c", "w")
 	f.write(header_generic+"\n")
 	f.write(header_gate_c+"\n")
 	f.write(fake_gate_funcs+"\n")
+	# gate functions
+	# function array
+	f.write("gate_func function_array[GATE_TYPE_COUNT] = {\n")
+	for  in types_list:
+		f.write("\t&" + t + "_func,\n")
+	f.write("}\n")
 	f.write("\n"+footer_gate_c+"\n")
 	f.close()
 
