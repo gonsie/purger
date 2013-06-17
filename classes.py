@@ -4,9 +4,21 @@ class Gate_Type:
         self.pin_direction = {}
         self.out_order = []
         self.in_order = []
+        self.pin_function = {}
     
-    def addPin(self, name, direction):
+    def addPin(self, name, atts):
+        if len(atts) > 1:
+            # needs to be output pin
+            direction = "output"
+            if atts[0] == "output":
+                function = atts[1]
+            else:
+                function = atts[0]
+        else:
+            direction = atts[0] # should be input
+            function = ""
         self.pin_direction[name] = direction
+        self.pin_function[name] = function
         if direction == "output":
             self.out_order.append(name)
             self.out_order.sort()

@@ -13,6 +13,7 @@ reserved = {
     'direction' : 'DIRECTION',
     'input' : 'IO_DIR',
     'output' : 'IO_DIR',
+    'function' : 'FUNCTION',
 }
 
 tokens = [
@@ -130,16 +131,21 @@ def create_parser():
         t[0] = []
         g = classes.Gate_Type(t[3])
         for p in t[6]:
-            g.addPin(p[0], p[1])
+            g.addPin(p[0], p[1:])
         gate_types[g.name] = g
 
     def p_named_attribute_pin(t):
         'named_attribute : PIN LPAR ID RPAR LCURLY attributes RCURLY'
-        t[0] = [(t[3], t[6][0])]
+        t[0] = [(t[3], t[6])]
 
     def p_named_attribute_direction(t):
         '''named_attribute : DIRECTION COLON IO_DIR
                            | DIRECTION COLON IO_DIR SEMI'''
+        t[0] = [t[3]]
+
+    def p_named_attribute_function(t):
+        '''named_attribute : FUNCITON COLON bool_exp
+                           | FUNCITON COLON bool_exp SEMI'''
         t[0] = [t[3]]
 
     def p_arg(t):
