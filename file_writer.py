@@ -19,6 +19,30 @@ header_gate_h='''#ifndef _gate_h
 footer_gate_h='''#endif
 '''
 
+fake_gate_funcs='''int input_gate_func (vector input, vector output){
+	return 0;
+}
+
+int output_gate_func (vector input, vector output){
+	return 0;
+}
+
+int fanout_func (vector input, vector output){
+	// assume input/output array sizes are at least 1
+	// assume all output array values are equal
+	if (output->array[0].value == input->array[0].value){
+		return 0;
+	} else {
+		int i;
+		for (i = 0; i < output->size; i++){
+			output->array[i].value = input->array[0].value;
+		}
+		return 1;
+	}
+}
+'''
+
+
 def write_gate_h(dir_prefix, types_list):
 	f = open(dir_prefix+"gate.h", "w")
 	f.write(header_generic+"\n")
@@ -33,6 +57,7 @@ def write_gate_c(dir_prefix):
 	f = open(dir_prefix+"gate.c", "w")
 	f.write(header_generic+"\n")
 	f.write(header_gate_c+"\n")
+	f.write(fake_gate_funcs+"\n")
 	f.write("\n"+footer_gate_c+"\n")
 	f.close()
 
