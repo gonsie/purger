@@ -1,5 +1,41 @@
 
 
+header_generic='''//Elsa Gonsiorowski
+//Rensselaer Polytechnic Institute
+'''
+
+header_gate_c='''#include <stdio.h>
+#include "gates_model.h"
+#include "gate.h"
+'''
+
+footer_gate_c='''
+'''
+
+header_gate_h='''#ifndef _gate_h
+#define _gate_h
+'''
+
+footer_gate_h='''#endif
+'''
+
+def write_gate_h(dir_prefix, types_list):
+	f = open(dir_prefix+"gate.h", "w")
+	f.write(header_generic+"\n")
+	f.write(header_gate_h+"\n")
+	f.write("#define GATE_TYPE_COUNT (" + str(len(types_list)) + ")\n\n")
+	for index, t in enumerate(types_list):
+		f.write("#define " + t + "_TYPE (" + str(index) + ")\n")
+	f.write("\n"+footer_gate_h+"\n")
+	f.close()
+
+def write_gate_c(dir_prefix):
+	f = open(dir_prefix+"gate.c", "w")
+	f.write(header_generic+"\n")
+	f.write(header_gate_c+"\n")
+	f.write("\n"+footer_gate_c+"\n")
+	f.close()
+
 def out_files(all_gates, gate_types, filename_prefix):
 	f = open(filename_prefix+"_types.txt", "w")
 	types_list = []
@@ -16,6 +52,7 @@ def out_files(all_gates, gate_types, filename_prefix):
 		f.write("\t"+instr+"\n")
 		f.write("\t"+outstr+"\n")
 	f.close()
+	write_gate_h(filename_prefix, types_list)
 	types_list.append(None)
 	f = open(filename_prefix+"_gates.txt", "w")
 	for g in all_gates:
@@ -37,4 +74,3 @@ def out_files(all_gates, gate_types, filename_prefix):
 		instr = ' '.join([' '.join(p[1:]) for p in inlist])
 		f.write(str(outcount)+" "+instr+"\n")
 	f.close()
-	
