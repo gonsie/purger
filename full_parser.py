@@ -81,10 +81,30 @@ if __name__ == "__main__":
 	start = time()
 	import wire_remover
 	wire_remover.main(ccx.result['wires'], ccx.result['gates'], lsi_lib.result)
+	total = time() - start
+	print "Total Time:", total, "s"
+	
+	print "Writing Files"
+	start = time()
 	import file_writer
 	file_writer.out_files(ccx.result['gates'], lsi_lib.result, "test_ccx_ross")
 	total = time() - start
 	print "Total Time:", total, "s"
+
+	print "Parsing Boolean Expressnions"
+	start = time()
+	be = PLYPair()
+	be.set_lexer(ply_boolean_expressions.create_lexer())
+	be.set_parser(ply_boolean_expressions.create_parser())
+	for g in lsi_lib.result:
+		g = lsi_lib.result[g]
+		print "*", g.name
+		ply_boolean_expressions.update(g.getPinMap())
+		for p in g.pin_function:
+			print p, ":", g.pin_function[p], "=>", be.parse(g.pin_function[p])
+	total = time() - start
+	print "Total Time:", total, "s"
+
 	import pdb; pdb.set_trace()
 
 	ccx.result.stats()

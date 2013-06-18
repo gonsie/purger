@@ -9,11 +9,8 @@ class Gate_Type:
     def addPin(self, name, atts):
         direction = atts[0]
         if len(atts) > 1:
-            function = atts[1]
-        else:
-            function = ""
+            self.pin_function[name] = atts[1]
         self.pin_direction[name] = direction
-        self.pin_function[name] = function
         if direction == "output":
             self.out_order.append(name)
             self.out_order.sort()
@@ -30,6 +27,14 @@ class Gate_Type:
             output += "\t//" + p + " : " + self.pin_function[p] + "\n"
             output += "\toutput->array[" + str(index) + "].value = 0;" 
         return output
+
+    def getPinMap(self):
+        pm = {}
+        for i, p in enumerate(self.in_order):
+            pm[p] = "inputs[" + str(i) + "]"
+        for i, p in enumerate(self.out_order):
+            pm[p] = "outputs[" + str(i) + "]"
+        return pm
 
 # TODO: number/order the pins
 

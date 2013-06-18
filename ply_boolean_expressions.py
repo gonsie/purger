@@ -2,35 +2,41 @@
 # Rensselaer Polytechnic Institute
 # July 9, 2012
 
+# reserved.update() is never used because this is empty!
 reserved = {}
 
 re_tokens = [
 	'NOT_B', 'NOT_A', 'XOR', 'AND', 'OR', 'ONE', 'ZERO', 'ID',
+	'LPAR', 'RPAR',
 ]
 
+# Mapping of pin name to C code name, i.e.
+# { A : inputs[0], B : inputs[1], Z : outputs[0] }
 pinmap = {}
 
 import ply.lex as lex
-def create_lexer(pins={}, pin_map={}):
+def create_lexer(pin_map={}):
 
 	global pinmap
 	pinmap = pin_map
 
 	global reserved
-	reserved.update(pins)
+	reserved = { k : 'PIN' for k in pin_map.keys() }
 
 	global tokens
 	tokens = re_tokens + list(reserved.values())
-	if len(pins) is 0:
+	if 'PIN' not in tokens:
 		tokens.append('PIN')
 
 	t_NOT_A = r'\''
 	t_NOT_B = r'\!'
 	t_XOR = r'\^'
-	t_AND = r'\*|\&|[ ]'
+	t_AND = r'\*|\&'
 	t_OR = r'\+|\|'
 	t_ONE = r'1'
 	t_ZERO = r'0'
+	t_LPAR = r'\('
+	t_RPAR = r'\)'
 
 	def t_ID(t):
 		r'[a-zA-Z][a-zA-Z0-9]*|\\\"[0-9][^\"]*\\\"'
@@ -40,6 +46,8 @@ def create_lexer(pins={}, pin_map={}):
 		else:
 			t.type = 'PIN'
 		return t
+
+	t_ignore = " \t\n"
 
 	def t_newline(t):
 		r'\n+|\\\n+'
@@ -65,7 +73,7 @@ def create_parser():
 		'expressions : expression expressions'
 		t[0] = t[1]
 		if t[2] != None:
-			t[0] += "\n" + t[2]
+			t[0] += " && " + t[2]
 
 	def p_empty(t):
 		'expressions :'
@@ -120,19 +128,23 @@ def create_parser():
 		'factor : PIN'
 		t[0] = pinmap[t[1]]
 
+	def p_factor_paren(t):
+		'factor : LPAR expressions RPAR'
+		t[0] = "(" + t[2] + ")"
+
 	def p_error(t):
 	    print "Syntax error at", t.value, "type", t.type, "on line", t.lexer.lineno
 
 	return yacc.yacc(tabmodule='ply_boolean_expressions_parsetab')
 
-def update(pins, pin_map):
+def update(pin_map):
 	global pinmap
 	pinmap = pin_map
 
 	global reserved
-	reserved.update(pins)
+	reserved = { k : 'PIN' for k in pin_map.keys() }
 
 	global tokens
 	tokens = re_tokens + list(reserved.values())
-	if len(pins) is 0:
+	if 'PIN' not in tokens:
 		tokens.append('PIN')
