@@ -55,7 +55,7 @@ def write_gate_h(dir_prefix, types_list):
 	f.write("\n"+footer_gate_h+"\n")
 	f.close()
 
-def write_gate_c(dir_prefix, types_list):
+def write_gate_c(dir_prefix, types_list, gate_types):
 	f = open(dir_prefix+"gate.c", "w")
 	f.write(header_generic+"\n")
 	f.write(header_gate_c+"\n")
@@ -63,7 +63,7 @@ def write_gate_c(dir_prefix, types_list):
 	# gate functions
 	# function array
 	f.write("gate_func function_array[GATE_TYPE_COUNT] = {\n")
-	for  in types_list:
+	for t in types_list:
 		f.write("\t&" + t + "_func,\n")
 	f.write("}\n")
 	f.write("\n"+footer_gate_c+"\n")
@@ -86,6 +86,7 @@ def out_files(all_gates, gate_types, filename_prefix):
 		f.write("\t"+outstr+"\n")
 	f.close()
 	write_gate_h(filename_prefix, types_list)
+	write_gate_c(filename_prefix, types_list, gate_types)
 	types_list.append(None)
 	f = open(filename_prefix+"_gates.txt", "w")
 	for g in all_gates:

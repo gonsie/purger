@@ -23,6 +23,14 @@ class Gate_Type:
         else:
             print "WARNING: unsupported pin direction:", direction, "for pin", name, "on gate type", self.name
 
+    def generateC(self):
+        output = ""
+        # add comments with original bool_exp
+        for index, p in enumerate(self.out_order):
+            output += "\t//" + p + " : " + self.pin_function[p] + "\n"
+            output += "\toutput->array[" + str(index) + "].value = 0;" 
+        return output
+
 # TODO: number/order the pins
 
 import itertools
