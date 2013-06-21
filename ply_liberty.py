@@ -109,8 +109,10 @@ def create_parser():
 
     def p_attribute(t):
         '''attribute : simple_attribute
+                     | simple_attribute SEMI
                      | complex_attribute
-                     | named_attribute'''
+                     | named_attribute
+                     | named_attribute_semi'''
         t[0] = t[1]
 
     def p_simple_attribute(t):
@@ -119,15 +121,14 @@ def create_parser():
                             | ID COLON NUM'''
         t[0] = []
 
-    def p_simple_attribute_semi(t):
-        '''simple_attribute : ID COLON STR SEMI
-                            | ID COLON ID SEMI
-                            | ID COLON NUM SEMI'''
-        t[0] = []
-
     def p_complex_attribute(t):
         'complex_attribute : ID LPAR arg args RPAR group_or_not'
         t[0] = []
+
+    def p_named_attribute_semi(t):
+        'named_attribute_semi : named_attribute_semi SEMI'
+        # doesn't prevent semicolon pileup (";;;;;;")
+        t[0] = t[1]
 
     def p_named_attribute_cell(t):
         'named_attribute : CELL LPAR ID RPAR LCURLY attributes RCURLY'
@@ -142,13 +143,11 @@ def create_parser():
         t[0] = [(t[3], t[6])]
 
     def p_named_attribute_direction(t):
-        '''named_attribute : DIRECTION COLON IO_DIR
-                           | DIRECTION COLON IO_DIR SEMI'''
+        'named_attribute_semi : DIRECTION COLON IO_DIR'
         t[0] = [t[3]]
 
     def p_named_attribute_function(t):
-        '''named_attribute : FUNCTION COLON arg
-                           | FUNCTION COLON arg SEMI'''
+        'named_attribute_semi : FUNCTION COLON arg'
         t[0] = [t[3]]
 
     def p_named_attribute_ff(t):
@@ -156,13 +155,11 @@ def create_parser():
         t[0] = [(t[3],["internal",t[8][0]]),(t[5],["internal",t[3]+"'"])]
 
     def p_named_attribute_next_state(t):
-        '''named_attribute : NEXT_STATE COLON arg
-                           | NEXT_STATE COLON arg SEMI'''
+        'named_attribute_semi : NEXT_STATE COLON arg'
         t[0] = [t[3]]
 
     def p_named_attribute_clocked_on(t):
-        '''named_attribute : CLOCKED_ON COLON arg
-                           | CLOCKED_ON COLON arg SEMI'''
+        'named_attribute_semi : CLOCKED_ON COLON arg'
         t[0] = []
         if t[3] != "CP":
             print "WARNING: an ff is not being clocked on CP:", t[3], "( line", t.lexer.lineno, ")"
