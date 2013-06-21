@@ -105,7 +105,11 @@ if __name__ == "__main__":
 		print "*", g.name
 		ply_boolean_expressions.update(g.getPinMap())
 		for p in g.pin_function:
-			func = be.parse(g.pin_function[p])
+			if type(g.pin_function[p]) is str:
+				func = be.parse(g.pin_function[p])
+			else:
+				func = g.pin_function[p].generateFuncCall(g.name, p)
+				subr = g.pin_function[p].generateFunc(g.name, p)
 			# do something with func
 			if not func:
 				error_count += 1

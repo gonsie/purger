@@ -17,6 +17,8 @@ reserved = {
     'ff' : 'FF',
     'clocked_on' : 'CLOCKED_ON',
     'next_state' : 'NEXT_STATE',
+    'latch' : 'LATCH',
+    'statetable' : 'STATETABLE',
 }
 
 tokens = [
@@ -150,13 +152,22 @@ def create_parser():
         'named_attribute_semi : FUNCTION COLON arg'
         t[0] = [t[3]]
 
-    def p_named_attribute_ff(t):
-        'named_attribute : FF LPAR arg COMMA arg RPAR LCURLY attributes RCURLY'
-        t[0] = [(t[3],["internal",t[8][0]]),(t[5],["internal",t[3]+"'"])]
+    def p_named_attribute_special_group(t):
+        '''named_attribute : FF special_group
+                           | LATCH special_group'''
+        t[2].setType(t[1])
+        t[0] = t[2].getPinRepr()
 
-    def p_named_attribute_next_state(t):
-        'named_attribute_semi : NEXT_STATE COLON arg'
-        t[0] = [t[3]]
+    def p_special_group(t):
+        'special_group = LPAR arg COMMA arg RPAR LCURLY attributes RCURLY'
+        # t[0] = [(t[3],["internal",None]),(t[5],["internal",t[3]+"'"])]
+        t[0] = classes.Special_Group()
+        t[0].addAtts(t[7])
+        t[0].addVars(t[2], t[4])
+
+    def p_named_attribute_special_group_atts(t):
+        '''named_attribute_semi : NEXT_STATE COLON arg'''
+        t[0] = [(t[1], t[3])]
 
     def p_named_attribute_clocked_on(t):
         'named_attribute_semi : CLOCKED_ON COLON arg'

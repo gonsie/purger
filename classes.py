@@ -1,3 +1,39 @@
+# use for latch, ff, state tables
+class Special_Group:
+    def __init__(self):
+        self.type = None
+        self.atts = {}
+        self.var1 = None
+        self.var2 = None
+
+    def setType(self, name):
+        self.type = name
+
+    def addAtts(self, tuple_list):
+        self.atts = {k : v for (k, v) in tuple_list}
+
+    def addVars(self, var1, var2):
+        self.var1 = var1
+        self.var2 = var2
+
+    def getPinRepr(self):
+        return [(self.var1, ["internal", self]),(self.var2, ["internal", self.var1+"'"])]
+
+    def generateFuncCall(self, cell, pin):
+        args = cell + "_" + pin + "_" + self.name + "("
+        args = args[:-2] + ");"
+        return args
+
+    def generateFunc(self, cell, pin):
+        params = "int " + cell + "_" + pin + "_" + self.name + " ("
+        for att in self.atts:
+            params += "int " + att + ", "
+            args += att + ", "
+        params = params[:-2] + ") {\n"
+        params += "}\n"
+        # do latch/ff/statetable logic here
+        return params
+
 class Gate_Type:
     def __init__(self, name):
         self.name = name
