@@ -15,10 +15,17 @@ reserved = {
     'output' : 'IO_DIR',
     'function' : 'FUNCTION',
     'ff' : 'FF',
-    'clocked_on' : 'CLOCKED_ON',
-    'next_state' : 'NEXT_STATE',
     'latch' : 'LATCH',
     'statetable' : 'STATETABLE',
+    'clocked_on' : 'CLOCKED_ON',
+    'next_state' : 'NEXT_STATE',
+    'enable' : 'ENABLE',
+    'data_in' : 'DATA_IN',
+    'clear' : 'CLEAR',
+    'preset' : 'PRESET',
+    'clear_preset_var1' : 'CLEAR_PRESET_VAR1',
+    'clear_preset_var2' : 'CLEAR_PRESET_VAR2',
+    'table' : 'TABLE',
 }
 
 tokens = [
@@ -111,26 +118,17 @@ def create_parser():
 
     def p_attribute(t):
         '''attribute : simple_attribute
-                     | simple_attribute SEMI
                      | complex_attribute
-                     | named_attribute
-                     | named_attribute_semi'''
+                     | named_attribute'''
         t[0] = t[1]
 
     def p_simple_attribute(t):
-        '''simple_attribute : ID COLON STR
-                            | ID COLON ID
-                            | ID COLON NUM'''
+        'simple_attribute : ID COLON arg'
         t[0] = []
 
     def p_complex_attribute(t):
         'complex_attribute : ID LPAR arg args RPAR group_or_not'
         t[0] = []
-
-    def p_named_attribute_semi(t):
-        'named_attribute_semi : named_attribute_semi SEMI'
-        # doesn't prevent semicolon pileup (";;;;;;")
-        t[0] = t[1]
 
     def p_named_attribute_cell(t):
         'named_attribute : CELL LPAR ID RPAR LCURLY attributes RCURLY'
@@ -145,43 +143,63 @@ def create_parser():
         t[0] = [(t[3], t[6])]
 
     def p_named_attribute_direction(t):
-        'named_attribute_semi : DIRECTION COLON IO_DIR'
+        '''named_attribute : DIRECTION COLON IO_DIR
+                           | DIRECTION COLON IO_DIR SEMI'''
         t[0] = [t[3]]
 
     def p_named_attribute_function(t):
-        'named_attribute_semi : FUNCTION COLON arg'
+        'named_attribute : FUNCTION COLON arg'
         t[0] = [t[3]]
 
     def p_named_attribute_special_group(t):
         '''named_attribute : FF special_group
-                           | LATCH special_group'''
+                           | LATCH special_group
+                           | STATETABLE special_group'''
         t[2].setType(t[1])
         t[0] = t[2].getPinRepr()
 
     def p_special_group(t):
-        'special_group = LPAR arg COMMA arg RPAR LCURLY attributes RCURLY'
-        # t[0] = [(t[3],["internal",None]),(t[5],["internal",t[3]+"'"])]
+        'special_group : LPAR arg COMMA arg RPAR LCURLY attributes RCURLY'
         t[0] = classes.Special_Group()
         t[0].addAtts(t[7])
         t[0].addVars(t[2], t[4])
 
     def p_named_attribute_special_group_atts(t):
-        '''named_attribute_semi : NEXT_STATE COLON arg'''
+        '''named_attribute : NEXT_STATE COLON arg
+                           | ENABLE COLON arg
+                           | DATA_IN COLON arg
+                           | CLEAR COLON arg
+                           | PRESET COLON arg
+                           | CLEAR_PRESET_VAR1 COLON arg
+                           | CLEAR_PRESET_VAR2 COLON arg
+                           | TABLE COLON arg'''
+        # some of these rules take L | H | N | T | X values
         t[0] = [(t[1], t[3])]
 
     def p_named_attribute_clocked_on(t):
-        'named_attribute_semi : CLOCKED_ON COLON arg'
+        'named_attribute : CLOCKED_ON COLON arg'
         t[0] = []
         if t[3] != "CP":
             print "WARNING: an ff is not being clocked on CP:", t[3], "( line", t.lexer.lineno, ")"
 
     def p_arg(t):
-        '''arg : STR
-               | NUM
-               | ID
-               | FF'''
+        '''arg : argl
+               | argl SEMI'''
         t[0] = t[1]
-        # note: 'ff' is also a unit, so it can appear in libary atts
+
+    def p_argl(t):
+        '''argl : STR
+                | NUM
+                | ID
+                | rhs_token'''
+        t[0] = t[1]
+
+    # some reserved words can also appear on RHS of atts
+    def p_rhs_token(t):
+        '''rhs_token : FF
+                     | CLEAR
+                     | PRESET'''
+        t[0] = t[1]
 
     def p_arg_e(t):
         'arg :'
@@ -205,6 +223,7 @@ def create_parser():
 
     def p_error(t):
         print "Syntax error at", t.value, "type", t.type, "on line", t.lexer.lineno
+        import pdb; pdb.set_trace()
         yacc.errok()
 
     return yacc.yacc(tabmodule='ply_liberty_parsetab')
