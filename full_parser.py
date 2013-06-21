@@ -59,18 +59,21 @@ if __name__ == "__main__":
 
 	# lsi_10k example
 	print "Parsing Library"
+	start = time()
 	lsi_lib = PLYPair()
 	lsi_lib.set_lexer(ply_liberty.create_lexer())
 	lsi_lib.set_parser(ply_liberty.create_parser())
 	lsi_lib.parse_file('Examples/lsi_10k.lib')
+	total = time() - start
+	print "Total Time:", total, "s"
 	# import pdb; pdb.set_trace()
 
 	print "Parsing CCX"
+	start = time()
 	cd = {key : "CELL" for key in lsi_lib.result.keys()}
 	ccx = PLYPair()
 	ccx.set_lexer(ply_verilog_netlist.create_lexer(cd))
 	ccx.set_parser(ply_verilog_netlist.create_parser(lsi_lib.result))
-	start = time()
 	ccx.parse_file('Examples/ccx_lsi.vSyn')
 	total = time() - start
 	print "Total Time:", total, "s"
