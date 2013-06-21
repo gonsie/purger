@@ -96,12 +96,17 @@ if __name__ == "__main__":
 	be = PLYPair()
 	be.set_lexer(ply_boolean_expressions.create_lexer())
 	be.set_parser(ply_boolean_expressions.create_parser())
+	error_count = 0
 	for g in lsi_lib.result:
 		g = lsi_lib.result[g]
 		print "*", g.name
 		ply_boolean_expressions.update(g.getPinMap())
 		for p in g.pin_function:
-			print p, ":", g.pin_function[p], "=>", be.parse(g.pin_function[p])
+			func = be.parse(g.pin_function[p])
+			# do something with func
+			if not func:
+				error_count += 1
+	print "Total of", error_count, "boolean expression parsing errors"
 	total = time() - start
 	print "Total Time:", total, "s"
 

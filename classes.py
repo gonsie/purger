@@ -4,6 +4,7 @@ class Gate_Type:
         self.pin_direction = {}
         self.out_order = []
         self.in_order = []
+        self.int_order = []
         self.pin_function = {}
     
     def addPin(self, name, atts):
@@ -17,6 +18,9 @@ class Gate_Type:
         elif direction == "input":
             self.in_order.append(name)
             self.in_order.sort()
+        elif direction == "internal":
+            self.int_order.append(name)
+            self.int_order.sort()
         else:
             print "WARNING: unsupported pin direction:", direction, "for pin", name, "on gate type", self.name
 
@@ -30,10 +34,11 @@ class Gate_Type:
 
     def getPinMap(self):
         pm = {}
-        for i, p in enumerate(self.in_order):
-            pm[p] = "inputs[" + str(i) + "]"
-        for i, p in enumerate(self.out_order):
-            pm[p] = "outputs[" + str(i) + "]"
+        counters = { "input" : 0, "output" : 0, "internal" : 0}
+        for p in self.pin_direction:
+            d = self.pin_direction[p]
+            pm[p] = d + "->array[" + str(counters[d]) + "].value"
+            counters[d] += 1
         return pm
 
 # TODO: number/order the pins

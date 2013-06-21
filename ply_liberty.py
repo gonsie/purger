@@ -14,6 +14,9 @@ reserved = {
     'input' : 'IO_DIR',
     'output' : 'IO_DIR',
     'function' : 'FUNCTION',
+    'ff' : 'FF',
+    'clocked_on' : 'CLOCKED_ON',
+    'next_state' : 'NEXT_STATE',
 }
 
 tokens = [
@@ -148,11 +151,29 @@ def create_parser():
                            | FUNCTION COLON arg SEMI'''
         t[0] = [t[3]]
 
+    def p_named_attribute_ff(t):
+        'named_attribute : FF LPAR arg COMMA arg RPAR LCURLY attributes RCURLY'
+        t[0] = [(t[3],["internal",t[8][0]]),(t[5],["internal",t[3]+"'"])]
+
+    def p_named_attribute_next_state(t):
+        '''named_attribute : NEXT_STATE COLON arg
+                           | NEXT_STATE COLON arg SEMI'''
+        t[0] = [t[3]]
+
+    def p_named_attribute_clocked_on(t):
+        '''named_attribute : CLOCKED_ON COLON arg
+                           | CLOCKED_ON COLON arg SEMI'''
+        t[0] = []
+        if t[3] != "CP":
+            print "WARNING: an ff is not being clocked on CP:", t[3], "( line", t.lexer.lineno, ")"
+
     def p_arg(t):
         '''arg : STR
                | NUM
-               | ID'''
+               | ID
+               | FF'''
         t[0] = t[1]
+        # note: 'ff' is also a unit, so it can appear in libary atts
 
     def p_arg_e(t):
         'arg :'
@@ -176,5 +197,6 @@ def create_parser():
 
     def p_error(t):
         print "Syntax error at", t.value, "type", t.type, "on line", t.lexer.lineno
+        yacc.errok()
 
     return yacc.yacc(tabmodule='ply_liberty_parsetab')
