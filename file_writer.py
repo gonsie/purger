@@ -74,14 +74,14 @@ def out_files(all_gates, gate_types, filename_prefix):
 	types_list = []
 	for k in gate_types:
 		types_list.append(k)
-		pins = gate_types[k].pin_direction.keys()
+		pins = gate_types[k].pins.keys()
 		pins.sort()
 		f.write(str(len(types_list)-1)+" "+gate_types[k].name)
 		for p in pins:
 			f.write(" "+p)
 		f.write("\n")
-		instr = ' '.join(gate_types[k].in_order)
-		outstr = ' '.join(gate_types[k].out_order)
+		instr = ' '.join(gate_types[k].getOrder('input'))
+		outstr = ' '.join(gate_types[k].getOrder('output'))
 		f.write("\t"+instr+"\n")
 		f.write("\t"+outstr+"\n")
 	f.close()

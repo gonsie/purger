@@ -104,15 +104,12 @@ if __name__ == "__main__":
 		g = lsi_lib.result[g]
 		print "*", g.name
 		ply_boolean_expressions.update(g.getPinMap())
-		for p in g.pin_function:
-			if type(g.pin_function[p]) is str:
-				func = be.parse(g.pin_function[p])
-			else:
-				func = g.pin_function[p].generateFuncCall(g.name, p)
-				subr = g.pin_function[p].generateFunc(g.name, p)
+		for p in g.pins:
+			if 'function' in g.pins[p]:
+				func = be.parse(g.pins[p]['function'])
+				print "\t", p, func
+			# do something for g.specials
 			# do something with func
-			if not func:
-				error_count += 1
 	print "Total of", error_count, "boolean expression parsing errors"
 	total = time() - start
 	print "Total Time:", total, "s"

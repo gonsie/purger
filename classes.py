@@ -10,6 +10,7 @@ class Special_Group:
     def setType(self, name):
         # type is set after arg and attribute processing
         self.type = name
+        if name == 'statetable': self.expandStatetable()
 
     def addAtts(self, tuple_list):
         self.atts = {k : v for (k, v) in tuple_list}
@@ -17,6 +18,15 @@ class Special_Group:
     def addVars(self, var1, var2):
         self.var1 = [k for k in var1.split(' ') if len(k) > 0]
         self.var2 = [k for k in var2.split(' ') if len(k) > 0]
+
+    def getInternalPins(self):
+        plist = []
+        if self.type == 'statetable':
+            # Add an 'I' before the interanal pins
+            plist = ["I"+k for k in self.var2]
+        else:
+            plist = self.var1 + self.var2
+        return {k : {'direction' : 'internal'} for k in plist}
 
     def generateFuncCall(self, cell, pin):
         args = cell + "_" + pin + "_" + self.name + "("
@@ -38,26 +48,28 @@ class Special_Group:
             print "ERROR: wrong type for statetable expansion:", self.type
             return
         rawtable = self.atts['table'].split('\\\n')
-        table = []
-        for l in table:
+        fulltable = []
+        for l in rawtable:
             l = l.strip(' ')
             l = l.strip(',')
             if l.find('/') != -1:
                 tmp = l
                 # forward / deletion
                 while l.find('/') != -1: l = l[:(l.find('/'))] + l[(l.find('/')+2):]
-                table.append(l)
+                fulltable.append(l)
                 l = tmp
                 # backward / deletion
                 while l.find('/') != -1: l = l[:(l.find('/')-1)] + l[(l.find('/')+1):]
-            table.append(l)
-            self.atts['table'] = table
+            fulltable.append(l)
+        table = [[[j for j in k.split(' ') if len(j) > 0] for k in v.split(':')] for v in fulltable]
+        self.atts['table'] = table
 
 class Gate_Type:
     def __init__(self, name):
         self.name = name
         self.pins = {}
         self.specials = {}
+        self.counts = {'input' : 0, 'output' : 0, 'internal' : 0}
 
     def add(self, name, entry):
         if name == 'pin':
@@ -65,22 +77,22 @@ class Gate_Type:
             self.pins[entry[0]] = entry[1]
         elif name == 'special':
             self.specials.update(entry)
+            entry = entry.items()[0]
+            self.pins.update(entry[1].getInternalPins())
     
     def setOrders(self):
         orders = ['input', 'output', 'internal']
         for o in orders:
-            olist = [k for k, v in self.pins.items() if o in v.values()]
-            olist.sort()
             index = 0
-            for s in olist:
+            for s in self.getOrder(o):
                 self.pins[s]['order'] = index
                 index += 1
+            self.counts[o] = index
 
     def generateC(self):
         output = ""
-        olist = [k for k, v in self.pins.items() if 'output' in v.values()]
         # add comments with original bool_exp
-        for p in olist:
+        for p in self.getOrder('output'):
             output += "\t//" + p + " : " + self.pins[p]['function'] + "\n"
             output += "\toutput->array[" + self.pins[p]['order'] + "].value = 0;" 
         return output
@@ -90,6 +102,11 @@ class Gate_Type:
         for p in self.pins:
             pm[p] = self.pins[p]['direction'] + "->array[" + str(self.pins[p]['order']) + "].value"
         return pm
+
+    def getOrder(self, direction):
+        ret = [k for k, v in self.pins.items() if direction in v.values()]
+        ret.sort()
+        return ret
 
 # TODO: number/order the pins
 
@@ -112,8 +129,8 @@ class Gate:
 
     def setType(self, t):
         self.type = t
-        self.in_pins = [0] * len(t.in_order)
-        self.out_pins = [0] * len(t.out_order)
+        self.in_pins = [0] * t.counts['input']
+        self.out_pins = [0] * t.counts['output']
         if self.type.name == "fanout": 
             self.fan_out = []
 
@@ -150,10 +167,10 @@ class Gate:
         if self.type.name == "fanout" and pin != "in":
             print "ERROR(g3): don't use .addRef on a fanout gate"
             return
-        if self.type.pin_direction[pin] == "input":
-            self.in_pins[self.type.in_order.index(pin)] = ref
+        if self.type.pins[pin]['direction'] == "input":
+            self.in_pins[self.type.pins[pin]['order']] = ref
         else:
-            self.out_pins[self.type.out_order.index(pin)] = ref
+            self.out_pins[self.type.pins[pin]['order']] = ref
 
     def updateRef(self, old_ref, new_ref):
         old_ref = self.validateRef(old_ref)
