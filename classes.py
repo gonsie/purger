@@ -3,21 +3,23 @@ class Special_Group:
     def __init__(self):
         self.type = None
         self.atts = {}
-        self.var1 = None
-        self.var2 = None
+        self.internal_pins = []
+        self.external_pins = []
 
     def setType(self, name):
+        # type is set after arg and attribute processing
         self.type = name
 
     def addAtts(self, tuple_list):
         self.atts = {k : v for (k, v) in tuple_list}
 
     def addVars(self, var1, var2):
-        self.var1 = var1
-        self.var2 = var2
-
-    def getPinRepr(self):
-        return [(self.var1, ["internal", self]),(self.var2, ["internal", self.var1+"'"])]
+        # check if it's a statetable
+        if ' ' in var1:
+            self.external_pins = [k for k in var1.split(' ') if len(k) > 0]
+            self.internal_pins = [k for k in var2.split(' ') if len(k) > 0]
+        else:
+            self.internal_pins = [var1, var2]
 
     def generateFuncCall(self, cell, pin):
         args = cell + "_" + pin + "_" + self.name + "("
@@ -34,6 +36,26 @@ class Special_Group:
         # do latch/ff/statetable logic here
         return params
 
+    def expandStatetable(self):
+        if self.type != "statetable":
+            print "ERROR: wrong type for statetable expansion:", self.type
+            return
+        rawtable = self.atts['table'].split('\\\n')
+        table = []
+        for l in table:
+            l = l.strip(' ')
+            l = l.strip(',')
+            if l.find('/') != -1:
+                tmp = l
+                # forward / deletion
+                while l.find('/') != -1: l = l[:(l.find('/'))] + l[(l.find('/')+2):]
+                table.append(l)
+                l = tmp
+                # backward / deletion
+                while l.find('/') != -1: l = l[:(l.find('/')-1)] + l[(l.find('/')+1):]
+            table.append(l)
+            self.atts['table'] = table
+
 class Gate_Type:
     def __init__(self, name):
         self.name = name
@@ -42,11 +64,16 @@ class Gate_Type:
         self.in_order = []
         self.int_order = []
         self.pin_function = {}
+        self.specials = {}
+
+    def add(self, name, entry):
+        if name == 'pin':
+            entry = entry.items()[0]
+            self.addPin(entry[0], entry[1])
+        elif name == 'special':
+            self.specials.update(entry)
     
-    def addPin(self, name, atts):
-        direction = atts[0]
-        if len(atts) > 1:
-            self.pin_function[name] = atts[1]
+    def addPin(self, name, direction):
         self.pin_direction[name] = direction
         if direction == "output":
             self.out_order.append(name)

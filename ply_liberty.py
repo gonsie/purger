@@ -98,12 +98,12 @@ def create_parser():
 
     def additional_types():
         gi = classes.Gate_Type("input_gate")
-        gi.addPin("out", ["output"])
+        gi.addPin("out", "output")
         go = classes.Gate_Type("output_gate")
-        go.addPin("in", ["input"])
+        go.addPin("in", "input")
         gw = classes.Gate_Type("fanout")
-        gw.addPin("in", ["input"])
-        gw.addPin("out", ["output"])
+        gw.addPin("in", "input")
+        gw.addPin("out", "output")
         gate_types[gi.name] = gi
         gate_types[go.name] = go
         gate_types[gw.name] = gw
@@ -135,12 +135,12 @@ def create_parser():
         t[0] = []
         g = classes.Gate_Type(t[3])
         for p in t[6]:
-            g.addPin(p[0], p[1])
+            g.add(p[0], p[1])
         gate_types[g.name] = g
 
     def p_named_attribute_pin(t):
         'named_attribute : PIN LPAR ID RPAR LCURLY attributes RCURLY'
-        t[0] = [(t[3], t[6])]
+        t[0] = [('pin', {t[3] : t[6][0]})]
 
     def p_named_attribute_direction(t):
         '''named_attribute : DIRECTION COLON IO_DIR
@@ -156,7 +156,7 @@ def create_parser():
                            | LATCH special_group
                            | STATETABLE special_group'''
         t[2].setType(t[1])
-        t[0] = t[2].getPinRepr()
+        t[0] = [('special', {t[1] : t[2]})]
 
     def p_special_group(t):
         'special_group : LPAR arg COMMA arg RPAR LCURLY attributes RCURLY'
