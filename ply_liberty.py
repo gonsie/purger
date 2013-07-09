@@ -98,12 +98,15 @@ def create_parser():
 
     def additional_types():
         gi = classes.Gate_Type("input_gate")
-        gi.addPin("out", "output")
+        gi.add('pin', {"out" : {'direction' : "output"}})
         go = classes.Gate_Type("output_gate")
-        go.addPin("in", "input")
+        go.add('pin', {"in": {'direction' : "input"}})
         gw = classes.Gate_Type("fanout")
-        gw.addPin("in", "input")
-        gw.addPin("out", "output")
+        gw.add('pin', {"in": {'direction' : "input"}})
+        gw.add('pin', {"out": {'direction' : "output", 'function' : "in"}})
+        gi.setOrders()
+        go.setOrders()
+        gw.setOrders()
         gate_types[gi.name] = gi
         gate_types[go.name] = go
         gate_types[gw.name] = gw
@@ -136,20 +139,21 @@ def create_parser():
         g = classes.Gate_Type(t[3])
         for p in t[6]:
             g.add(p[0], p[1])
+        g.setOrders()
         gate_types[g.name] = g
 
     def p_named_attribute_pin(t):
         'named_attribute : PIN LPAR ID RPAR LCURLY attributes RCURLY'
-        t[0] = [('pin', {t[3] : t[6][0]})]
+        t[0] = [('pin', {t[3] : {k : v for d in t[6] for k, v in d.items()}})]
 
     def p_named_attribute_direction(t):
         '''named_attribute : DIRECTION COLON IO_DIR
                            | DIRECTION COLON IO_DIR SEMI'''
-        t[0] = [t[3]]
+        t[0] = [{t[1] : t[3]}]
 
     def p_named_attribute_function(t):
         'named_attribute : FUNCTION COLON arg'
-        t[0] = [t[3]]
+        t[0] = [{t[1] : t[3]}]
 
     def p_named_attribute_special_group(t):
         '''named_attribute : FF special_group

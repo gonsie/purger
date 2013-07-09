@@ -3,8 +3,9 @@ class Special_Group:
     def __init__(self):
         self.type = None
         self.atts = {}
-        self.internal_pins = []
-        self.external_pins = []
+        # var1 and var2 change depending on type
+        self.var1 = []
+        self.var2 = []
 
     def setType(self, name):
         # type is set after arg and attribute processing
@@ -14,12 +15,8 @@ class Special_Group:
         self.atts = {k : v for (k, v) in tuple_list}
 
     def addVars(self, var1, var2):
-        # check if it's a statetable
-        if ' ' in var1:
-            self.external_pins = [k for k in var1.split(' ') if len(k) > 0]
-            self.internal_pins = [k for k in var2.split(' ') if len(k) > 0]
-        else:
-            self.internal_pins = [var1, var2]
+        self.var1 = [k for k in var1.split(' ') if len(k) > 0]
+        self.var2 = [k for k in var2.split(' ') if len(k) > 0]
 
     def generateFuncCall(self, cell, pin):
         args = cell + "_" + pin + "_" + self.name + "("
@@ -59,49 +56,39 @@ class Special_Group:
 class Gate_Type:
     def __init__(self, name):
         self.name = name
-        self.pin_direction = {}
-        self.out_order = []
-        self.in_order = []
-        self.int_order = []
-        self.pin_function = {}
+        self.pins = {}
         self.specials = {}
 
     def add(self, name, entry):
         if name == 'pin':
             entry = entry.items()[0]
-            self.addPin(entry[0], entry[1])
+            self.pins[entry[0]] = entry[1]
         elif name == 'special':
             self.specials.update(entry)
     
-    def addPin(self, name, direction):
-        self.pin_direction[name] = direction
-        if direction == "output":
-            self.out_order.append(name)
-            self.out_order.sort()
-        elif direction == "input":
-            self.in_order.append(name)
-            self.in_order.sort()
-        elif direction == "internal":
-            self.int_order.append(name)
-            self.int_order.sort()
-        else:
-            print "WARNING: unsupported pin direction:", direction, "for pin", name, "on gate type", self.name
+    def setOrders(self):
+        orders = ['input', 'output', 'internal']
+        for o in orders:
+            olist = [k for k, v in self.pins.items() if o in v.values()]
+            olist.sort()
+            index = 0
+            for s in olist:
+                self.pins[s]['order'] = index
+                index += 1
 
     def generateC(self):
         output = ""
+        olist = [k for k, v in self.pins.items() if 'output' in v.values()]
         # add comments with original bool_exp
-        for index, p in enumerate(self.out_order):
-            output += "\t//" + p + " : " + self.pin_function[p] + "\n"
-            output += "\toutput->array[" + str(index) + "].value = 0;" 
+        for p in olist:
+            output += "\t//" + p + " : " + self.pins[p]['function'] + "\n"
+            output += "\toutput->array[" + self.pins[p]['order'] + "].value = 0;" 
         return output
 
     def getPinMap(self):
         pm = {}
-        counters = { "input" : 0, "output" : 0, "internal" : 0}
-        for p in self.pin_direction:
-            d = self.pin_direction[p]
-            pm[p] = d + "->array[" + str(counters[d]) + "].value"
-            counters[d] += 1
+        for p in self.pins:
+            pm[p] = self.pins[p]['direction'] + "->array[" + str(self.pins[p]['order']) + "].value"
         return pm
 
 # TODO: number/order the pins
