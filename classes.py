@@ -43,19 +43,47 @@ class Special_Group:
         return output
 
     def generateStatetable(self, gate_type):
-        for line in self.atts.table:
+        output = ""
+        pm = gate_type.getPinMap()
+        for line in self.atts['table']:
             input_node_values = line[0]
             current_internal_values = line[1]
             next_internal_values = line[2]
-            # some really smart lookup table logic here
+            # comment with contents of table line
+            output += "\t//" + str(line) + "\n"
+            # create conditionals
+            conditions = []
+            assignments = []
+            for p, v in zip(self.var1, input_node_values):
+                if v != "-":
+                    conditions.append(pm[p] + " == " + v)
+            for p, v in zip(self.var2, current_internal_values):
+                if v != "-":
+                    conditions.append(pm[p] + " == " + v)
+            # create assignments
+            for p, v in zip(self.var2, next_internal_values):
+                if v != "N":
+                    assignments.append("\t\t" + pm[p] + " = " + v + ";\n")
+            # add to c code
+            if len(assignments) > 0 and len(conditions) > 0:
+                output += "\tif ("
+                for c in conditions:
+                    output += " " + c + " &&"
+                output = output[:-2] + ") {\n"
+                for a in assignments:
+                    output += a
+                output += "\t}\n"
+        return output
 
     def generateLatch(self, gate_type):
         # have generic latch logic here
-        pass
+        output = ""
+        return output
 
     def generateFf(self, gate_type):
         # have generic ff logic here
-        pass
+        output = ""
+        return output
 
     def generateFuncCall(self, cell, pin):
         args = cell + "_" + pin + "_" + self.name + "("
