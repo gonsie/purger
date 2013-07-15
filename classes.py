@@ -28,6 +28,35 @@ class Special_Group:
             plist = self.var1 + self.var2
         return {k : {'direction' : 'internal'} for k in plist}
 
+    def generateC(self, gate_type):
+        output = "int " + gate_type.name + "_" + self.type
+        output += " (vector input, vector internal, vector output) {\n"
+        if self.type == 'statetable':
+            output += self.generateStatetable(gate_type)
+        elif self.type == 'latch':
+            output += self.generateLatch(gate_type)
+        elif self.type == 'ff':
+            output += self.generateFf(gate_type)
+        else:
+            print "ERROR: unknown special type", self.type, "cannot generate function"
+        output += "}\n"
+        return output
+
+    def generateStatetable(self, gate_type):
+        for line in self.atts.table:
+            input_node_values = line[0]
+            current_internal_values = line[1]
+            next_internal_values = line[2]
+            # some really smart lookup table logic here
+
+    def generateLatch(self, gate_type):
+        # have generic latch logic here
+        pass
+
+    def generateFf(self, gate_type):
+        # have generic ff logic here
+        pass
+
     def generateFuncCall(self, cell, pin):
         args = cell + "_" + pin + "_" + self.name + "("
         args = args[:-2] + ");"
