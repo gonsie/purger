@@ -22,8 +22,7 @@ class Special_Group:
     def getInternalPins(self):
         plist = []
         if self.type == 'statetable':
-            # Add an 'I' before the interanal pins
-            plist = ["I"+k for k in self.var2]
+            plist = self.var2
         else:
             plist = self.var1 + self.var2
         return {k : {'direction' : 'internal'} for k in plist}
@@ -104,6 +103,8 @@ class Special_Group:
         if self.type != "statetable":
             print "ERROR: wrong type for statetable expansion:", self.type
             return
+        # ALERT : for some reason, statetables in lsi_lib don't actually reference internal nodes
+        self.var2 = ["I"+k for k in self.var2]
         rawtable = self.atts['table'].split('\\\n')
         fulltable = []
         for l in rawtable:
