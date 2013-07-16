@@ -78,17 +78,49 @@ class Special_Group:
                 output += "\t}\n"
         return output
 
+    def expandPresets(self):
+        if 'clear_preset_var1' not in self.atts or 'clear_preset_var2' not in self.atts:
+            print "ERROR: expecting clear_preset_var# attributes in", self.type
+            return
+        for k, v in [['clear_preset_var1', self.var1[0]], ['clear_preset_var2', self.var2[0]]]:
+            self.atts['o_'+k] = self.atts[k]
+            if self.atts[k] == "N": self.atts[k] = v
+            elif self.atts[k] == "H": self.atts[k] = '1'
+            elif self.atts[k] == "L": self.atts[k] = '0'
+            elif self.atts[k] == "T": self.atts[k] = "LOGIC_NOT(" + v + ")"
+            elif self.atts[k] == "X": self.atts[k] = 'X'
+
     def generateLatch(self, gate_type):
         # have generic latch logic here
         output = ""
-        # if (enable) {
-        #   var1 = data_in
-        #   var2 = ! data_in
-        # } if (clear) {
-        #   var1 = clear_preset_var1
-        #   var2 = clear_preset_var2
-        # }
-        # something like this
+        if 'clear' in self.atts and 'preset' in self.atts:
+            output += "\t//clear and preset\n"
+            output += "\t//clear_preset_var1 = " + self.atts['clear_preset_var1'] + "\n"
+            output += "\t//clear_preset_var2 = " + self.atts['clear_preset_var2'] + "\n"
+            output += "\tif ( (" + self.atts['clear'] + ") && (" + self.atts['preset'] + ") ) {\n"
+            self.expandPresets()
+            output += "\t\t" + self.var1[0] + " = " + self.atts['clear_preset_var1'] + ";\n"
+            output += "\t\t" + self.var2[0] + " = " + self.atts['clear_preset_var2'] + ";\n"
+            output += "\t\treturn 1;\n\t}\n"
+        if 'preset' in self.atts:
+            output += "\t//preset = " + self.atts['o_preset'] + "\n"
+            output += "\tif (" + self.atts['preset'] + ") {\n"
+            output += "\t\t" + self.var1[0] + " = 1;\n"
+            output += "\t\t" + self.var2[0] + " = 0;\n"
+            output += "\t\treturn 1;\n\t}\n"
+        if 'clear' in self.atts:
+            output += "\t//clear = " + self.atts['o_clear'] + "\n"
+            output += "\tif (" + self.atts['clear'] + ") {\n"
+            output += "\t\t" + self.var1[0] + " = 0;\n"
+            output += "\t\t" + self.var2[0] + " = 1;\n"
+            output += "\t\treturn 1;\n\t}\n"
+        if 'enable' in self.atts:
+            output += "\t//enable = " + self.atts['o_enable'] + "\n"
+            output += "\t//data_in = " + self.atts['o_data_in'] + "\n"
+            output += "\tif (" + self.atts['enable'] + ") {\n"
+            output += "\t\t" + self.var1[0] + " = " + self.atts['data_in'] + ";\n"
+            output += "\t\t" + self.var2[0] + " = !" + self.atts['data_in'] + ";\n"
+            output += "\t\treturn 1;\n\t}\n"
         return output
 
     def generateFf(self, gate_type):

@@ -76,7 +76,6 @@ if __name__ == "__main__":
 	error_count = 0
 	for g in lsi_lib.result:
 		g = lsi_lib.result[g]
-		print "*", g.name
 		ply_boolean_expressions.update(g.getPinMap())
 		for p in g.pins:
 			if 'function' in g.pins[p]:
