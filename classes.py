@@ -47,7 +47,6 @@ class Special_Group:
 
     def generateStatetable(self, gate_type):
         output = ""
-        pm = gate_type.getPinMap()
         for line in self.atts['table']:
             input_node_values = line[0]
             current_internal_values = line[1]
@@ -59,14 +58,14 @@ class Special_Group:
             assignments = []
             for p, v in zip(self.var1, input_node_values):
                 if v != "-":
-                    conditions.append(pm[p] + " == " + v)
+                    conditions.append(gate_type.pins[p]['cref'] + " == " + v)
             for p, v in zip(self.var2, current_internal_values):
                 if v != "-":
-                    conditions.append(pm[p] + " == " + v)
+                    conditions.append(gate_type.pins[p]['cref'] + " == " + v)
             # create assignments
             for p, v in zip(self.var2, next_internal_values):
                 if v != "N":
-                    assignments.append("\t\t" + pm[p] + " = " + v + ";\n")
+                    assignments.append("\t\t" + gate_type.pins[p]['cref'] + " = " + v + ";\n")
             # add to c code
             if len(assignments) > 0 and len(conditions) > 0:
                 output += "\tif ("
@@ -117,9 +116,8 @@ class Special_Group:
 
     def generateLatch(self, gate_type):
         # have generic latch logic here
-        pm = gate_type.getPinMap()
-        v1 = pm[self.var1[0]]
-        v2 = pm[self.var2[0]]
+        v1 = gate_type.pins[self.var1[0]]['cref']
+        v2 = gate_type.pins[self.var2[0]]['cref']
         output = self.generateLFF(v1, v2)
         if 'enable' in self.atts:
             output += "\t//enable = " + self.atts['o_enable'] + "\n"
@@ -132,12 +130,11 @@ class Special_Group:
 
     def generateFf(self, gate_type):
         # have generic ff logic here
-        pm = gate_type.getPinMap()
-        v1 = pm[self.var1[0]]
-        v2 = pm[self.var2[0]]
+        v1 = gate_type.pins[self.var1[0]]['cref']
+        v2 = gate_type.pins[self.var2[0]]['cref']
         output = self.generateLFF(v1, v2)
         # assume all FF's are clocked_on CP
-        cp = pm['CP']
+        cp = gate_type.pins['CP']['cref']
         output += "\t//clocked_on = CP\n"
         output += "\t//next_state = " + self.atts['o_next_state'] + "\n"
         output += "\tif (" + cp + ") {\n"
@@ -208,19 +205,28 @@ class Gate_Type:
                 self.pins[s]['order'] = index
                 index += 1
             self.counts[o] = index
+        for p in self.pins:
+            self.pins[p]['cref'] = self.pins[p]['direction'] + "->array[" + str(self.pins[p]['order']) + "].value"
 
     def generateC(self):
-        output = ""
+        helpers = ""
+        output = "int " + self.name + "_func  (vector input, vector internal, vector output) {\n"
+        if len(self.specials) > 0:
+            k = 'ff' if 'ff' in self.specials else 'latch'
+            # call the special first
+            helpers += self.specials[k].generateC(self) + "\n"
+            output += "\t" + self.name + "_" + k + "(input, internal, output);\n"
         # add comments with original bool_exp
         for p in self.getOrder('output'):
-            output += "\t//" + p + " : " + self.pins[p]['function'] + "\n"
-            output += "\toutput->array[" + self.pins[p]['order'] + "].value = 0;" 
-        return output
+            output += "\t//" + p + " : " + self.pins[p]['o_function'] + "\n"
+            output += "\t" + self.pins[p]['cref'] + " = " + self.pins[p]['function'] + ";\n"
+        output += "\treturn 1;\n}\n"
+        return helpers + output
 
     def getPinMap(self):
         pm = {}
         for p in self.pins:
-            pm[p] = self.pins[p]['direction'] + "->array[" + str(self.pins[p]['order']) + "].value"
+            pm[p] = self.pins[p]['cref']
         return pm
 
     def getOrder(self, direction):
