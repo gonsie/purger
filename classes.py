@@ -90,8 +90,7 @@ class Special_Group:
             elif self.atts[k] == "T": self.atts[k] = "LOGIC_NOT(" + v + ")"
             elif self.atts[k] == "X": self.atts[k] = 'X'
 
-    def generateLatch(self, gate_type):
-        # have generic latch logic here
+    def generateLFF(self, v1, v2):
         output = ""
         if 'clear' in self.atts and 'preset' in self.atts:
             output += "\t//clear and preset\n"
@@ -99,33 +98,52 @@ class Special_Group:
             output += "\t//clear_preset_var2 = " + self.atts['clear_preset_var2'] + "\n"
             output += "\tif ( (" + self.atts['clear'] + ") && (" + self.atts['preset'] + ") ) {\n"
             self.expandPresets()
-            output += "\t\t" + self.var1[0] + " = " + self.atts['clear_preset_var1'] + ";\n"
-            output += "\t\t" + self.var2[0] + " = " + self.atts['clear_preset_var2'] + ";\n"
+            output += "\t\t" + v1 + " = " + self.atts['clear_preset_var1'] + ";\n"
+            output += "\t\t" + v2 + " = " + self.atts['clear_preset_var2'] + ";\n"
             output += "\t\treturn 1;\n\t}\n"
         if 'preset' in self.atts:
             output += "\t//preset = " + self.atts['o_preset'] + "\n"
             output += "\tif (" + self.atts['preset'] + ") {\n"
-            output += "\t\t" + self.var1[0] + " = 1;\n"
-            output += "\t\t" + self.var2[0] + " = 0;\n"
+            output += "\t\t" + v1 + " = 1;\n"
+            output += "\t\t" + v2 + " = 0;\n"
             output += "\t\treturn 1;\n\t}\n"
         if 'clear' in self.atts:
             output += "\t//clear = " + self.atts['o_clear'] + "\n"
             output += "\tif (" + self.atts['clear'] + ") {\n"
-            output += "\t\t" + self.var1[0] + " = 0;\n"
-            output += "\t\t" + self.var2[0] + " = 1;\n"
+            output += "\t\t" + v1 + " = 0;\n"
+            output += "\t\t" + v2 + " = 1;\n"
             output += "\t\treturn 1;\n\t}\n"
+        return output
+
+    def generateLatch(self, gate_type):
+        # have generic latch logic here
+        pm = gate_type.getPinMap()
+        v1 = pm[self.var1[0]]
+        v2 = pm[self.var2[0]]
+        output = self.generateLFF(v1, v2)
         if 'enable' in self.atts:
             output += "\t//enable = " + self.atts['o_enable'] + "\n"
             output += "\t//data_in = " + self.atts['o_data_in'] + "\n"
             output += "\tif (" + self.atts['enable'] + ") {\n"
-            output += "\t\t" + self.var1[0] + " = " + self.atts['data_in'] + ";\n"
-            output += "\t\t" + self.var2[0] + " = !" + self.atts['data_in'] + ";\n"
+            output += "\t\t" + v1 + " = " + self.atts['data_in'] + ";\n"
+            output += "\t\t" + v2 + " = LOGIC_NOT(" + v1 + ");\n"
             output += "\t\treturn 1;\n\t}\n"
         return output
 
     def generateFf(self, gate_type):
         # have generic ff logic here
-        output = ""
+        pm = gate_type.getPinMap()
+        v1 = pm[self.var1[0]]
+        v2 = pm[self.var2[0]]
+        output = self.generateLFF(v1, v2)
+        # assume all FF's are clocked_on CP
+        cp = pm['CP']
+        output += "\t//clocked_on = CP\n"
+        output += "\t//next_state = " + self.atts['o_next_state'] + "\n"
+        output += "\tif (" + cp + ") {\n"
+        output += "\t\t" + v1 + " = " + self.atts['next_state'] + ";\n"
+        output += "\t\t" + v2 + " = LOGIC_NOT(" + v1 + ");\n"
+        output += "\t\treturn 1;\n\t}\n"
         return output
 
     def generateFuncCall(self, cell, pin):
