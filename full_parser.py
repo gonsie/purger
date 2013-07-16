@@ -68,6 +68,30 @@ if __name__ == "__main__":
 	print "Total Time:", total, "s"
 	# import pdb; pdb.set_trace()
 
+	print "Parsing Boolean Expressnions"
+	start = time()
+	be = PLYPair()
+	be.set_lexer(ply_boolean_expressions.create_lexer())
+	be.set_parser(ply_boolean_expressions.create_parser())
+	error_count = 0
+	for g in lsi_lib.result:
+		g = lsi_lib.result[g]
+		print "*", g.name
+		ply_boolean_expressions.update(g.getPinMap())
+		for p in g.pins:
+			if 'function' in g.pins[p]:
+				g.pins[p]['o_function'] = g.pins[p]['function']
+				g.pins[p]['function'] = be.parse(g.pins[p]['function'])
+		for s in g.specials:
+			s = g.specials[s]
+			for k in s.getBEatts():
+				s.atts['o_'+k] = s.atts[k]
+				s.atts[k] = be.parse(s.atts[k])
+	print "Total of", error_count, "boolean expression parsing errors"
+	total = time() - start
+	print "Total Time:", total, "s"
+	# import pdb; pdb.set_trace()
+
 	print "Parsing CCX"
 	start = time()
 	cd = {key : "CELL" for key in lsi_lib.result.keys()}
@@ -91,26 +115,6 @@ if __name__ == "__main__":
 	start = time()
 	import file_writer
 	file_writer.out_files(ccx.result['gates'], lsi_lib.result, "test_ccx_ross")
-	total = time() - start
-	print "Total Time:", total, "s"
-
-	print "Parsing Boolean Expressnions"
-	start = time()
-	be = PLYPair()
-	be.set_lexer(ply_boolean_expressions.create_lexer())
-	be.set_parser(ply_boolean_expressions.create_parser())
-	error_count = 0
-	for g in lsi_lib.result:
-		g = lsi_lib.result[g]
-		print "*", g.name
-		ply_boolean_expressions.update(g.getPinMap())
-		for p in g.pins:
-			if 'function' in g.pins[p]:
-				func = be.parse(g.pins[p]['function'])
-				print "\t", p, func
-			# do something for g.specials
-			# do something with func
-	print "Total of", error_count, "boolean expression parsing errors"
 	total = time() - start
 	print "Total Time:", total, "s"
 

@@ -27,6 +27,10 @@ class Special_Group:
             plist = self.var1 + self.var2
         return {k : {'direction' : 'internal'} for k in plist}
 
+    def getBEatts(self):
+        badKeys = ['table', 'clear_preset_var1', 'clear_preset_var2']
+        return {k for k in self.atts.keys() if k not in badKeys}
+
     def generateC(self, gate_type):
         output = "int " + gate_type.name + "_" + self.type
         output += " (vector input, vector internal, vector output) {\n"
@@ -38,7 +42,7 @@ class Special_Group:
             output += self.generateFf(gate_type)
         else:
             print "ERROR: unknown special type", self.type, "cannot generate function"
-        output += "}\n"
+        output += "\treturn 1;\n}\n"
         return output
 
     def generateStatetable(self, gate_type):
@@ -77,6 +81,14 @@ class Special_Group:
     def generateLatch(self, gate_type):
         # have generic latch logic here
         output = ""
+        # if (enable) {
+        #   var1 = data_in
+        #   var2 = ! data_in
+        # } if (clear) {
+        #   var1 = clear_preset_var1
+        #   var2 = clear_preset_var2
+        # }
+        # something like this
         return output
 
     def generateFf(self, gate_type):
