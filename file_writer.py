@@ -59,8 +59,10 @@ def write_gate_c(dir_prefix, types_list, gate_types):
 	f = open(dir_prefix+"gate.c", "w")
 	f.write(header_generic+"\n")
 	f.write(header_gate_c+"\n")
-	f.write(fake_gate_funcs+"\n")
 	# gate functions
+	for k in types_list:
+		print k
+		f.write(gate_types[k].generateC() + "\n")
 	# function array
 	f.write("gate_func function_array[GATE_TYPE_COUNT] = {\n")
 	for t in types_list:
@@ -68,6 +70,22 @@ def write_gate_c(dir_prefix, types_list, gate_types):
 	f.write("}\n")
 	f.write("\n"+footer_gate_c+"\n")
 	f.close()
+
+def generateC(filename_prefix, gate_types):
+	# this file just lists all cells with pins
+	f = open(filename_prefix+"_lib.txt", "w")
+	types_list = gate_types.keys()
+	## master list of cell name to cell number ##
+	types_list.sort()
+	for i, k in enumerate(types_list):
+		f.write(str(i) + " " + gate_types[k].name + "\n")
+		instr = ' '.join(gate_types[k].getOrder('input'))
+		outstr = ' '.join(gate_types[k].getOrder('output'))
+		f.write("\t"+instr+"\n")
+		f.write("\t"+outstr+"\n")
+	f.close()
+	write_gate_h(filename_prefix, types_list)
+	write_gate_c(filename_prefix, types_list, gate_types)
 
 def out_files(all_gates, gate_types, filename_prefix):
 	f = open(filename_prefix+"_types.txt", "w")
