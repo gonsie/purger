@@ -1,0 +1,114 @@
+FLIP-FLOP
+
+ff (variable1, variable2) {
+	clocked_on : "Boolean_expression" ;
+	next_state : "Boolean_expression" ;
+	clear : "Boolean_expression" ;
+	preset : "Boolean_expression" ;
+	clear_preset_var1 : value ;
+	clear_preset_var2 : value ;
+	clocked_on_also : "Boolean_expression" ;
+	powed_down_function : "Boolean_expression" ;
+}
+
+variable1 := The state of the noninverting output of the flip-flop. It is considered the 1-bit storage of the flip-flop.
+variable2 := The state of the inverting output
+
+NOTE: clocked_on is never used for lsi_lib
+Function Table for single-stage flip-flop attributes
+
+| active edge | clear    | preset   | variable1         | variable2         |
+|-------------+----------+----------+-------------------+-------------------|
+| clocked_on  | inactive | inactive | next_state        | !next_state       |
+| --          | active   | inactive | 0                 | 1                 |
+| --          | inactive | active   | 1                 | 0                 |
+| --          | active   | active   | clear_preset_var1 | clear_preset_var2 |
+
+Valid values for clear_preset_var*
+
+| value |   meaning |
+|-------+-----------|
+| L     |         0 |
+| H     |         1 |
+| N     | No change |
+| T     |    Toggle |
+| X     |   Unknown |
+
+NOTE: clocked_on_also is never used for lsi_lib
+Function Table for Master-Slave flip-flop attributes
+
+| active edge     | clear    | preset   | internal1         | internal2         | variable1         | variable2         |
+|-----------------+----------+----------+-------------------+-------------------+-------------------+-------------------|
+| clocked_on      | inactive | inactive | next_state        | !next_state       |                   |                   |
+| clocked_on_also | inactive | inactive |                   |                   | internal1         | internal2         |
+| --              | active   | active   | clear_preset_var1 | clear_preset_var2 | clear_preset_var1 | clear_preset_var2 |
+| --              | active   | inactive | 0                 | 1                 | 0                 | 1                 |
+| --              | inactive | active   | 1                 | 0                 | 1                 | 0                 |
+
+---
+
+LATCH
+
+latch (variable1, variable2) {
+	enable : "Boolean_expression" ;
+	data_in : "Boolean_expression" ;
+	clear : "Boolean_expression" ;
+	preset : "Boolean_expression" ;
+	clear_preset_var1 : value ;
+	clear_preset_var2 : value ;
+}
+
+variable1 := The state of the noninverting output of the latch. It is considered the 1-bit storage of the latch
+variable2 := The state of the inverting output
+
+Function Table for latch group attributes
+
+| enable | clear    | preset   | variable1         | variable2         |
+|--------+----------+----------+-------------------+-------------------|
+| active | inactive | inactive | data_in           | !data_in          |
+| --     | active   | inactive | 0                 | 1                 |
+| --     | inactive | active   | 1                 | 0                 |
+| --     | active   | active   | clear_preset_var1 | clear_preset_var2 |
+
+Valid values for clear_preset_var*
+
+| value |   meaning |
+|-------+-----------|
+| L     |         0 |
+| H     |         1 |
+| N     | No change |
+| T     |    Toggle |
+| X     |   Unknown |
+
+---
+
+STATETABLE
+
+statetable ("input node names", "internal node names") {
+	table : "input node values : current internal values : next internal values,\
+			 input node values : current internal values : next internal values" ;
+}
+
+Legitimate Values for Table
+
+| Input Node | Current Internal Node | Next Internal Node | State Represented                 |
+|------------+-----------------------+--------------------+-----------------------------------|
+| L          | L                     | L                  | Low                               |
+| H          | H                     | H                  | High                              |
+| -          | -                     | -                  | Don't care / Not specified        |
+| L/H        | L/H                   | L/H                | Expands to both L and H           |
+| H/L        | H/L                   | H/L                | Expands to both H and L           |
+| R          |                       |                    | Rising edge (from low to high)    |
+| F          |                       |                    | Falling edge (from high to low)   |
+| ~R         |                       |                    | Not rising edge                   |
+| ~F         |                       |                    | Not falling edge                  |
+|            |                       | X                  | Unknown                           |
+|            |                       | N                  | No event from current value. Hold |
+
+
+int CELL_statetable_function (vector input, vector internal, vector output) {
+	if (input->array[0].value == L)
+	return 0;
+}
+
+
