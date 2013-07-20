@@ -118,17 +118,17 @@ def generateLookups(filename_prefix, gate_types):
 	# input size
 	f.write("\nint gate_input_size[GATE_TYPE_COUNT] = {\n\t")
 	for t in types_list:
-		f.write(str(t.counts['input']) + ", ")
+		f.write(str(gate_types[t].counts['input']) + ", ")
 	f.write("\n\t}\n")
 	# internal size
 	f.write("\nint gate_internal_size[GATE_TYPE_COUNT] = {\n\t")
 	for t in types_list:
-		f.write(str(t.counts['internal']) + ", ")
+		f.write(str(gate_types[t].counts['internal']) + ", ")
 	f.write("\n\t}\n")
 	# output size
 	f.write("\nint gate_output_size[GATE_TYPE_COUNT] = {\n\t")
 	for t in types_list:
-		f.write(str(t.counts['output']) + ", ")
+		f.write(str(gate_types[t].counts['output']) + ", ")
 	f.write("\n\t}\n")
 	# footer
 	f.close()
