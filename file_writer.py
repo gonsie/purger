@@ -1,64 +1,28 @@
 
 
-header_generic='''//Elsa Gonsiorowski
+header='''//Elsa Gonsiorowski
 //Rensselaer Polytechnic Institute
 '''
 
-header_gate_c='''#include <stdio.h>
-#include "gates_model.h"
-#include "gate.h"
-'''
-
-footer_gate_c='''
-'''
-
-header_gate_h='''#ifndef _gate_h
-#define _gate_h
-'''
-
-footer_gate_h='''#endif
-'''
-
-fake_gate_funcs='''int input_gate_func (vector input, vector output){
-	return 0;
-}
-
-int output_gate_func (vector input, vector output){
-	return 0;
-}
-
-int fanout_func (vector input, vector output){
-	// assume input/output array sizes are at least 1
-	// assume all output array values are equal
-	if (output->array[0].value == input->array[0].value){
-		return 0;
-	} else {
-		int i;
-		for (i = 0; i < output->size; i++){
-			output->array[i].value = input->array[0].value;
-		}
-		return 1;
-	}
-}
-'''
-
-
 def write_gate_h(filename_prefix, types_list):
 	f = open(filename_prefix+"_types.h", "w")
-	f.write(header_generic+"\n")
-	f.write(header_gate_h+"\n")
+	f.write(header+"\n")
+	f.write("#ifndef _"+filename_prefix+"_types_h\n")
+	f.write("#define _"+filename_prefix+"_types_h\n\n")
 	# total gate count def
 	f.write("#define GATE_TYPE_COUNT (" + str(len(types_list)) + ")\n\n")
 	# defs with gate types
 	for index, t in enumerate(types_list):
 		f.write("#define " + t + "_TYPE (" + str(index) + ")\n")
-	f.write("\n"+footer_gate_h+"\n")
+	f.write("\n#endif\n")
 	f.close()
 
 def write_gate_c(filename_prefix, types_list, gate_types):
 	f = open(filename_prefix+"_functions.c", "w")
-	f.write(header_generic+"\n")
-	f.write(header_gate_c+"\n")
+	f.write(header+"\n")
+	f.write("#include <stdio.h>\n")
+	f.write("#include \"gates_model.h\"\n")
+	f.write("#include \""+filename_prefix+"_types.h\"\n\n")
 	# gate functions
 	for k in types_list:
 		print k
@@ -68,7 +32,6 @@ def write_gate_c(filename_prefix, types_list, gate_types):
 	for t in types_list:
 		f.write("\t&" + t + "_func,\n")
 	f.write("}\n")
-	f.write("\n"+footer_gate_c+"\n")
 	f.close()
 
 def generateC(filename_prefix, gate_types):
