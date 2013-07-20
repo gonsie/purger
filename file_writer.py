@@ -44,7 +44,7 @@ int fanout_func (vector input, vector output){
 
 
 def write_gate_h(dir_prefix, types_list):
-	f = open(dir_prefix+"gate.h", "w")
+	f = open(dir_prefix+"_types.h", "w")
 	f.write(header_generic+"\n")
 	f.write(header_gate_h+"\n")
 	# total gate count def
@@ -56,7 +56,7 @@ def write_gate_h(dir_prefix, types_list):
 	f.close()
 
 def write_gate_c(dir_prefix, types_list, gate_types):
-	f = open(dir_prefix+"gate.c", "w")
+	f = open(dir_prefix+"_functions.c", "w")
 	f.write(header_generic+"\n")
 	f.write(header_gate_c+"\n")
 	# gate functions
@@ -87,24 +87,7 @@ def generateC(filename_prefix, gate_types):
 	write_gate_h(filename_prefix, types_list)
 	write_gate_c(filename_prefix, types_list, gate_types)
 
-def out_files(all_gates, gate_types, filename_prefix):
-	f = open(filename_prefix+"_types.txt", "w")
-	types_list = []
-	for k in gate_types:
-		types_list.append(k)
-		pins = gate_types[k].pins.keys()
-		pins.sort()
-		f.write(str(len(types_list)-1)+" "+gate_types[k].name)
-		for p in pins:
-			f.write(" "+p)
-		f.write("\n")
-		instr = ' '.join(gate_types[k].getOrder('input'))
-		outstr = ' '.join(gate_types[k].getOrder('output'))
-		f.write("\t"+instr+"\n")
-		f.write("\t"+outstr+"\n")
-	f.close()
-	write_gate_h(filename_prefix, types_list)
-	write_gate_c(filename_prefix, types_list, gate_types)
+def generateRoss(filename_prefix, gate_types, all_gates):
 	types_list.append(None)
 	f = open(filename_prefix+"_gates.txt", "w")
 	for g in all_gates:
@@ -125,4 +108,27 @@ def out_files(all_gates, gate_types, filename_prefix):
 		inlist.sort()
 		instr = ' '.join([' '.join(p[1:]) for p in inlist])
 		f.write(str(outcount)+" "+instr+"\n")
+	f.close()
+
+def generateLookups(filename_prefix, gate_types):
+	f = open(filename_prefix+"_lookups.c", "w")
+	types_list = gate_types.keys()
+	types_list.sort()
+	# header
+	# input size
+	f.write("\nint gate_input_size[GATE_TYPE_COUNT] = {\n\t")
+	for t in types_list:
+		f.write(str(t.counts['input']) + ", ")
+	f.write("\n\t}\n")
+	# internal size
+	f.write("\nint gate_internal_size[GATE_TYPE_COUNT] = {\n\t")
+	for t in types_list:
+		f.write(str(t.counts['internal']) + ", ")
+	f.write("\n\t}\n")
+	# output size
+	f.write("\nint gate_output_size[GATE_TYPE_COUNT] = {\n\t")
+	for t in types_list:
+		f.write(str(t.counts['output']) + ", ")
+	f.write("\n\t}\n")
+	# footer
 	f.close()
