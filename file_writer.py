@@ -43,8 +43,8 @@ int fanout_func (vector input, vector output){
 '''
 
 
-def write_gate_h(dir_prefix, types_list):
-	f = open(dir_prefix+"_types.h", "w")
+def write_gate_h(filename_prefix, types_list):
+	f = open(filename_prefix+"_types.h", "w")
 	f.write(header_generic+"\n")
 	f.write(header_gate_h+"\n")
 	# total gate count def
@@ -55,8 +55,8 @@ def write_gate_h(dir_prefix, types_list):
 	f.write("\n"+footer_gate_h+"\n")
 	f.close()
 
-def write_gate_c(dir_prefix, types_list, gate_types):
-	f = open(dir_prefix+"_functions.c", "w")
+def write_gate_c(filename_prefix, types_list, gate_types):
+	f = open(filename_prefix+"_functions.c", "w")
 	f.write(header_generic+"\n")
 	f.write(header_gate_c+"\n")
 	# gate functions
