@@ -218,8 +218,8 @@ class Gate_Type:
             output += "\t" + self.name + "_" + k + "(input, internal, output);\n"
         # add comments with original bool_exp
         for p in self.getOrder('output'):
-            output += "\t//" + p + " : " + self.pins[p]['o_function'] + "\n"
-            output += "\t" + self.pins[p]['cref'] + " = " + self.pins[p]['function'] + ";\n"
+            if 'o_function' in self.pins[p]: output += "\t//" + p + " : " + self.pins[p]['o_function'] + "\n"
+            if 'function' in self.pins[p]: output += "\t" + self.pins[p]['cref'] + " = " + self.pins[p]['function'] + ";\n"
         output += "\treturn 1;\n}\n"
         return helpers + output
 
