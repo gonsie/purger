@@ -179,6 +179,8 @@ def create_parser():
                            | TABLE COLON arg'''
         # some of these rules take L | H | N | T | X values
         t[0] = [(t[1], t[3])]
+        if t[1].find('clear_preset_var') != -1 and t[2] == 'T':
+            print "WARNING: a Toggle of internal state, may need to be manually reversed"
 
     def p_named_attribute_clocked_on(t):
         'named_attribute : CLOCKED_ON COLON arg'

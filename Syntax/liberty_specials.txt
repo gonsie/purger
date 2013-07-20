@@ -14,7 +14,7 @@ ff (variable1, variable2) {
 variable1 := The state of the noninverting output of the flip-flop. It is considered the 1-bit storage of the flip-flop.
 variable2 := The state of the inverting output
 
-NOTE: clocked_on is never used for lsi_lib
+NOTE: clocked_on is always CP for lsi_lib
 Function Table for single-stage flip-flop attributes
 
 | active edge | clear    | preset   | variable1         | variable2         |
@@ -25,6 +25,7 @@ Function Table for single-stage flip-flop attributes
 | --          | active   | active   | clear_preset_var1 | clear_preset_var2 |
 
 Valid values for clear_preset_var*
+NOTE: always L for lsi_lib (ff)
 
 | value |   meaning |
 |-------+-----------|
