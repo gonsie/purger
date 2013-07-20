@@ -113,7 +113,7 @@ if __name__ == "__main__":
 	print "Writing Files"
 	start = time()
 	import file_writer
-	file_writer.out_files(ccx.result['gates'], lsi_lib.result, "test_ccx_ross")
+	file_writer.generateC("lsi_10k", lsi_lib.result)
 	total = time() - start
 	print "Total Time:", total, "s"
 
