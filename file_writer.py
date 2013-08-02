@@ -30,7 +30,7 @@ def write_gate_c(filename_prefix, types_list, gate_types):
 	f.write("gate_func function_array[GATE_TYPE_COUNT] = {\n")
 	for t in types_list:
 		f.write("\t&" + t + "_func,\n")
-	f.write("}\n")
+	f.write("};\n")
 	f.close()
 
 def write_lookup_c(filename_prefix, types_list, gate_types):
@@ -41,17 +41,17 @@ def write_lookup_c(filename_prefix, types_list, gate_types):
 	f.write("\nint gate_input_size[GATE_TYPE_COUNT] = {\n\t")
 	for t in types_list:
 		f.write(str(gate_types[t].counts['input']) + ", ")
-	f.write("\n\t}\n")
+	f.write("\n\t};\n")
 	# internal size
 	f.write("\nint gate_internal_size[GATE_TYPE_COUNT] = {\n\t")
 	for t in types_list:
 		f.write(str(gate_types[t].counts['internal']) + ", ")
-	f.write("\n\t}\n")
+	f.write("\n\t};\n")
 	# output size
 	f.write("\nint gate_output_size[GATE_TYPE_COUNT] = {\n\t")
 	for t in types_list:
 		f.write(str(gate_types[t].counts['output']) + ", ")
-	f.write("\n\t}\n")
+	f.write("\n\t};\n")
 	f.close()
 
 def generateC(filename_prefix, gate_types):
@@ -72,25 +72,28 @@ def generateC(filename_prefix, gate_types):
 	write_lookup_c(filename_prefix, types_list, gate_types)
 
 def generateRoss(filename_prefix, gate_types, all_gates):
+	types_list = gate_types.keys()
+	types_list.sort()
 	types_list.append(None)
 	f = open(filename_prefix+"_gates.txt", "w")
 	for g in all_gates:
 		g = all_gates[g]
 		f.write(str(g.gid)+" "+str(types_list.index(g.type.name))+" ")
-		outcount = 0
 		inlist = []
 		for r in g.ref_pin:
 			if type(r) is str:
 				# always strings for io_cells
 				# print "ERROR(w3): ref is string:", r, "for", g.name
 				continue
-			if g.getRefDirection(r) == "output":
-				outcount += 1
-			else:
+			if g.getRefDirection(r) == "input":
 				p3 = r.getOutIndex(g)
 				inlist.append((g.getRefPin(r), str(r.gid), str(p3)))
 		inlist.sort()
 		instr = ' '.join([' '.join(p[1:]) for p in inlist])
-		f.write(str(outcount)+" "+instr+"\n")
+		f.write(instr)
+		# fanout special case
+		if g.type.name == 'fanout':
+			f.write(" "+str(g.type.counts['output']))
+		f.write("\n")
 	f.close()
 

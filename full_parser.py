@@ -100,7 +100,6 @@ if __name__ == "__main__":
 	ccx.parse_file('Examples/ccx_lsi.vSyn')
 	total = time() - start
 	print "Total Time:", total, "s"
-	# print ccx.result
 	# import pdb; pdb.set_trace()
 
 	print "Removing Wires from database"
@@ -109,19 +108,17 @@ if __name__ == "__main__":
 	wire_remover.main(ccx.result['wires'], ccx.result['gates'], lsi_lib.result)
 	total = time() - start
 	print "Total Time:", total, "s"
+	# import pdb; pdb.set_trace()
 	
 	print "Writing Files"
 	start = time()
 	import file_writer
 	file_writer.generateC("lsi_10k", lsi_lib.result)
+	file_writer.generateRoss("ccx", lsi_lib.result, ccx.result['gates'])
 	total = time() - start
 	print "Total Time:", total, "s"
 
 	import pdb; pdb.set_trace()
-
-	ccx.result.stats()
-	ccx.result.net_stats()
-	ccx.result.wire_stats(lsi_lib.result)
 
 	p = prompt()
 	p()
