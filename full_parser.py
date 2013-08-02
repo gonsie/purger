@@ -28,33 +28,6 @@ import ply_liberty
 import ply_boolean_expressions
 from time import time
 
-def prompt(vars=None):
-    prompt_message = "Brama Front End"
-    try:
-        from IPython.Shell import IPShellEmbed
-        ipshell = IPShellEmbed(argv=[''],banner=prompt_message,exit_msg="Goodbye")
-        return  ipshell
-    except ImportError:
-        if vars is None:  vars=globals()
-        import code
-        import rlcompleter
-        import readline
-        readline.parse_and_bind("tab: complete")
-        # calling this with globals ensures we can see the environment
-        print prompt_message
-        shell = code.InteractiveConsole(vars)
-        return shell.interact
-
-def dict_stats(d):
-	total = 0
-	max_len = 0
-	for k in d:
-		total += len(d[k])
-		max_len = max(max_len, len(d[k]))
-	print "Average Length =", total, "/", len(d), "=", total / float(len(d))
-	print "Max = ", max_len
-
-
 if __name__ == "__main__":
 
 	# lsi_10k example
@@ -109,7 +82,7 @@ if __name__ == "__main__":
 	total = time() - start
 	print "Total Time:", total, "s"
 	# import pdb; pdb.set_trace()
-	
+
 	print "Writing Files"
 	start = time()
 	import file_writer
@@ -119,9 +92,4 @@ if __name__ == "__main__":
 	print "Total Time:", total, "s"
 
 	import pdb; pdb.set_trace()
-
-	p = prompt()
-	p()
-
-
 
