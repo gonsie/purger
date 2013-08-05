@@ -23,7 +23,7 @@ class PLYPair:
 		self.result = self.parser.parse(text, lexer=self.lexer)
 		return self.result
 
-def main(flib, fnet):
+def main(flib, fnet, targetdir="current/"):
 	
 	import ply_liberty
 	print "\nParsing Library"
@@ -85,8 +85,8 @@ def main(flib, fnet):
 	start = time()
 	flib = flib.split('/')[-1].split('.')[0]
 	fnet = fnet.split('/')[-1].split('.')[0]
-	file_writer.generateC(flib, lsi_lib.result)
-	file_writer.generateRoss(fnet, lsi_lib.result, ccx.result['gates'])
+	file_writer.generateC(targetdir+flib, lsi_lib.result)
+	file_writer.generateRoss(targetdir+fnet, lsi_lib.result, ccx.result['gates'])
 	total = time() - start
 	print "Total Time:", total, "s"
 

@@ -5,10 +5,11 @@ header='''//Elsa Gonsiorowski
 '''
 
 def write_gate_h(filename_prefix, types_list):
-	f = open("current/"+filename_prefix+"_types.h", "w")
+	f = open(filename_prefix+"_types.h", "w")
 	f.write(header+"\n")
-	f.write("#ifndef _"+filename_prefix+"_types_h\n")
-	f.write("#define _"+filename_prefix+"_types_h\n\n")
+	filename = filename_prefix.split("/")[-1].split(".")[0]
+	f.write("#ifndef _"+filename+"_types_h\n")
+	f.write("#define _"+filename+"_types_h\n\n")
 	# total gate count def
 	f.write("#define GATE_TYPE_COUNT (" + str(len(types_list)) + ")\n\n")
 	# defs with gate types
@@ -18,7 +19,7 @@ def write_gate_h(filename_prefix, types_list):
 	f.close()
 
 def write_gate_c(filename_prefix, types_list, gate_types):
-	f = open("current/"+filename_prefix+"_functions.c", "w")
+	f = open(filename_prefix+"_functions.c", "w")
 	f.write(header+"\n")
 	f.write("#include <stdio.h>\n")
 	f.write("#include \"gates_model.h\"\n")
@@ -34,7 +35,7 @@ def write_gate_c(filename_prefix, types_list, gate_types):
 	f.close()
 
 def write_lookup_c(filename_prefix, types_list, gate_types):
-	f = open("current/"+filename_prefix+"_lookups.c", "w")
+	f = open(filename_prefix+"_lookups.c", "w")
 	f.write(header+"\n")
 	f.write("#include \"gates_model.h\"\n")
 	# input size
@@ -56,7 +57,7 @@ def write_lookup_c(filename_prefix, types_list, gate_types):
 
 def generateC(filename_prefix, gate_types):
 	# this file just lists all cells with pins
-	f = open("current/"+filename_prefix+"_lib.txt", "w")
+	f = open(filename_prefix+"_lib.txt", "w")
 	types_list = gate_types.keys()
 	## master list of cell name to cell number ##
 	types_list.sort()
@@ -75,7 +76,7 @@ def generateRoss(filename_prefix, gate_types, all_gates):
 	types_list = gate_types.keys()
 	types_list.sort()
 	types_list.append(None)
-	f = open("current/"+filename_prefix+"_gates.txt", "w")
+	f = open(filename_prefix+"_gates.txt", "w")
 	for g in all_gates:
 		g = all_gates[g]
 		f.write(str(g.gid)+" "+str(types_list.index(g.type.name))+" ")
