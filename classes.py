@@ -234,8 +234,6 @@ class Gate_Type:
         ret.sort()
         return ret
 
-# TODO: number/order the pins
-
 import itertools
 
 class Gate:
@@ -351,8 +349,6 @@ class Gate:
         if ref in self.out_pins:
             return self.out_pins.index(ref)
         return -1
-
-# TODO: auto-increment gid's
 
 class Range:
     def __init__(self, start=None, end=None):

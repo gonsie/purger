@@ -23,25 +23,21 @@ class PLYPair:
 		self.result = self.parser.parse(text, lexer=self.lexer)
 		return self.result
 
-import ply_verilog_netlist
-import ply_liberty
-import ply_boolean_expressions
-from time import time
-
-if __name__ == "__main__":
-
-	# lsi_10k example
-	print "Parsing Library"
+def main(flib, fnet):
+	
+	import ply_liberty
+	print "\nParsing Library"
 	start = time()
 	lsi_lib = PLYPair()
 	lsi_lib.set_lexer(ply_liberty.create_lexer())
 	lsi_lib.set_parser(ply_liberty.create_parser())
-	lsi_lib.parse_file('Examples/lsi_10k.lib')
+	lsi_lib.parse_file(flib)
 	total = time() - start
 	print "Total Time:", total, "s"
 	# import pdb; pdb.set_trace()
 
-	print "Parsing Boolean Expressnions"
+	import ply_boolean_expressions
+	print "\nParsing Boolean Expressnions"
 	start = time()
 	be = PLYPair()
 	be.set_lexer(ply_boolean_expressions.create_lexer())
@@ -64,32 +60,43 @@ if __name__ == "__main__":
 	print "Total Time:", total, "s"
 	# import pdb; pdb.set_trace()
 
-	print "Parsing CCX"
+	import ply_verilog_netlist
+	print "\nParsing CCX"
 	start = time()
 	cd = {key : "CELL" for key in lsi_lib.result.keys()}
 	ccx = PLYPair()
 	ccx.set_lexer(ply_verilog_netlist.create_lexer(cd))
 	ccx.set_parser(ply_verilog_netlist.create_parser(lsi_lib.result))
-	ccx.parse_file('Examples/ccx_lsi.vSyn')
+	ccx.parse_file(fnet)
 	total = time() - start
 	print "Total Time:", total, "s"
 	# import pdb; pdb.set_trace()
 
-	print "Removing Wires from database"
-	start = time()
 	import wire_remover
+	print "\nRemoving Wires from database"
+	start = time()
 	wire_remover.main(ccx.result['wires'], ccx.result['gates'], lsi_lib.result)
 	total = time() - start
 	print "Total Time:", total, "s"
 	# import pdb; pdb.set_trace()
 
-	print "Writing Files"
-	start = time()
 	import file_writer
-	file_writer.generateC("lsi_10k", lsi_lib.result)
-	file_writer.generateRoss("ccx", lsi_lib.result, ccx.result['gates'])
+	print "\nWriting Files"
+	start = time()
+	flib = flib.split('/')[-1].split('.')[0]
+	fnet = fnet.split('/')[-1].split('.')[0]
+	file_writer.generateC(flib, lsi_lib.result)
+	file_writer.generateRoss(fnet, lsi_lib.result, ccx.result['gates'])
 	total = time() - start
 	print "Total Time:", total, "s"
 
 	import pdb; pdb.set_trace()
 
+from time import time
+import sys
+
+if __name__ == "__main__":
+	if len(sys.argv) < 3:
+		print "Usage:", sys.argv[0], "library_file netlist_file"
+	else:
+		main(sys.argv[1], sys.argv[2])
