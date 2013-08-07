@@ -38,6 +38,7 @@ def write_lookup_c(filename_prefix, types_list, gate_types):
 	f = open(filename_prefix+"_lookups.c", "w")
 	f.write(header+"\n")
 	f.write("#include \"gates_model.h\"\n")
+	f.write("#inclue \"" + filename_prefix + "_types.h\"\n")
 	# input size
 	f.write("\nint gate_input_size[GATE_TYPE_COUNT] = {\n\t")
 	for t in types_list:
