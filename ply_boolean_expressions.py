@@ -73,7 +73,7 @@ def create_parser():
 		'expressions : expression expressions'
 		t[0] = t[1]
 		if t[2] != None:
-			t[0] += " && " + t[2]
+			t[0] = "(" + t[0] + " && " + t[2] + ")"
 
 	def p_empty(t):
 		'expressions :'
@@ -85,7 +85,7 @@ def create_parser():
 
 	def p_bool(t):
 		'bool : bool OR join'
-		t[0] = t[1] + " || " + t[3]
+		t[0] = "(" + t[1] + " || " + t[3] + ")"
 
 	def p_bool_s(t):
 		'bool : join'
@@ -93,7 +93,7 @@ def create_parser():
 
 	def p_join(t):
 		'join : join AND expr'
-		t[0] = t[1] + " && " + t[3]
+		t[0] = "(" + t[1] + " && " + t[3] + ")"
 
 	def p_join_s(t):
 		'join : expr'
