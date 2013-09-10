@@ -97,7 +97,7 @@ def generateRoss(filename_prefix, gate_types, all_gates):
 		f.write(instr)
 		# fanout special case
 		if g.type.name == 'fanout':
-			f.write(" "+str(g.type.counts['output']))
+			f.write(" "+str(len(g.fan_out)))
 		f.write("\n")
 	f.close()
 
