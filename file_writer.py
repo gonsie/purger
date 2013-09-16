@@ -24,7 +24,7 @@ def write_gate_c(filename_prefix, types_list, gate_types):
 	f.write("#include <stdio.h>\n")
 	f.write("#include \"gates_model.h\"\n")
 	filename = filename_prefix.split("/")[-1]
-	f.write("#include \""+filename+"_types.h\"\n\n")
+	f.write("#include \"library_types.h\"\n\n")
 	# gate functions
 	for k in types_list:
 		f.write(gate_types[k].generateC() + "\n")
@@ -40,7 +40,7 @@ def write_lookup_c(filename_prefix, types_list, gate_types):
 	f.write(header+"\n")
 	f.write("#include \"gates_model.h\"\n")
 	filename = filename_prefix.split("/")[-1]
-	f.write("#include \"" + filename + "_types.h\"\n")
+	f.write("#include \"library_types.h\"\n")
 	# input size
 	f.write("\nint gate_input_size[GATE_TYPE_COUNT] = {\n\t")
 	for t in types_list:
