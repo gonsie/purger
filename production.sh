@@ -1,14 +1,16 @@
 #!/bin/bash
 
 # make 'current' dir if it doesn't exist
-if [ ! -e current/ ]; then
-    mkdir current
-    mkdir current/old
-else
+if [ -e current/ ]; then
     if [ ! -e current/old ]; then
         mkdir current/old
     fi
-    mv current/*.* current/old/
+    mkdir tmp
+    mv current/*.* tmp
+    mv tmp current/old/bak-`date +%F-%H`
+else
+    mkdir current
+    mkdir current/old
 fi
 
 # read file name from command line
