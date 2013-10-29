@@ -1,3 +1,12 @@
+# use for timing groups in pins
+class Timing_Group:
+    def __init__(self, atts):
+        keys = [atts[i][0] for i in range(len(atts))]
+        vals = [atts[i][1] for i in range(len(atts))]
+        self.related_pin = vals[keys.index('related_pin')]
+        self.id = "timing_"+self.related_pin
+        self.atts = {keys[i] : vals[i] for i in range(len(atts))}
+
 # use for latch, ff, state tables
 class Special_Group:
     def __init__(self):

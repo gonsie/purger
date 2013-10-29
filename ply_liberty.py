@@ -26,6 +26,11 @@ reserved = {
     'clear_preset_var1' : 'CLEAR_PRESET_VAR1',
     'clear_preset_var2' : 'CLEAR_PRESET_VAR2',
     'table' : 'TABLE',
+    'timing' : 'TIMING',
+    'timing_type' : 'TIMING_TYPE',
+    'intrinsic_rise' : 'INTRINSIC_RISE',
+    'intrinsic_fall' : 'INTRINSIC_FALL',
+    'related_pin' : 'RELATED_PIN',
 }
 
 tokens = [
@@ -154,6 +159,22 @@ def create_parser():
     def p_named_attribute_function(t):
         'named_attribute : FUNCTION COLON arg'
         t[0] = [{t[1] : t[3]}]
+
+    def p_named_attribute_timing(t):
+        'named_attribute : TIMING timing_group'
+        t[0] = [{t[2].id : t[2]}]
+
+    def p_timing_group(t):
+        'timing_group : LPAR RPAR LCURLY attributes RCURLY'
+        t[0] = classes.Timing_Group(t[4])
+
+
+    def p_named_attribute_timing_group(t):
+        '''named_attribute : TIMING_TYPE COLON arg
+                           | INTRINSIC_RISE COLON arg
+                           | INTRINSIC_FALL COLON arg
+                           | RELATED_PIN COLON arg'''
+        t[0] = [(t[1], t[3])]
 
     def p_named_attribute_special_group(t):
         '''named_attribute : FF special_group
