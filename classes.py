@@ -1,11 +1,35 @@
 # use for timing groups in pins
 class Timing_Group:
     def __init__(self, atts):
-        keys = [atts[i][0] for i in range(len(atts))]
-        vals = [atts[i][1] for i in range(len(atts))]
-        self.related_pin = vals[keys.index('related_pin')]
-        self.id = "timing_"+self.related_pin
-        self.atts = {keys[i] : vals[i] for i in range(len(atts))}
+        self.atts = {atts[i][0] : atts[i][1] for i in range(len(atts))}
+        self.id = "timing_"+self.atts['related_pin']
+        self.rise = "0"
+        self.fall = "0"
+        self.setRF()
+
+    def setRF(self):
+        if 'intrinsic_rise' in self.atts:
+            self.rise = self.atts['intrinsic_rise']
+        if 'intrinsic_fall' in self.atts:
+            self.fall = self.atts['intrinsic_fall']
+        if 'intrinsic_rise' not in self.atts and 'intrinsic_fall' not in self.atts:
+            print "Warning: No Timing", self.atts            
+
+    def generateC(self, input_order):
+        output = ""
+        in_pins = self.atts['related_pin'].split(' ')
+        output += "\t\t//" + str(in_pins) + "\n"
+        output += "\t\tif ("
+        for p in in_pins:
+            output += " in_pin == " + str(input_order.index(p)) + " || "
+        output = output[:-3]
+        output += ") {\n"
+        if 'intrinsic_rise' in self.atts:
+            output += "\t\t\tif (rising) {\n\t\t\t\treturn " + self.rise + ";\n\t\t\t}\n"
+        if 'intrinsic_fall' in self.atts:
+            output += "\t\t\tif (!rising) {\n\t\t\t\treturn " + self.fall + ";\n\t\t\t}\n"
+        output += "\t\t}\n"
+        return output
 
 # use for latch, ff, state tables
 class Special_Group:
@@ -216,21 +240,31 @@ class Gate_Type:
             self.counts[o] = index
         for p in self.pins:
             self.pins[p]['cref'] = self.pins[p]['direction'] + "->array[" + str(self.pins[p]['order']) + "].value"
+            # tack on timing here
+            if any('timing' in k for k in self.pins[p].keys()):
+                self.pins[p]['timing'] = [k for k in self.pins[p].keys() if 'timing' in k]
 
     def generateC(self):
         helpers = ""
-        output = "int " + self.name + "_func  (vector input, vector internal, vector output) {\n"
+        function = "int " + self.name + "_func  (vector input, vector internal, vector output) {\n"
+        delay = "float " + self.name + "_delay_func (int in_pin, int out_pin, bool rising) {\n"
         if len(self.specials) > 0:
             k = 'ff' if 'ff' in self.specials else 'latch'
             # call the special first
             helpers += self.specials[k].generateC(self) + "\n"
-            output += "\t" + self.name + "_" + k + "(input, internal, output);\n"
+            function += "\t" + self.name + "_" + k + "(input, internal, output);\n"
         # add comments with original bool_exp
         for p in self.getOrder('output'):
-            if 'o_function' in self.pins[p]: output += "\t//" + p + " : " + self.pins[p]['o_function'] + "\n"
-            if 'function' in self.pins[p]: output += "\t" + self.pins[p]['cref'] + " = " + self.pins[p]['function'] + ";\n"
-        output += "\treturn 1;\n}\n"
-        return helpers + output
+            if 'o_function' in self.pins[p]: function += "\t//" + p + " : " + self.pins[p]['o_function'] + "\n"
+            if 'function' in self.pins[p]: function += "\t" + self.pins[p]['cref'] + " = " + self.pins[p]['function'] + ";\n"
+            if 'timing' in self.pins[p]: 
+                delay += "\tif (out_pin == " + str(self.pins[p]['order']) + ") {\n"
+                for t in self.pins[p]['timing']:
+                    delay += self.pins[p][t].generateC(self.getOrder('input'))
+                delay += "\t}\n"
+        function += "\treturn 1;\n}\n"
+        delay += "\treturn 1.0;\n}\n"
+        return helpers + function + delay
 
     def getPinMap(self):
         pm = {}

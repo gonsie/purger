@@ -32,7 +32,12 @@ def write_gate_c(filename_prefix, types_list, gate_types):
 	f.write("gate_func function_array[GATE_TYPE_COUNT] = {\n")
 	for t in types_list:
 		f.write("\t&" + t + "_func,\n")
-	f.write("};\n")
+	f.write("};\n\n")
+	# delay array
+	f.write("delay_func delay_array[GATE_TYPE_COUNT] = {\n")
+	for t in types_list:
+		f.write("\t&" + t + "_delay_func,\n")
+	f.write("};\n\n")
 	f.close()
 
 def write_lookup_c(filename_prefix, types_list, gate_types):
