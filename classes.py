@@ -247,7 +247,7 @@ class Gate_Type:
     def generateC(self):
         helpers = ""
         function = "int " + self.name + "_func  (vector input, vector internal, vector output) {\n"
-        delay = "float " + self.name + "_delay_func (int in_pin, int out_pin, bool rising) {\n"
+        delay = "float " + self.name + "_delay_func (int in_pin, int out_pin, BOOL rising) {\n"
         if len(self.specials) > 0:
             k = 'ff' if 'ff' in self.specials else 'latch'
             # call the special first
