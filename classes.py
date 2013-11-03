@@ -39,6 +39,10 @@ class Special_Group:
         # var1 and var2 change depending on type
         self.var1 = []
         self.var2 = []
+        self.parent = ""
+
+    def setParent(self, name):
+        self.parent = name
 
     def setType(self, name):
         # type is set after arg and attribute processing
@@ -174,6 +178,8 @@ class Special_Group:
         output += "\t\t" + v1 + " = " + self.atts['next_state'] + ";\n"
         output += "\t\t" + v2 + " = LOGIC_NOT(" + v1 + ");\n"
         output += "\t\treturn 1;\n\t}\n"
+        if 'internal' in self.atts['next_state']:
+            print "ALERT: reverse needed for", self.parent
         return output
 
     def generateFuncCall(self, cell, pin):
@@ -229,6 +235,7 @@ class Gate_Type:
             self.specials.update(entry)
             entry = entry.items()[0]
             self.pins.update(entry[1].getInternalPins())
+            entry[1].setParent(self.name)
     
     def setOrders(self):
         orders = ['input', 'output', 'internal']
