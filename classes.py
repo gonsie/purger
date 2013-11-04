@@ -252,6 +252,8 @@ class Gate_Type:
                 self.pins[p]['timing'] = [k for k in self.pins[p].keys() if 'timing' in k]
 
     def generateC(self):
+        if self.name == "fanout":
+            return self.fanoutC()
         helpers = ""
         function = "int " + self.name + "_func  (vector input, vector internal, vector output) {\n"
         delay = "float " + self.name + "_delay_func (int in_pin, int out_pin, BOOL rising) {\n"
@@ -272,6 +274,16 @@ class Gate_Type:
         function += "\treturn 1;\n}\n"
         delay += "\treturn 1.0;\n}\n"
         return helpers + function + delay
+
+    def fanoutC():
+        output = ""
+        output += "int fanout_func (vector input, vector internal, vector output) {\n"
+        output += "\tint i;\n\tfor (i = 0; i < output->size; i++) {\n"
+        output += "\t\toutput->array[i].value = input->array[0].value;\n"
+        output += "\t}\n\treturn 1;\n}\n"
+        output += "float fanout_delay_func (int in_pin, int out_pin, BOOL rising) {\s"
+        output += "\treturn 0.1;\n}\n"
+        return output
 
     def getPinMap(self):
         pm = {}
