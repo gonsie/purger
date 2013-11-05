@@ -275,7 +275,7 @@ class Gate_Type:
         delay += "\treturn 1.0;\n}\n"
         return helpers + function + delay
 
-    def fanoutC():
+    def fanoutC(self):
         output = ""
         output += "int fanout_func (vector input, vector internal, vector output) {\n"
         output += "\tint i;\n\tfor (i = 0; i < output->size; i++) {\n"
