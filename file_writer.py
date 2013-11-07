@@ -5,11 +5,11 @@ header='''//Elsa Gonsiorowski
 '''
 
 def write_gate_h(filename_prefix, types_list):
-	f = open(filename_prefix+"_types.h", "w")
+	f = open(filename_prefix+".h", "w")
 	f.write(header+"\n")
 	filename = filename_prefix.split("/")[-1]
-	f.write("#ifndef _"+filename+"_types_h\n")
-	f.write("#define _"+filename+"_types_h\n\n")
+	f.write("#ifndef _"+filename+"_h\n")
+	f.write("#define _"+filename+"_h\n\n")
 	# total gate count def
 	f.write("#define GATE_TYPE_COUNT (" + str(len(types_list)) + ")\n\n")
 	# defs with gate types
@@ -19,7 +19,7 @@ def write_gate_h(filename_prefix, types_list):
 	f.close()
 
 def write_gate_c(filename_prefix, types_list, gate_types):
-	f = open(filename_prefix+"_functions.c", "w")
+	f = open(filename_prefix+".c", "w")
 	f.write(header+"\n")
 	f.write("#include <stdio.h>\n")
 	f.write("#include \"gates_model.h\"\n")
@@ -43,14 +43,6 @@ def write_gate_c(filename_prefix, types_list, gate_types):
 	for t in types_list:
 		f.write("\t&" + t + "_reverse,\n")
 	f.write("};\n\n")
-	f.close()
-
-def write_lookup_c(filename_prefix, types_list, gate_types):
-	f = open(filename_prefix+"_lookups.c", "w")
-	f.write(header+"\n")
-	f.write("#include \"gates_model.h\"\n")
-	filename = filename_prefix.split("/")[-1]
-	f.write("#include \"library_types.h\"\n")
 	# input size
 	f.write("\nint gate_input_size[GATE_TYPE_COUNT] = {\n\t")
 	for t in types_list:
@@ -83,7 +75,6 @@ def generateC(filename_prefix, gate_types):
 	f.close()
 	write_gate_h(filename_prefix, types_list)
 	write_gate_c(filename_prefix, types_list, gate_types)
-	write_lookup_c(filename_prefix, types_list, gate_types)
 
 def generateRoss(filename_prefix, gate_types, all_gates):
 	types_list = gate_types.keys()
