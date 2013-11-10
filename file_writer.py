@@ -24,7 +24,7 @@ def write_gate_c(filename_prefix, types_list, gate_types):
 	f.write("#include <stdio.h>\n")
 	f.write("#include \"gates_model.h\"\n")
 	filename = filename_prefix.split("/")[-1]
-	f.write("#include \"library_types.h\"\n\n")
+	f.write("#include \"library.h\"\n\n")
 	# gate functions
 	for k in types_list:
 		f.write(gate_types[k].generateC() + "\n")

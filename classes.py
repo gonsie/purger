@@ -290,8 +290,9 @@ class Gate_Type:
         output += "\tint i;\n\tfor (i = 0; i < output->size; i++) {\n"
         output += "\t\toutput->array[i].value = input->array[0].value;\n"
         output += "\t}\n\treturn 1;\n}\n"
-        output += "float fanout_delay_func (int in_pin, int out_pin, BOOL rising) {\s"
+        output += "float fanout_delay_func (int in_pin, int out_pin, BOOL rising) {\n"
         output += "\treturn 0.1;\n}\n"
+        output += "void fanout_reverse (vector input, vector internal, vector output) {\n}\n"
         return output
 
     def getPinMap(self):
