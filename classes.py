@@ -273,7 +273,10 @@ class Gate_Type:
         # add comments with original bool_exp
         for p in self.getOrder('output'):
             if 'o_function' in self.pins[p]: function += "\t//" + p + " : " + self.pins[p]['o_function'] + "\n"
-            if 'function' in self.pins[p]: function += "\t" + self.pins[p]['cref'] + " = " + self.pins[p]['function'] + ";\n"
+            if 'function' in self.pins[p]: 
+                function += "\t" + self.pins[p]['cref'] + " = " + self.pins[p]['function'] + ";\n"
+                if 'output' in self.pins[p]['function']:
+                    print "ALERT: output pin used on RHS of gate function!", self.name, p 
             if 'timing' in self.pins[p]: 
                 delay += "\tif (out_pin == " + str(self.pins[p]['order']) + ") {\n"
                 for t in self.pins[p]['timing']:
