@@ -70,7 +70,7 @@ class Special_Group:
 
     def generateC(self, gate_type):
         output = "int " + gate_type.name + "_" + self.type
-        output += " (vector input, vector internal, vector output) {\n"
+        output += " (int* input, int* internal, int* output) {\n"
         if self.type == 'statetable':
             output += self.generateStatetable(gate_type)
         elif self.type == 'latch':
@@ -252,7 +252,7 @@ class Gate_Type:
                 index += 1
             self.counts[o] = index
         for p in self.pins:
-            self.pins[p]['cref'] = self.pins[p]['direction'] + "->array[" + str(self.pins[p]['order']) + "].value"
+            self.pins[p]['cref'] = self.pins[p]['direction'] + "[" + str(self.pins[p]['order']) + "]"
             # tack on timing here
             if any('timing' in k for k in self.pins[p].keys()):
                 self.pins[p]['timing'] = [k for k in self.pins[p].keys() if 'timing' in k]
@@ -261,9 +261,9 @@ class Gate_Type:
         if self.name == "fanout":
             return self.fanoutC()
         helpers = ""
-        function = "int " + self.name + "_func  (vector input, vector internal, vector output) {\n"
+        function = "int " + self.name + "_func  (int* input, int* internal, int* output) {\n"
         delay = "float " + self.name + "_delay_func (int in_pin, int out_pin, BOOL rising) {\n"
-        reverse = "void " + self.name + "_reverse (vector input, vector internal, vector output) {\n"
+        reverse = "void " + self.name + "_reverse (int* input, int* internal, int* output) {\n"
         if len(self.specials) > 0:
             k = 'ff' if 'ff' in self.specials else 'latch'
             # call the special first
@@ -289,13 +289,13 @@ class Gate_Type:
 
     def fanoutC(self):
         output = ""
-        output += "int fanout_func (vector input, vector internal, vector output) {\n"
-        output += "\tint i;\n\tfor (i = 0; i < output->size; i++) {\n"
-        output += "\t\toutput->array[i].value = input->array[0].value;\n"
+        output += "int fanout_func (int* input, int* internal, int* output) {\n"
+        output += "\tint i;\n\tfor (i = 0; i < internal; i++) {\n"
+        output += "\t\toutput[i] = input[0];\n"
         output += "\t}\n\treturn 1;\n}\n"
         output += "float fanout_delay_func (int in_pin, int out_pin, BOOL rising) {\n"
         output += "\treturn 0.1;\n}\n"
-        output += "void fanout_reverse (vector input, vector internal, vector output) {\n}\n"
+        output += "void fanout_reverse (int* input, int* internal, int* output) {\n}\n"
         return output
 
     def getPinMap(self):
