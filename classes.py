@@ -425,6 +425,16 @@ class Gate:
             return self.out_pins.index(ref)
         return -1
 
+    def getInIndex(self, ref):
+        ref = self.validateRef(ref)
+        if ref not in self.ref_pin:
+            print "ERROR(g9): unknown reference", ref, "for", self.name
+            print self.ref_pin
+            return None
+        if ref in self.in_pins:
+            return self.in_pins.index(ref)
+        return -1
+
 class Range:
     def __init__(self, start=None, end=None):
         if end is not None:

@@ -85,6 +85,7 @@ def generateRoss(filename_prefix, gate_types, all_gates):
 		g = all_gates[g]
 		f.write(str(g.gid)+" "+str(types_list.index(g.type.name))+" ")
 		inlist = []
+		outlist = []
 		for r in g.ref_pin:
 			if type(r) is str:
 				# always strings for io_cells
@@ -93,12 +94,23 @@ def generateRoss(filename_prefix, gate_types, all_gates):
 			if g.getRefDirection(r) == "input":
 				p3 = r.getOutIndex(g)
 				inlist.append((g.getRefPin(r), str(r.gid), str(p3)))
+			if g.getRefDirection(r) == "output":
+				p3 = r.getInIndex(g)
+				outlist.append((g.getRefPin(r), str(r.gid), str(p3)))
 		inlist.sort()
+		outlist.sort()
+		while len(inlist) < g.type.counts['input']:
+			inlist.append((-1, '-1', '-1'))
+		while len(outlist) < g.type.counts['output']:
+			outlist.append((-1, '-1', '-1'))
 		instr = ' '.join([' '.join(p[1:]) for p in inlist])
+		outstr = ' '.join([' '.join(p[1:]) for p in outlist])
 		f.write(instr)
 		# fanout special case
 		if g.type.name == 'fanout':
 			f.write(" "+str(len(g.fan_out)))
+		else:
+			f.write(" "+outstr)
 		f.write("\n")
 	f.close()
 
