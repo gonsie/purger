@@ -103,7 +103,7 @@ def generateRoss(filename_prefix, gate_types, all_gates):
 			inlist.append((-1, '-1', '-1'))
 		while len(outlist) < g.type.counts['output']:
 			outlist.append((-1, '-1', '-1'))
-		instr = ' '.join([' '.join(p[1:]) for p in inlist])
+		instr = ' '.join([p[1] for p in inlist])
 		outstr = ' '.join([' '.join(p[1:]) for p in outlist])
 		f.write(instr)
 		# fanout special case
