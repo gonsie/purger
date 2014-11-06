@@ -1,4 +1,4 @@
-# Unified ROSS-Gates Emission Routine
+# Parser Unified ROSS-Gates Emission Routine
   This project contains ply-based parsers for [Liberty](http://www.opensourceliberty.org/opensourceliberty.html) gate libraries and Verilog netlists.
   These parses emit code which augments the existing [ROSS Gates Model](http://github.com/gonsie/gates).
   Note that these are not tested for the general Liberty and Verilog specifications, and as such they may only work for a subset of libraries.
