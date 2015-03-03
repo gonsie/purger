@@ -13,7 +13,7 @@ class Timing_Group:
         if 'intrinsic_fall' in self.atts:
             self.fall = self.atts['intrinsic_fall']
         if 'intrinsic_rise' not in self.atts and 'intrinsic_fall' not in self.atts:
-            print "Warning: No Timing", self.atts            
+            print "Warning: No Timing", self.atts
 
     def generateC(self, input_order):
         output = ""
@@ -242,7 +242,7 @@ class Gate_Type:
             entry = entry.items()[0]
             self.pins.update(entry[1].getInternalPins())
             entry[1].setParent(self.name)
-    
+
     def setOrders(self):
         orders = ['input', 'output', 'internal']
         for o in orders:
@@ -262,6 +262,8 @@ class Gate_Type:
             return self.fanoutC()
         helpers = ""
         function = "int " + self.name + "_func  (int* input, int* internal, int* output) {\n"
+        function += "\tunsigned char old_md5[16], new_md5[16];\n"
+        function += "\tcompute_md5(output, old_md5);\n"
         delay = "float " + self.name + "_delay_func (int in_pin, int out_pin, BOOL rising) {\n"
         reverse = "void " + self.name + "_reverse (int* input, int* internal, int* output) {\n"
         if len(self.specials) > 0:
@@ -273,16 +275,17 @@ class Gate_Type:
         # add comments with original bool_exp
         for p in self.getOrder('output'):
             if 'o_function' in self.pins[p]: function += "\t//" + p + " : " + self.pins[p]['o_function'] + "\n"
-            if 'function' in self.pins[p]: 
+            if 'function' in self.pins[p]:
                 function += "\t" + self.pins[p]['cref'] + " = " + self.pins[p]['function'] + ";\n"
                 if 'output' in self.pins[p]['function']:
-                    print "ALERT: output pin used on RHS of gate function!", self.name, p 
-            if 'timing' in self.pins[p]: 
+                    print "ALERT: output pin used on RHS of gate function!", self.name, p
+            if 'timing' in self.pins[p]:
                 delay += "\tif (out_pin == " + str(self.pins[p]['order']) + ") {\n"
                 for t in self.pins[p]['timing']:
                     delay += self.pins[p][t].generateC(self.getOrder('input'))
                 delay += "\t}\n"
-        function += "\treturn 1;\n}\n"
+        function += "\tcompute_md5(output, new_md5);"
+        function += "\treturn (strcmp(old_md5, new_md5) != 0);\n}\n"
         delay += "\treturn 1.0;\n}\n"
         reverse += "}\n"
         return helpers + function + delay + reverse
@@ -312,7 +315,7 @@ class Gate_Type:
 import itertools
 
 class Gate:
-    
+
     newid = itertools.count().next
 
     def __init__(self, name):
@@ -330,14 +333,14 @@ class Gate:
         self.type = t
         self.in_pins = [0] * t.counts['input']
         self.out_pins = [0] * t.counts['output']
-        if self.type.name == "fanout": 
+        if self.type.name == "fanout":
             self.fan_out = []
 
     def validateRef(self, ref):
         if ref not in self.ref_pin:
             for r in self.ref_pin:
                 if type(ref) is str and isinstance(r, Gate) and r.name == ref:
-                    return r 
+                    return r
                 if isinstance(ref, Gate) and type(r) is str and ref.name == r:
                     return r
             print "==> ERROR: could not find", ref, "in", self.name
@@ -390,7 +393,7 @@ class Gate:
 
     def getRefPin(self, ref):
         ref = self.validateRef(ref)
-        if ref not in self.ref_pin: 
+        if ref not in self.ref_pin:
             print "ERROR(g5): unknown reference", ref, "for", self.name
             print self.ref_pin
             return None
@@ -414,7 +417,7 @@ class Gate:
 
     def getOutIndex(self, ref):
         ref = self.validateRef(ref)
-        if ref not in self.ref_pin: 
+        if ref not in self.ref_pin:
             print "ERROR(g8): unknown reference", ref, "for", self.name
             print self.ref_pin
             return None

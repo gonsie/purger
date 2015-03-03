@@ -1,8 +1,8 @@
 {
 	"folders" : [
 		{
-			"path" : "/Users/gonsie/Projects/gate-parser/",
-			"name" : "gate-parser",
+			"path" : "/Users/gonsie/Projects/purger/",
+			"name" : "purger",
 			"folder_exclude_patterns" : ["ply"],
 			"file_exclude_patterns" : [
 				"parselog.txt", "*parsetab.py", "parser.out", //ply generated files

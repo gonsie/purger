@@ -22,6 +22,7 @@ def write_gate_c(filename_prefix, types_list, gate_types):
 	f = open(filename_prefix+".c", "w")
 	f.write(header+"\n")
 	f.write("#include <stdio.h>\n")
+	f.write("#include \"calc-md5.h\"\n")
 	f.write("#include \"gates_model.h\"\n")
 	filename = filename_prefix.split("/")[-1]
 	f.write("#include \"library.h\"\n\n")
