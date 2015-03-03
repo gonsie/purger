@@ -39,11 +39,6 @@ def write_gate_c(filename_prefix, types_list, gate_types):
 	for t in types_list:
 		f.write("\t&" + t + "_delay_func,\n")
 	f.write("};\n\n")
-	# reverse functions
-	f.write("reverse_func reverse_array[GATE_TYPE_COUNT] = {\n")
-	for t in types_list:
-		f.write("\t&" + t + "_reverse,\n")
-	f.write("};\n\n")
 	# input size
 	f.write("\nint gate_input_size[GATE_TYPE_COUNT] = {\n\t")
 	for t in types_list:

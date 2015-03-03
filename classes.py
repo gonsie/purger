@@ -182,12 +182,6 @@ class Special_Group:
             print "ALERT: reverse needed for", self.parent
         return output
 
-    def generateReverse(self, gate_type):
-        output = ""
-        if 'next_state' in self.atts and 'internal' in self.atts['next_state']:
-            output += "\t// ALERT: reverse needed here: " + self.type + "\n"
-        return output
-
     def generateFuncCall(self, cell, pin):
         args = cell + "_" + pin + "_" + self.name + "("
         args = args[:-2] + ");"
@@ -265,13 +259,11 @@ class Gate_Type:
         function += "\tunsigned char old_md5[16], new_md5[16];\n"
         function += "\tcompute_md5(output, " + counts['output'] + ", old_md5);\n"
         delay = "float " + self.name + "_delay_func (int in_pin, int out_pin, BOOL rising) {\n"
-        reverse = "void " + self.name + "_reverse (int* input, int* internal, int* output) {\n"
         if len(self.specials) > 0:
             k = 'ff' if 'ff' in self.specials else 'latch'
             # call the special first
             helpers += self.specials[k].generateC(self) + "\n"
             function += "\t" + self.name + "_" + k + "(input, internal, output);\n"
-            reverse += self.specials[k].generateReverse(self)
         # add comments with original bool_exp
         for p in self.getOrder('output'):
             if 'o_function' in self.pins[p]: function += "\t//" + p + " : " + self.pins[p]['o_function'] + "\n"
@@ -287,8 +279,7 @@ class Gate_Type:
         function += "\tcompute_md5(output, " + counts['output'] + ", new_md5);"
         function += "\treturn (memcmp(old_md5, new_md5, 16) != 0);\n}\n"
         delay += "\treturn 1.0;\n}\n"
-        reverse += "}\n"
-        return helpers + function + delay + reverse
+        return helpers + function + delay
 
     def fanoutC(self):
         output = ""
@@ -298,7 +289,6 @@ class Gate_Type:
         output += "\t}\n\treturn 1;\n}\n"
         output += "float fanout_delay_func (int in_pin, int out_pin, BOOL rising) {\n"
         output += "\treturn 0.1;\n}\n"
-        output += "void fanout_reverse (int* input, int* internal, int* output) {\n}\n"
         return output
 
     def getPinMap(self):
