@@ -263,7 +263,7 @@ class Gate_Type:
         helpers = ""
         function = "int " + self.name + "_func  (int* input, int* internal, int* output) {\n"
         function += "\tunsigned char old_md5[16], new_md5[16];\n"
-        function += "\tcompute_md5(output, old_md5);\n"
+        function += "\tcompute_md5(output, " + counts['output'] + ", old_md5);\n"
         delay = "float " + self.name + "_delay_func (int in_pin, int out_pin, BOOL rising) {\n"
         reverse = "void " + self.name + "_reverse (int* input, int* internal, int* output) {\n"
         if len(self.specials) > 0:
@@ -284,8 +284,8 @@ class Gate_Type:
                 for t in self.pins[p]['timing']:
                     delay += self.pins[p][t].generateC(self.getOrder('input'))
                 delay += "\t}\n"
-        function += "\tcompute_md5(output, new_md5);"
-        function += "\treturn (strcmp(old_md5, new_md5) != 0);\n}\n"
+        function += "\tcompute_md5(output, " + counts['output'] + ", new_md5);"
+        function += "\treturn (memcmp(old_md5, new_md5, 16) != 0);\n}\n"
         delay += "\treturn 1.0;\n}\n"
         reverse += "}\n"
         return helpers + function + delay + reverse
