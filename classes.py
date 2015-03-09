@@ -256,8 +256,8 @@ class Gate_Type:
             return self.fanoutC()
         helpers = ""
         function = "int " + self.name + "_func  (int* input, int* internal, int* output) {\n"
-        function += "\tint old_val[" + counts['output'] + "];\n"
-        function += "\tmemcpy(&old_val, output, " + counts['output'] + ");\n"
+        function += "\tint old_val[" + str(self.counts['output']) + "];\n"
+        function += "\tmemcpy(&old_val, output, " + str(self.counts['output']) + ");\n"
         delay = "float " + self.name + "_delay_func (int in_pin, int out_pin, BOOL rising) {\n"
         if len(self.specials) > 0:
             k = 'ff' if 'ff' in self.specials else 'latch'
@@ -276,7 +276,7 @@ class Gate_Type:
                 for t in self.pins[p]['timing']:
                     delay += self.pins[p][t].generateC(self.getOrder('input'))
                 delay += "\t}\n"
-        function += "\treturn (memcmp(old_val, output, " + counts['output'] + ") != 0);\n}\n"
+        function += "\treturn (memcmp(old_val, output, " + str(self.counts['output']) + ") != 0);\n}\n"
         delay += "\treturn 1.0;\n}\n"
         return helpers + function + delay
 
