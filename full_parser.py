@@ -24,7 +24,7 @@ class PLYPair:
 		return self.result
 
 def main(flib, fnet, targetdir="current/"):
-	
+
 	import ply_liberty
 	print "\nParsing Library"
 	start = time()
@@ -37,7 +37,7 @@ def main(flib, fnet, targetdir="current/"):
 	# import pdb; pdb.set_trace()
 
 	import ply_boolean_expressions
-	print "\nParsing Boolean Expressnions"
+	print "\nParsing Boolean Expressions"
 	start = time()
 	be = PLYPair()
 	be.set_lexer(ply_boolean_expressions.create_lexer())
