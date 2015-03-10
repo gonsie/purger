@@ -6,6 +6,7 @@ class Timing_Group:
         self.rise = "0"
         self.fall = "0"
         self.setRF()
+        self.parent = ""
 
     def setRF(self):
         if 'intrinsic_rise' in self.atts:
@@ -14,6 +15,9 @@ class Timing_Group:
             self.fall = self.atts['intrinsic_fall']
         if 'intrinsic_rise' not in self.atts and 'intrinsic_fall' not in self.atts:
             print "Warning: No Timing", self.atts
+
+    def setParent(self, parent):
+        self.parent = parent
 
     def generateC(self, input_order):
         output = ""
@@ -26,8 +30,12 @@ class Timing_Group:
         output += ") {\n"
         if 'intrinsic_rise' in self.atts:
             output += "\t\t\tif (rising) {\n\t\t\t\treturn " + self.rise + ";\n\t\t\t}\n"
+            if float(self.rise) == 0.0:
+                print "ALERT: 0 rise delay at " + self.parent + " pin " + self.atts['related_pin']
         if 'intrinsic_fall' in self.atts:
             output += "\t\t\tif (!rising) {\n\t\t\t\treturn " + self.fall + ";\n\t\t\t}\n"
+            if float(self.fall) == 0.0:
+                print "ALERT: 0 fall delay at " + self.parent + " pin " + self.atts['related_pin']
         output += "\t\t}\n"
         return output
 
