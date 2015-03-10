@@ -258,15 +258,21 @@ class Gate_Type:
             # tack on timing here
             if any('timing' in k for k in self.pins[p].keys()):
                 self.pins[p]['timing'] = [k for k in self.pins[p].keys() if 'timing' in k]
+                for k in self.pins[p]['timing']:
+                    self.pins[p][k].setParent(self.name)
 
     def generateC(self):
         if self.name == "fanout":
             return self.fanoutC()
         helpers = ""
         function = "int " + self.name + "_func  (int* input, int* internal, int* output) {\n"
+        delay = "float " + self.name + "_delay_func (int in_pin, int out_pin, BOOL rising) {\n"
+        if self.counts['output'] == 0:
+            function += "\treturn 0;\n}\n"
+            delay += "\ttw_error(TW_LOC, \"delay function called on no outputs\");\n\treturn 0;\n}\n"
+            return function + delay
         function += "\tint old_val[" + str(self.counts['output']) + "];\n"
         function += "\tmemcpy(&old_val, output, " + str(self.counts['output']) + ");\n"
-        delay = "float " + self.name + "_delay_func (int in_pin, int out_pin, BOOL rising) {\n"
         if len(self.specials) > 0:
             k = 'ff' if 'ff' in self.specials else 'latch'
             # call the special first
