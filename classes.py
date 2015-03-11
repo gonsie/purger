@@ -268,7 +268,7 @@ class Gate_Type:
         function = "void " + self.name + "_func  (int* input, int* internal, int* output) {\n"
         delay = "float " + self.name + "_delay_func (int in_pin, int out_pin, BOOL rising) {\n"
         if self.counts['output'] == 0:
-            function += "\treturn 0;\n}\n"
+            function += "\treturn;\n}\n"
             delay += "\ttw_error(TW_LOC, \"delay function called on no outputs\");\n\treturn 0;\n}\n"
             return function + delay
         if len(self.specials) > 0:
