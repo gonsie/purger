@@ -265,14 +265,12 @@ class Gate_Type:
         if self.name == "fanout":
             return self.fanoutC()
         helpers = ""
-        function = "int " + self.name + "_func  (int* input, int* internal, int* output) {\n"
+        function = "void " + self.name + "_func  (int* input, int* internal, int* output) {\n"
         delay = "float " + self.name + "_delay_func (int in_pin, int out_pin, BOOL rising) {\n"
         if self.counts['output'] == 0:
             function += "\treturn 0;\n}\n"
             delay += "\ttw_error(TW_LOC, \"delay function called on no outputs\");\n\treturn 0;\n}\n"
             return function + delay
-        function += "\tint old_val[" + str(self.counts['output']) + "];\n"
-        function += "\tmemcpy(&old_val, output, " + str(self.counts['output']) + ");\n"
         if len(self.specials) > 0:
             k = 'ff' if 'ff' in self.specials else 'latch'
             # call the special first
@@ -290,13 +288,13 @@ class Gate_Type:
                 for t in self.pins[p]['timing']:
                     delay += self.pins[p][t].generateC(self.getOrder('input'))
                 delay += "\t}\n"
-        function += "\treturn (memcmp(old_val, output, " + str(self.counts['output']) + ") != 0);\n}\n"
+        function += "\treturn;\n}\n"
         delay += "\treturn 1.0;\n}\n"
         return helpers + function + delay
 
     def fanoutC(self):
         output = ""
-        output += "int fanout_func (int* input, int* internal, int* output) {\n"
+        output += "void fanout_func (int* input, int* internal, int* output) {\n"
         output += "\tint i;\n\tfor (i = 0; i < internal[0]; i++) {\n"
         output += "\t\toutput[i] = input[0];\n"
         output += "\t}\n\treturn 1;\n}\n"
