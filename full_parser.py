@@ -42,7 +42,6 @@ def main(flib, fnet, targetdir="current/"):
 	be = PLYPair()
 	be.set_lexer(ply_boolean_expressions.create_lexer())
 	be.set_parser(ply_boolean_expressions.create_parser())
-	error_count = 0
 	for g in lsi_lib.result:
 		g = lsi_lib.result[g]
 		ply_boolean_expressions.update(g.getPinMap())
@@ -55,7 +54,6 @@ def main(flib, fnet, targetdir="current/"):
 			for k in s.getBEatts():
 				s.atts['o_'+k] = s.atts[k]
 				s.atts[k] = be.parse(s.atts[k])
-	print "Total of", error_count, "boolean expression parsing errors"
 	total = time() - start
 	print "Total Time:", total, "s"
 	# import pdb; pdb.set_trace()
