@@ -53,7 +53,7 @@ def create_lexer(nets={}):
     def t_newline(t):
         r'\n+'
         t.lexer.lineno += len(t.value)
-    
+
     # Error handling rule
     def t_error(t):
         print "Illegal character '%s'" % t.value[0]
@@ -92,7 +92,7 @@ def create_parser(gate_types, gid=0):
     def p_list_of_ports_e(t):
         'list_of_ports :'
         t[0] = ""
-    
+
     def p_port(t):
         'port : port_expression'
         t[0] = t[1]
@@ -140,7 +140,7 @@ def create_parser(gate_types, gid=0):
         for i in range_obj.enumeration():
             for v in list_of_variables:
                 output.append(v + "[" + str(i) + "]")
-        return output        
+        return output
 
     def p_module_item_inout(t):
         '''module_item : INPUT range list_of_variables SEMI
@@ -342,7 +342,7 @@ def create_parser(gate_types, gid=0):
 
     def p_error(t):
         print "Syntax error at", t.value, "type", t.type, "on line", t.lexer.lineno
-    
+
     def base(s):
         base = -1
         if s == "'b" or s == "'B":
@@ -357,6 +357,6 @@ def create_parser(gate_types, gid=0):
 
     # def explode_range(r):
     #     [a, b] = r.strip('[]').split(':')
-        # for 
+        # for
 
     return yacc.yacc(tabmodule='ply_verilog_netlist_parsetab')
