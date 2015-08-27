@@ -84,7 +84,7 @@ def load_library(lib_name):
 def lib_cells(library):
 	return {key : "CELL" for key in library.keys()}
 
-def process_netlist(netlist_name, library):
+def load_netlist(netlist_name, library):
 	fullname = pkl_name(ply_default_netlist+'-'+ply_default_library, netlist_name)
 	result = None
 	if pkl_exists(fullname):
