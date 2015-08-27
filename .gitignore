@@ -1,3 +1,4 @@
+*.pkl
 parselog.txt
 *parsetab.py
 *.pyc
