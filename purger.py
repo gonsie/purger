@@ -81,8 +81,8 @@ def load_library(lib_name):
 		pkl_dump(fullname, result)
 	return result
 
-def lib_cells(result):
-	return {key : "CELL" for key in result.keys()}
+def lib_cells(library):
+	return {key : "CELL" for key in library.keys()}
 
 def process_netlist(netlist_name, library):
 	mnet = importlib.import_module(ply_default_netlist)
