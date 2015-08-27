@@ -68,7 +68,7 @@ def load_library(lib_name):
 		pbxp = PLYPair(mbxp.create_lexer(), mbxp.create_parser())
 		for g in result:
 			g = result[g]
-			m.update(g.getPinMap())
+			mbxp.update(g.getPinMap())
 			for p in g.pins:
 				if 'function' in g.pins[p]:
 					g.pins[p]['o_function'] = g.pins[p]['function']
