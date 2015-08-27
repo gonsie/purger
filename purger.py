@@ -87,7 +87,9 @@ def lib_cells(library):
 def process_netlist(netlist_name, library):
 	mnet = importlib.import_module(ply_default_netlist)
 	pnet = PLYPair(mnet.create_lexer(lib_cells(library)), mnet.create_parser(library))
-	return
+	result = pp.parse(netlist_name)
+	import wire_remover
+	wire_remover.main(result['wires'], result['gates'], library)
 
 def purger_help():
 	print ""
