@@ -85,11 +85,19 @@ def lib_cells(library):
 	return {key : "CELL" for key in library.keys()}
 
 def process_netlist(netlist_name, library):
-	mnet = importlib.import_module(ply_default_netlist)
-	pnet = PLYPair(mnet.create_lexer(lib_cells(library)), mnet.create_parser(library))
-	result = pp.parse(netlist_name)
-	import wire_remover
-	wire_remover.main(result['wires'], result['gates'], library)
+	fullname = pkl_name(ply_default_netlist+'-'+ply_default_library, netlist_name)
+	result = None
+	if pkl_exists(fullname):
+		print "pkl file exists; loading..."
+		result = pkl_load(fullname)
+	else:
+		print "pkl file does not exist; processing..."
+		mnet = importlib.import_module(ply_default_netlist)
+		pnet = PLYPair(mnet.create_lexer(lib_cells(library)), mnet.create_parser(library))
+		result = pp.parse(netlist_name)
+		import wire_remover
+		wire_remover.main(result['wires'], result['gates'], library)
+	return result
 
 def purger_help():
 	print ""
