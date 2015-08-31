@@ -139,6 +139,20 @@ def write_model():
 	sys.stdout.close()
 	sys.stdout = stdout
 
+def write_module(name, netlist):
+	import file_writer
+	global g_library
+	files = file_writer.instanceFiles(name, number)
+	for f in files:
+		if os.path.isfile(f):
+			print "Error: File", f, "exists"
+			return
+	stdout = sys.stdout
+	sys.stdout = open(name+"_errors.txt", "w")
+	file_writer.generateRoss(name, g_library, netlist['gates'])
+	sys.stdout.close()
+	sys.stdout = stdout
+
 def purger_help():
 	print ""
 	print "Welcome to PURGER:"
