@@ -94,7 +94,7 @@ def load_netlist(netlist_name, library):
 		print "pkl file does not exist; processing..."
 		mnet = importlib.import_module(ply_default_netlist)
 		pnet = PLYPair(mnet.create_lexer(lib_cells(library)), mnet.create_parser(library))
-		result = pp.parse(netlist_name)
+		result = pnet.parse_file(netlist_name)
 		import wire_remover
 		wire_remover.main(result['wires'], result['gates'], library)
 	return result
