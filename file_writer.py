@@ -120,3 +120,9 @@ def generateDirectedConnections(filename_prefix, direction, all_gates):
 def generateConnections(filename_prefix, all_gates):
 	generateDirectedConnections(filename_prefix, "input", all_gates)
 	generateDirectedConnections(filename_prefix, "output", all_gates)
+
+def modelFiles(prefix):
+	return [prefix+"_lib.txt", prefix+".c", prefix+".h"]
+
+def instanceFiles(prefix, number):
+	return [prefix+"_"+number+"_input_connections.txt", prefix+"_"+number+"_output_connections.txt", prefix+"_"+number+"_gates.txt"]
