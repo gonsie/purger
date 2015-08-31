@@ -58,12 +58,12 @@ def pkl_dump(fullname, result):
 
 import importlib
 def load_library(lib_name):
-	if g_library:
-		print "Error: Library", libname, "is already loaded"
-		return
-	fullname = pkl_name(ply_default_library, lib_name)
 	global g_library
 	global g_libname
+	if g_library:
+		print "Alert: Library", g_libname, "is already loaded"
+		return
+	fullname = pkl_name(ply_default_library, lib_name)
 	if pkl_exists(fullname):
 		print "pkl file exist; loading..."
 		g_library = pkl_load(fullname)
@@ -100,11 +100,11 @@ def load_defaults():
 	load_netlist_parser(g_library)
 
 def load_netlist_parser(library):
+	global g_netlist_parser
 	if g_netlist_parser:
-		print "Error: Default netlist parser already loaded"
+		print "Alert: Default netlist parser already loaded"
 		return
 	mnet = importlib.import_module(ply_default_netlist)
-	global g_netlist_parser
 	g_netlist_parser = PLYPair(mnet.create_lexer(lib_cells(library)), mnet.create_parser(library))
 
 def parse_netlist(netlist_name):
