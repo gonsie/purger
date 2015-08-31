@@ -8,6 +8,11 @@ ply_default_library = "ply_liberty"
 ply_default_boolexp = "ply_boolean_expressions"
 ply_default_netlist = "ply_verilog_netlist"
 
+## GLOBAL VARIABLE
+g_library = None
+g_libname = None
+g_netlist_parser = None
+
 # Encapsulation of lexer/parser pair
 class PLYPair:
 	def __init__(self, l=None, p=None):
@@ -53,21 +58,27 @@ def pkl_dump(fullname, result):
 
 import importlib
 def load_library(lib_name):
+	if g_library:
+		print "Error: Library", libname, "is already loaded"
+		return
 	fullname = pkl_name(ply_default_library, lib_name)
-	result = None
+	global g_library
+	global g_libname
 	if pkl_exists(fullname):
 		print "pkl file exist; loading..."
-		result = pkl_load(fullname)
+		g_library = pkl_load(fullname)
+		g_libname = lib_name
 	else:
 		print "pkl file does not exist; processing"
 		mlib = importlib.import_module(ply_default_library)
 		plib = PLYPair(mlib.create_lexer(), mlib.create_parser())
-		result = plib.parse_file(lib_name)
+		g_library = plib.parse_file(lib_name)
+		g_libname = lib_name
 		# boolean expressions
 		mbxp = importlib.import_module(ply_default_boolexp)
 		pbxp = PLYPair(mbxp.create_lexer(), mbxp.create_parser())
-		for g in result:
-			g = result[g]
+		for g in g_library:
+			g = g_library[g]
 			mbxp.update(g.getPinMap())
 			for p in g.pins:
 				if 'function' in g.pins[p]:
@@ -78,13 +89,25 @@ def load_library(lib_name):
 				for k in s.getBEatts():
 					s.atts['o_'+k] = s.atts[k]
 					s.atts[k] = pbxp.parse(s.atts[k])
-		pkl_dump(fullname, result)
-	return result
+		pkl_dump(fullname, g_library)
 
 def lib_cells(library):
 	return {key : "CELL" for key in library.keys()}
 
-def load_netlist(netlist_name, library):
+def load_defaults():
+	load_library("lsi_10k.lib")
+	global g_library
+	load_netlist_parser(g_library)
+
+def load_netlist_parser(library):
+	if g_netlist_parser:
+		print "Error: Default netlist parser already loaded"
+		return
+	mnet = importlib.import_module(ply_default_netlist)
+	global g_netlist_parser
+	g_netlist_parser = PLYPair(mnet.create_lexer(lib_cells(library)), mnet.create_parser(library))
+
+def parse_netlist(netlist_name):
 	fullname = pkl_name(ply_default_netlist+'-'+ply_default_library, netlist_name)
 	result = None
 	if pkl_exists(fullname):
@@ -92,11 +115,11 @@ def load_netlist(netlist_name, library):
 		result = pkl_load(fullname)
 	else:
 		print "pkl file does not exist; processing..."
-		mnet = importlib.import_module(ply_default_netlist)
-		pnet = PLYPair(mnet.create_lexer(lib_cells(library)), mnet.create_parser(library))
-		result = pnet.parse_file(netlist_name)
+		global g_netlist_parser
+		result = g_netlist_parser.parse_file(netlist_name)
 		import wire_remover
-		wire_remover.main(result['wires'], result['gates'], library)
+		global g_library
+		wire_remover.main(result['wires'], result['gates'], g_library)
 	return result
 
 def purger_help():
