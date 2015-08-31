@@ -122,6 +122,23 @@ def parse_netlist(netlist_name):
 		wire_remover.main(result['wires'], result['gates'], g_library)
 	return result
 
+def write_model():
+	import file_writer
+	global g_library
+	global g_libname
+	if not g_library:
+		print "Error: no library is loaded"
+	files = file_writer.modelFiles(g_libname)
+	for f in files:
+		if os.path.isfile(f):
+			print "Error: File", f, "exists"
+			return
+	stdout = sys.stdout
+	sys.stdout = open(g_libname+"_errors.txt", "w")
+	file_writer.generateC(g_libname, g_library)
+	sys.stdout.close()
+	sys.stdout = stdout
+
 def purger_help():
 	print ""
 	print "Welcome to PURGER:"
