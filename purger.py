@@ -67,13 +67,13 @@ def load_library(lib_name):
 	if pkl_exists(fullname):
 		print "pkl file exist; loading..."
 		g_library = pkl_load(fullname)
-		g_libname = lib_name
+		g_libname = lib_name.split("/")[-1].split(".")[0]
 	else:
 		print "pkl file does not exist; processing"
 		mlib = importlib.import_module(ply_default_library)
 		plib = PLYPair(mlib.create_lexer(), mlib.create_parser())
 		g_library = plib.parse_file(lib_name)
-		g_libname = lib_name
+		g_libname = lib_name.split("/")[-1].split(".")[0]
 		# boolean expressions
 		mbxp = importlib.import_module(ply_default_boolexp)
 		pbxp = PLYPair(mbxp.create_lexer(), mbxp.create_parser())
