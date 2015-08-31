@@ -410,8 +410,8 @@ class Gate:
         # return self.type.pin_direction[self.ref_pin[ref]]
 
     def addFanOut(self, ref):
-        if self.type.name is not "fanout":
-            print "ERROR(g7): fanout gate type expected"
+        if self.type.name != "fanout":
+            print "ERROR(g7): fanout gate type expected, instead:", self.type.name
             return
         self.ref_pin[ref] = "out"
         self.fan_out.append(ref)
