@@ -18,12 +18,12 @@ def main(all_wires, all_gates, gate_types):
 		#	which can lead to many inputs (to gates)
 		for g in all_wires[w]:
 			d = g.getRefDirection(w)
-			if d == "input": 
+			if d == "input":
 				inputs += 1
-			elif d == "output": 
+			elif d == "output":
 				outputs += 1
 				inref = g
-			else: 
+			else:
 				print "ERROR(w1): pin with direction", d, "for wire", w
 		if inputs == 0 and outputs == 0:
 			pop_list.append(w)
