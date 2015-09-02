@@ -114,7 +114,7 @@ def generateDirectedConnections(filename_prefix, direction, all_gates):
 	p = [x for x in all_gates if all_gates[x].type.name == direction+"_gate"]
 	p.sort()
 	for i in p:
-		f.write(i+"\n")
+		f.write(i[8:]+"\n")
 	f.close()
 
 def generateConnections(filename_prefix, all_gates):
