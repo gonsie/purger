@@ -150,6 +150,7 @@ def write_module(name, netlist):
 	stdout = sys.stdout
 	sys.stdout = open(name+"_errors.txt", "w")
 	file_writer.generateRoss(name, g_library, netlist['gates'])
+	file_writer.generateConnections(name, netlist['gates'])
 	sys.stdout.close()
 	sys.stdout = stdout
 
