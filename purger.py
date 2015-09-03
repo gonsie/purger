@@ -177,7 +177,11 @@ def parse_netlist(netlist_name):
 		global g_netlist_parser
 		result = g_netlist_parser.parse_file(netlist_name)
 		global g_library
+		stdout = sys.stdout
+		sys.stdout = open(netlist_name+"_errors.txt", 'w')
 		remove_wires(result['wires'], result['gates'], g_library)
+		sys.stdout.close()
+		sys.stdout = stdout
 		pkl_dump(netlist_name, result)
 	return result
 
