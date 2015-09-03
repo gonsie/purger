@@ -107,6 +107,65 @@ def load_netlist_parser(library):
 	mnet = importlib.import_module(ply_default_netlist)
 	g_netlist_parser = PLYPair(mnet.create_lexer(lib_cells(library)), mnet.create_parser(library))
 
+def remove_wires(all_wires, all_gates, gate_types):
+	import classes
+	error_count = 0
+	error_names = []
+	pop_list = []
+	for w in all_wires:
+		# import pdb; pdb.set_trace()
+		# all_wires[w] is a list of gate objects
+		inputs = 0
+		inref = ""
+		outputs = 0
+		# note that we want 1 output to a wire (from a gate)
+		#	which can lead to many inputs (to gates)
+		for g in all_wires[w]:
+			d = g.getRefDirection(w)
+			if d == "input":
+				inputs += 1
+			elif d == "output":
+				outputs += 1
+				inref = g
+			else:
+				print "ERROR(w1): pin with direction", d, "for wire", w
+		if inputs == 0 and outputs == 0:
+			pop_list.append(w)
+			continue
+		if inputs == 0 or outputs == 0 or outputs > 1:
+			print "ERROR(w2): wrong number of inputs (", inputs, ") or outputs (", outputs, ") on wire", w
+			error_count += 1
+			error_names.append(w)
+			continue
+		if inputs > 1:
+			# print "WARNING: wire", w, "has fannout", outputs
+			fan = classes.Gate(w)
+			fan.setType(gate_types["fanout"])
+			for g in all_wires[w]:
+				if g.getRefDirection(w) is "output":
+					fan.addRef("in", inref)
+				else:
+					fan.addFanOut(g)
+				g.updateRef(w, fan)
+			all_gates[fan.name] = fan
+		else:
+			g0 = all_wires[w][0]
+			g1 = all_wires[w][1]
+			g0.updateRef(w, g1)
+			g1.updateRef(w, g0)
+	for w in pop_list:
+		all_wires.pop(w)
+	print "Total of", error_count, "wire errors"
+	# gate checker
+	error_count = 0
+	for g in all_gates:
+		g = all_gates[g]
+		for k in g.ref_pin:
+			if type(k) is str and g.type.name.find("put_gate") == -1:
+				print "ERROR(w4): Gate", g.name, "references wire", k
+				error_count += 1
+	print "Total of", error_count, "gate errors"
+
 def parse_netlist(netlist_name):
 	fullname = pkl_name(ply_default_netlist+'-'+ply_default_library, netlist_name)
 	result = None
@@ -117,9 +176,8 @@ def parse_netlist(netlist_name):
 		print "pkl file does not exist; processing..."
 		global g_netlist_parser
 		result = g_netlist_parser.parse_file(netlist_name)
-		import wire_remover
 		global g_library
-		wire_remover.main(result['wires'], result['gates'], g_library)
+		remove_wires(result['wires'], result['gates'], g_library)
 	return result
 
 def write_model(prefix=""):
