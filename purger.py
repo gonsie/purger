@@ -178,6 +178,7 @@ def parse_netlist(netlist_name):
 		result = g_netlist_parser.parse_file(netlist_name)
 		global g_library
 		remove_wires(result['wires'], result['gates'], g_library)
+		pkl_dump(netlist_name, result)
 	return result
 
 def write_model(prefix=""):
