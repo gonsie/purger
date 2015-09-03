@@ -147,12 +147,8 @@ def write_module(name, netlist):
 	# 	if os.path.isfile(f):
 	# 		print "Error: File", f, "exists"
 	# 		return
-	stdout = sys.stdout
-	sys.stdout = open(name+"_errors.txt", "w")
 	file_writer.generateRoss(name, g_library, netlist['gates'])
 	file_writer.generateConnections(name, netlist['gates'])
-	sys.stdout.close()
-	sys.stdout = stdout
 
 def purger_help():
 	print ""
