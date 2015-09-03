@@ -228,8 +228,9 @@ def purger_help():
 
 import sys
 if __name__ == "__main__":
-	print "Load PURGER functions into an interactive python shell:"
-	print "$ python -i", sys.argv[0]
-	print ""
-	print "Find out more about PURGER with the command"
-	print "> purger_help()"
+	if not sys.flags.interactive:
+		print "Load PURGER functions into an interactive python shell:"
+		print "$ python -i", sys.argv[0]
+	else:
+		print "Find out more about PURGER with the command"
+		print "> purger_help()"
