@@ -214,15 +214,17 @@ def write_module(name, netlist):
 	file_writer.generateConnections(name, netlist['gates'])
 
 def purger_help():
-	print ""
 	print "Welcome to PURGER:"
 	print "Parser-Unified ROSS Gates Emission Routine"
 	print ""
 	print "Available commands:"
-	print "\tpurger_help()\t\t\tShow this help text"
-	print "\tload_library(lib_name)\t\tLoad a library using", ply_default_library, "and", ply_default_boolexp
-	print "\tprocess_netlist(netlist_name)\tProcess a netlist using", ply_default_netlist
-	print "\tsomething_else?????"
+	print "\tpurger_help()\t\t\t\tShow this help text"
+	print "\tlib  = load_library(lib_name)\t\tLoad a library using", ply_default_library, "and", ply_default_boolexp
+	print "\tnetp = load_netlist_parser(lib)\t\tLoad a netlist parser using", ply_default_netlist
+	print "\tload_defaults()\t\t\t\tInit the default library and load default netlist parser"
+	print "\tnet  = process_netlist(netlist_name)\tProcess a netlist using", ply_default_netlist
+	print "\twrite_model(\"prefix\")\t\t\tGenerate the library gate model"
+	print "\twrite_module(\"prefix/name\", net)\tGenerate the ROSS init file and connection files"
 
 import sys
 if __name__ == "__main__":
