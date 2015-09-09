@@ -216,7 +216,8 @@ def create_parser(gate_types, gid=0):
         t[0] = t[1]
 
     def p_port_connection_dot(t):
-        'port_connection : DOT ID LPAREN primary RPAREN'
+        '''port_connection : DOT ID LPAREN primary RPAREN
+                           | DOT ID LPAREN LCURLY list_of_primaries RCURLY RPAREN'''
         t[0] = [(t[2], t[4])]
 
     def p_port_connection_e(t):
@@ -279,6 +280,20 @@ def create_parser(gate_types, gid=0):
         t[0] = ""
 
 # NUMBERS
+
+    def p_list_of_primaries(t):
+        'list_of_primaries : primary more_primaries'
+        t[0] = [t[1]]
+        if t[2] != None: t[0].extend(t[2])
+
+    def p_more_primaries(t):
+        'more_primaries : COMMA primary more_primaries'
+        t[0] = [t[2]]
+        if t[3] != None: t[0].extend(t[3])
+
+    def p_more_primaries_e(t):
+        'more_primaries :'
+        pass
 
     def p_primary_num(t):
         'primary : number'
