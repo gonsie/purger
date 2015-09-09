@@ -16,7 +16,7 @@ reserved = {
 re_tokens = [
     'SEMI', 'COMMA', 'DOT', 'COLON',
     'EQ', 'BASE', 'SIGN',
-    'LPAREN', 'RPAREN',  'LSQUARE', 'RSQUARE',
+    'LPAREN', 'RPAREN',  'LSQUARE', 'RSQUARE', 'LCURLY', 'RCURLY',
     'SFLOAT', 'UNSIGNED', 'ID',
 ]
 
@@ -35,6 +35,8 @@ def create_lexer(nets={}):
     t_DOT = r'\.'
     t_LSQUARE = r'\['
     t_RSQUARE = r'\]'
+    t_LCURLY = r'\{'
+    t_RCURLY = r'\}'
     t_COLON = r':'
     t_EQ = r'\='
     t_BASE = r'\'[bBoOdDhH]'
