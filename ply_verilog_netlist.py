@@ -84,6 +84,14 @@ def create_parser(gate_types, gid=0):
         t[0] = {}
         t[0]['wires'] = all_wires
         t[0]['gates'] = all_cells
+        t[0]['gate_type'] = classes.Gate_Type(t[2])
+        in_conex = [y[8:] for y in all_cells if all_cells[y].type.name == "input_gate"]
+        outconex = [y[8:] for y in all_cells if all_cells[y].type.name == "output_gate"]
+        for y in in_conex:
+            t[0]['gate_type'].add('pin', {y : {'direction' : "input"}})
+        for y in outconex:
+            t[0]['gate_type'].add('pin', {y : {'direction' : "output"}})
+        t[0]['gate_type'].setOrders()
 
 # LIST_OF_PORTS
 
