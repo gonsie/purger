@@ -481,9 +481,9 @@ class Range:
         elif ':' in s:
             self.type = 'Range'
             r = s.strip('[]').split(':')
-            self.start = r[0]
-            self.end = r[1]
+            self.start = min(int(r[0]), int(r[1]))
+            self.end = max(int(r[0]), int(r[1]))
         else:
             self.type = 'Single'
-            self.value = s.strip('[]')
+            self.value = int(s.strip('[]'))
 
