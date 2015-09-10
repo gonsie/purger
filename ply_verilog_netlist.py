@@ -264,14 +264,14 @@ def create_parser(gate_types, gid=0):
         'assignment : primary EQ primary'
         if t[1] in all_wires and t[3] in all_wires:
             ## TODO: make a fannout cell!
-            flag = 0
+            flag = False
             if "io_cell_"+t[3] in all_cells:
-                flag += 1
+                flag = True
                 all_wires[t[1]].append(all_cells["io_cell_"+t[3]])
                 all_cells["io_cell_"+t[3]].addIORef(t[1])
                 all_wires.pop(t[3])
             if "io_cell_"+t[1] in all_cells:
-                if flag != 0: print "ALERT: io_cell assigned to io_cell"
+                if flag: print "ALERT: io_cell assigned to io_cell"
                 all_wires[t[3]].append(all_cells["io_cell_"+t[1]])
                 all_cells["io_cell_"+t[1]].addIORef(t[3])
                 all_wires.pop(t[1])
