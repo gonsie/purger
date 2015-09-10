@@ -216,8 +216,17 @@ def create_parser(gate_types, gid=0):
         t[0] = t[1]
 
     def p_port_connection_dot(t):
-        t[0] = [(t[2], t[4])]
         'port_connection : DOT ID LPAREN primary RPAREN'
+        if type(t[4]) is str and t[4].find(':') != -1:
+            print "Warning: multibit wire as port connection", t[4]
+            range_obj = classes.Range()
+            x = t[4].split('[')
+            range_obj.parse_string(x[-1])
+            wl = wire_enumeration(range_obj, x[0])
+            t[0] = [(t[2], wl)]
+        else:
+            t[0] = [(t[2], t[4])]
+
     def p_port_connection_curly(t):
         'port_connection : DOT ID LPAREN LCURLY list_of_primaries RCURLY RPAREN'
         t[0] = [(t[2], t[5])]
