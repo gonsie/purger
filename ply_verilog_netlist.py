@@ -276,8 +276,12 @@ def create_parser(gate_types, gid=0):
                 all_cells["io_cell_"+t[1]].addIORef(t[3])
                 all_wires.pop(t[1])
         else:
-            print "ERROR: assign stmt without 2 wires:", t[1], "=", t[3]
-        t[0] = ""
+            if "io_cell_"+t[1] in all_cells:
+                all_cells["io_cell_"+t[1]].setAssign(t[3])
+                all_wires.pop(t[1])
+            else:
+                print "ERROR: constant assign stmt without io cell:", t[1], "=", t[3]
+                t[0] = ""
 
 # NUMBERS
 

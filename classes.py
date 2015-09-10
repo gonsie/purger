@@ -326,6 +326,7 @@ class Gate:
         self.ref_pin = {}
         self.in_pins = []
         self.out_pins = []
+        self.const_assign = False
 
     def __repr__(self):
         return self.name+"_gate"
@@ -438,6 +439,13 @@ class Gate:
         if ref in self.in_pins:
             return self.in_pins.index(ref)
         return -1
+
+    def setAssign(self, constval):
+        try:
+            self.const_assign = int(constval)
+        except Exception:
+            print "ERROR(g10): assign constant not an int", constval
+            self.const_assign = constval
 
 class Range:
     def __init__(self, start=None, end=None):
