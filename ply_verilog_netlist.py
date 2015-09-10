@@ -216,9 +216,11 @@ def create_parser(gate_types, gid=0):
         t[0] = t[1]
 
     def p_port_connection_dot(t):
-        '''port_connection : DOT ID LPAREN primary RPAREN
-                           | DOT ID LPAREN LCURLY list_of_primaries RCURLY RPAREN'''
         t[0] = [(t[2], t[4])]
+        'port_connection : DOT ID LPAREN primary RPAREN'
+    def p_port_connection_curly(t):
+        'port_connection : DOT ID LPAREN LCURLY list_of_primaries RCURLY RPAREN'
+        t[0] = [(t[2], t[5])]
 
     def p_port_connection_e(t):
         'port_connection :'
