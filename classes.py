@@ -1,3 +1,5 @@
+import itertools
+
 # use for timing groups in pins
 class Timing_Group:
     def __init__(self, atts):
@@ -312,8 +314,6 @@ class Gate_Type:
         ret = [k for k, v in self.pins.items() if direction in v.values()]
         ret.sort()
         return ret
-
-import itertools
 
 class Gate:
 
