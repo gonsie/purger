@@ -9,6 +9,58 @@ def LoadModule(module_name):
     f.close()
     return mod
 
+# use as a placeholder for modules that appear in netlists
+# aka megacells that don't belong to the gate library
+class Module:
+    def __init__(self, mname, idname=""):
+        self.name = idname
+        self.type = mname
+        self.inputs = {}
+        self.outputs= {}
+        self.conx = {}
+        self.dangling_refs = []
+
+    def getDirection(self, wirename):
+        if wirename in self.inputs:
+            return "input"
+        elif wirename in self.outputs:
+            return "output"
+        else:
+            return None
+
+    def connections(self, all_cells):
+        p = [x for x in all_cells if all_cells[x].type.name == "input_gate"]
+        for i in p:
+            self.inputs[i[8:]] = all_cells[i].gid
+        p = [x for x in all_cells if all_cells[x].type.name == "output_gate"]
+        for i in p:
+            self.outputs[i[8:]] = all_cells[i].gid
+
+    def addConex(self, conxlist):
+        # conxlist is a list of tuples:
+        # elem[0] is name of a port
+        # elem[1] is name of wire
+        # or list of 0/1's (several wires set to const)
+        for i in conxlist:
+            self.conx[i[0]] = i[1]
+
+    def updateRef(self, old_ref, new_ref):
+        if old_ref in self.conx.values():
+            for k in self.conx:
+                if self.conx[k] == old_ref:
+                    self.conx[k] = new_ref
+        else:
+            self.dangling_refs.append((old_ref, new_ref))
+
+    def pkl(self):
+        pkl_name = self.type+"_obj.pkl"
+        if os.path.isfile(pkl_name):
+            print "ERROR:", self.type, "cannot be pkl'd, file exsits"
+            return
+        f = open(pkl_name, 'wb')
+        cPickle.dump(self, f)
+        f.close()
+
 # use for timing groups in pins
 class Timing_Group:
     def __init__(self, atts):
