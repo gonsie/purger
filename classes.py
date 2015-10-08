@@ -1,5 +1,14 @@
 import itertools
 
+import os.path
+import cPickle
+def LoadModule(module_name):
+    pkl_name = module_name+"_obj.pkl"
+    f = open(pkl_name, 'rb')
+    mod = cPickle.load(f)
+    f.close()
+    return mod
+
 # use for timing groups in pins
 class Timing_Group:
     def __init__(self, atts):
