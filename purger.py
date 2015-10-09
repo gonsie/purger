@@ -132,7 +132,7 @@ def remove_wires(all_wires, all_gates, gate_types):
 		if inputs == 0 and outputs == 0:
 			pop_list.append(w)
 			continue
-		if inputs == 0 or outputs == 0 or outputs > 1:
+		if inputs == 0 or outputs != 1:
 			print "ERROR(w2): wrong number of inputs (", inputs, ") or outputs (", outputs, ") on wire", w
 			error_count += 1
 			error_names.append(w)
@@ -148,7 +148,7 @@ def remove_wires(all_wires, all_gates, gate_types):
 					fan.addFanOut(g)
 				g.updateRef(w, fan)
 			all_gates[fan.name] = fan
-		else:
+		else: # outputs = 1, inputs = 1
 			g0 = all_wires[w][0]
 			g1 = all_wires[w][1]
 			g0.updateRef(w, g1)
