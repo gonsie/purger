@@ -6,3 +6,4 @@ sublime-project.sublime-workspace
 pypy-1.9/
 current/
 Generated/
+*.txt
