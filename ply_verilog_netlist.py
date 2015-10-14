@@ -195,8 +195,9 @@ def create_parser(gate_types, gid=0):
 
     def p_module_item_megacell(t):
         'module_item : MEGACELL ID LPAREN list_of_module_connections RPAREN SEMI'
-        print "Found MEGACELL", t[1]
-        pass
+        # check if megacell definition has been parsed (if so, load it)
+        # otherwise, send user to parse it and DIE
+        raise Exception("Could not find megacell gate type " + t[1])
 
 # MORE_MODULES / CELLS / CONNECTING PORTS
 
