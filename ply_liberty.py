@@ -36,7 +36,7 @@ reserved = {
 tokens = [
     'PLUS', 'MINUS', 'MULT', 'DIV', 'EQ',
     'COMMA', 'SEMI', 'COLON',
-    'LPAR', 'RPAR', 'LCURLY', 'RCURLY', 
+    'LPAR', 'RPAR', 'LCURLY', 'RCURLY',
     'NUM', 'STR', 'ID',
 ] + list(reserved.values())
 
