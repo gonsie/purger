@@ -17,7 +17,7 @@ re_tokens = [
     'SEMI', 'COMMA', 'DOT', 'COLON',
     'EQ', 'BASE', 'SIGN',
     'LPAREN', 'RPAREN',  'LSQUARE', 'RSQUARE', 'LCURLY', 'RCURLY',
-    'SFLOAT', 'UNSIGNED', 'ID',
+    'SFLOAT', 'UNSIGNED', 'MEGACELL', 'ID',
 ]
 
 def create_lexer(nets={}):
@@ -43,6 +43,13 @@ def create_lexer(nets={}):
     t_SFLOAT = r'[\+-]?[\d_A-Fa-f]+\.[\d_A-Fa-f]+'
     t_SIGN = r'[\+-]'
     t_UNSIGNED = r'[\d_A-Fa-fXxZz]+'
+
+    # NOTE: functionally defined tokens are added first
+    #       in the same order in which they are defined
+
+    def t_MEGACELL(t):
+        r'n2_[\S]+_cust'
+        return t
 
     def t_ID(t):
         r'[a-zA-Z_][\w$]*|\\[\S]+'
@@ -185,6 +192,11 @@ def create_parser(gate_types, gid=0):
         t[0] = ""
         if len(t[3]) > 0: print "ERROR: multiple module definitions for one cell type"
         print "ERROR: multiple module definiton rule for no reason"
+
+    def p_module_item_megacell(t):
+        'module_item : MEGACELL ID LPAREN list_of_module_connections RPAREN SEMI'
+        print "Found MEGACELL", t[1]
+        pass
 
 # MORE_MODULES / CELLS / CONNECTING PORTS
 
