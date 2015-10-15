@@ -213,6 +213,12 @@ def write_module(name, netlist):
 	file_writer.generateRoss(name, g_library, netlist['gates'])
 	file_writer.generateConnections(name, netlist['gates'])
 
+def add_megacell(cellname):
+	# must be called AFTER netlist parser is initiated (with cells)
+	global g_library
+	h = pkl_load(cellname + '.pkl')
+	g_library[cellname] = h
+
 def purger_help():
 	print "Welcome to PURGER:"
 	print "Parser-Unified ROSS Gates Emission Routine"

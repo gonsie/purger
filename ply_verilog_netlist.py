@@ -177,8 +177,11 @@ def create_parser(gate_types, gid=0):
         t[0] = ""
 
     def p_module_item_module_single(t):
-        'module_item : CELL ID LPAREN list_of_module_connections RPAREN SEMI'
+        '''module_item : CELL ID LPAREN list_of_module_connections RPAREN SEMI
+                       | MEGACELL ID LPAREN list_of_module_connections RPAREN SEMI'''
         t[0] = ""
+        if t[1] not in gate_types:
+            raise Exception("Could not find megacell gate type " + t[1])
         g = classes.Gate(t[2])
         g.setType(gate_types[t[1]])
         for p in t[4]:
@@ -191,13 +194,6 @@ def create_parser(gate_types, gid=0):
         'module_item : CELL module_instance more_modules SEMI'
         t[0] = ""
         if len(t[3]) > 0: print "ERROR: multiple module definitions for one cell type"
-        print "ERROR: multiple module definiton rule for no reason"
-
-    def p_module_item_megacell(t):
-        'module_item : MEGACELL ID LPAREN list_of_module_connections RPAREN SEMI'
-        # check if megacell definition has been parsed (if so, load it)
-        # otherwise, send user to parse it and DIE
-        raise Exception("Could not find megacell gate type " + t[1])
 
 # MORE_MODULES / CELLS / CONNECTING PORTS
 
