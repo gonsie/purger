@@ -7,3 +7,5 @@ pypy-1.9/
 current/
 Generated/
 *.txt
+*.vSyn # force add for LFS
+*.txt
