@@ -297,6 +297,7 @@ class Gate_Type:
         self.pins = {}
         self.specials = {}
         self.counts = {'input' : 0, 'output' : 0, 'internal' : 0}
+        self.multibits = {}
 
     def add(self, name, entry):
         if name == 'pin':
@@ -307,6 +308,9 @@ class Gate_Type:
             entry = entry.items()[0]
             self.pins.update(entry[1].getInternalPins())
             entry[1].setParent(self.name)
+        elif name == 'multibit':
+            entry = entry.items()[0]
+            self.multibits[entry[0]] = entry[1]
 
     def setOrders(self):
         orders = ['input', 'output', 'internal']
@@ -428,6 +432,10 @@ class Gate:
             print "ERROR(io): IOref for unknown type:", self.type.name
 
     def addRef(self, pin, ref):
+        if pin in self.type.multibits:
+            for p in self.type.multibits[pin]['wires']:
+                self.addRef(p, ref)
+            return
         self.ref_pin[ref] = pin
         if self.type.name == "fanout" and pin != "in":
             print "ERROR(g3): don't use .addRef on a fanout gate"
