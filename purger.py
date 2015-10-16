@@ -53,8 +53,14 @@ def pkl_load(fullname):
 
 def pkl_dump(fullname, result):
 	f = open(fullname,'wb')
-	cPickle.dump(result, f)
-	f.close()
+	try:
+		cPickle.dump(result, f)
+		f.close()
+	except RuntimeError, e:
+		print "Could not pkl", fullname, e
+		f.close()
+		os.remove(fullname)
+
 
 import importlib
 def load_library(lib_name):
