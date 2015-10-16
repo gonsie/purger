@@ -43,6 +43,12 @@ class PLYPair:
 		self.result = self.parser.parse(text, lexer=self.lexer)
 		return self.result
 
+# OS and PKL FUNCTIONS
+def path_name(filename):
+	global g_generated_path
+	name = filename.split('.')[0]
+	return g_generated_path+name+'/'
+
 import os.path
 def pkl_exists(name):
 	return os.path.isfile(name+'.pkl')
@@ -65,22 +71,20 @@ def pkl_dump(name, result):
 		os.remove(name+'.pkl')
 
 import importlib
-def load_library(lib_name):
+def load_library(filename):
 	global g_library
-	global g_libname
 	if g_library:
-		print "Alert: Library", g_libname, "is already loaded"
+		print "Alert: Library", filename, "is already loaded"
 		return
-	if pkl_exists(fullname):
+	gen_path = path_name(filename)
+	if pkl_exists(gen_path+filename):
 		print "pkl file exist; loading..."
-		g_library = pkl_load(fullname)
-		g_libname = lib_name.split("/")[-1].split(".")[0]
+		g_library = pkl_load(gen_path+filename)
 	else:
 		print "pkl file does not exist; processing"
 		mlib = importlib.import_module(ply_default_library)
 		plib = PLYPair(mlib.create_lexer(), mlib.create_parser())
-		g_library = plib.parse_file(lib_name)
-		g_libname = lib_name.split("/")[-1].split(".")[0]
+		g_library = plib.parse_file(g_data_path+filename)
 		# boolean expressions
 		mbxp = importlib.import_module(ply_default_boolexp)
 		pbxp = PLYPair(mbxp.create_lexer(), mbxp.create_parser())
@@ -96,7 +100,7 @@ def load_library(lib_name):
 				for k in s.getBEatts():
 					s.atts['o_'+k] = s.atts[k]
 					s.atts[k] = pbxp.parse(s.atts[k])
-		pkl_dump(fullname, g_library)
+		pkl_dump(gen_path+filename, g_library)
 
 def lib_cells(library):
 	return {key : "CELL" for key in library.keys()}
