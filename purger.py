@@ -236,7 +236,7 @@ def purger_help():
 	print "\tlib  = load_library(lib_name)\t\tLoad a library using", ply_default_library, "and", ply_default_boolexp
 	print "\tnetp = load_netlist_parser(lib)\t\tLoad a netlist parser using", ply_default_netlist
 	print "\tload_defaults()\t\t\t\tInit the default library and load default netlist parser"
-	print "\tnet  = process_netlist(netlist_name)\tProcess a netlist using", ply_default_netlist
+	print "\tnet  = parse_netlist(netlist_name)\tProcess a netlist using", ply_default_netlist
 	print "\twrite_model(\"prefix\")\t\t\tGenerate the library gate model"
 	print "\twrite_module(\"prefix/name\", net)\tGenerate the ROSS init file and connection files"
 
