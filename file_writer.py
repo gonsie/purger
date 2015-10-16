@@ -57,7 +57,7 @@ def write_gate_c(filename_prefix, types_list, gate_types):
 
 def generateC(filename_prefix, gate_types):
 	# this file just lists all cells with pins
-	f = open(filename_prefix+"_lib.txt", "w")
+	f = open(filename_prefix+".txt", "w")
 	types_list = gate_types.keys()
 	## master list of cell name to cell number ##
 	types_list.sort()
@@ -122,7 +122,7 @@ def generateConnections(filename_prefix, all_gates):
 	generateDirectedConnections(filename_prefix, "output", all_gates)
 
 def modelFiles(prefix):
-	return [prefix+"_lib.txt", prefix+".c", prefix+".h"]
+	return [prefix+".txt", prefix+".c", prefix+".h"]
 
 def instanceFiles(prefix, number):
 	return [prefix+"_"+number+"_input_connections.txt", prefix+"_"+number+"_output_connections.txt", prefix+"_"+number+"_gates.txt"]
