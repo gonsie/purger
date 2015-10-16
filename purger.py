@@ -38,10 +38,6 @@ class PLYPair:
 		return self.result
 
 import os.path
-def pkl_name(plyname, filename):
-	fname = os.path.basename(filename)
-	return plyname+'-parsed-'+fname+'.pkl'
-
 def pkl_exists(fullname):
 	return os.path.isfile(fullname)
 
@@ -70,7 +66,6 @@ def load_library(lib_name):
 	if g_library:
 		print "Alert: Library", g_libname, "is already loaded"
 		return
-	fullname = pkl_name(ply_default_library, lib_name)
 	if pkl_exists(fullname):
 		print "pkl file exist; loading..."
 		g_library = pkl_load(fullname)
@@ -178,7 +173,6 @@ def remove_wires(all_wires, all_gates, gate_types):
 	print "Total of", error_count, "gate errors"
 
 def parse_netlist(netlist_name):
-	fullname = pkl_name(ply_default_netlist+'-'+ply_default_library, netlist_name)
 	result = None
 	if pkl_exists(fullname):
 		print "pkl file exists; loading..."
