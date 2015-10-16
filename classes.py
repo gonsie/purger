@@ -55,7 +55,7 @@ class Module:
     def pkl(self):
         pkl_name = self.type+"_obj.pkl"
         if os.path.isfile(pkl_name):
-            print "ERROR:", self.type, "cannot be pkl'd, file exsits"
+            print "classes.Module ERROR:", self.type, "cannot be pkl'd, file exsits"
             return
         f = open(pkl_name, 'wb')
         cPickle.dump(self, f)
