@@ -14,6 +14,12 @@ g_library = None
 g_libname = None
 g_netlist_parser = None
 
+## FILE SYSTEM SETTINGS
+g_data_path = "Data/"
+g_data_netlist_file_type = ".vSyn"
+g_data_rtl_file_type = ".v"
+g_generated_path = "Generated/"
+
 # Encapsulation of lexer/parser pair
 class PLYPair:
 	def __init__(self, l=None, p=None):
