@@ -115,6 +115,9 @@ def create_parser():
         gw.add('pin', {"out": {'direction' : "output", 'function' : "in"}})
         gw.setOrders()
         gate_types[gw.name] = gw
+        # all megacells devolve into one "type"
+        gm = classes.Gate_Type("mega_gate")
+        gate_types[gm.name] = gm
 
     def p_attributes(t):
         'attributes : attribute attributes'
