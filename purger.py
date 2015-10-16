@@ -38,26 +38,25 @@ class PLYPair:
 		return self.result
 
 import os.path
-def pkl_exists(fullname):
-	return os.path.isfile(fullname)
+def pkl_exists(name):
+	return os.path.isfile(name+'.pkl')
 
 import cPickle
-def pkl_load(fullname):
-	f = open(fullname, 'rb')
+def pkl_load(name):
+	f = open(name+'.pkl', 'rb')
 	result = cPickle.load(f)
 	f.close()
 	return result
 
-def pkl_dump(fullname, result):
-	f = open(fullname,'wb')
+def pkl_dump(name, result):
+	f = open(name+'.pkl','wb')
 	try:
 		cPickle.dump(result, f)
 		f.close()
 	except RuntimeError, e:
-		print "Could not pkl", fullname, e
+		print "Could not pkl", name, e
 		f.close()
-		os.remove(fullname)
-
+		os.remove(name+'.pkl')
 
 import importlib
 def load_library(lib_name):
