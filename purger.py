@@ -215,8 +215,16 @@ def write_module(name, netlist):
 
 def add_megacell(cellname):
 	# must be called AFTER netlist parser is initiated (with cells)
+	if pkl_exists(cellname+'.pkl'):
+		print "pkl file exists, loading..."
+		h = pkl_load(cellname + '.pkl')
+	else:
+		print "pkl file does not exist, parsing rtl file..."
+		rlib = importlib.import_module('ply_verilog_rtl')
+		r = PLYPair(rlib.create_lexer(), rlib.create_parser())
+		h = r.parse_file(cellname+'.v')[0]
+		pkl_dump(cellname+'.pkl', h)
 	global g_library
-	h = pkl_load(cellname + '.pkl')
 	g_library[cellname] = h
 
 def purger_help():
