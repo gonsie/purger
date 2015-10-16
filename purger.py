@@ -7,6 +7,7 @@
 ply_default_library = "ply_liberty"
 ply_default_boolexp = "ply_boolean_expressions"
 ply_default_netlist = "ply_verilog_netlist"
+ply_default_rtl = "ply_verilog_rtl"
 
 ## GLOBAL VARIABLE
 g_library = None
@@ -239,7 +240,8 @@ def add_megacell(cellname):
 		h = pkl_load(cellname + '.pkl')
 	else:
 		print "pkl file does not exist, parsing rtl file..."
-		rlib = importlib.import_module('ply_verilog_rtl')
+		global ply_default_rtl
+		rlib = importlib.import_module(ply_default_rtl)
 		r = PLYPair(rlib.create_lexer(), rlib.create_parser())
 		h = r.parse_file(cellname+'.v')[0]
 		pkl_dump(cellname+'.pkl', h)
