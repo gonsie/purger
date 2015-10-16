@@ -96,11 +96,6 @@ def load_library(lib_name):
 def lib_cells(library):
 	return {key : "CELL" for key in library.keys()}
 
-def load_defaults():
-	load_library("lsi_10k.lib")
-	global g_library
-	load_netlist_parser(g_library)
-
 def load_netlist_parser(library):
 	global g_netlist_parser
 	if g_netlist_parser:
@@ -108,6 +103,11 @@ def load_netlist_parser(library):
 		return
 	mnet = importlib.import_module(ply_default_netlist)
 	g_netlist_parser = PLYPair(mnet.create_lexer(lib_cells(library)), mnet.create_parser(library))
+
+def load_defaults():
+	load_library("lsi_10k.lib")
+	global g_library
+	load_netlist_parser(g_library)
 
 def remove_wires(all_wires, all_gates, gate_types):
 	import classes
