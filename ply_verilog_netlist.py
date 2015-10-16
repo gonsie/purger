@@ -91,6 +91,9 @@ def create_parser(gate_types, gid=0):
         t[0] = {}
         t[0]['wires'] = all_wires
         t[0]['gates'] = all_cells
+        t[0]['obj'] = classes.Module(t[2])
+        t[0]['obj'].connections(all_cells)
+        t[0]['obj'].pkl()
 
 # LIST_OF_PORTS
 
@@ -147,8 +150,11 @@ def create_parser(gate_types, gid=0):
             return list_of_variables
         output = []
         for i in range_obj.enumeration():
-            for v in list_of_variables:
-                output.append(v + "[" + str(i) + "]")
+            if type(list_of_variables) is list:
+                for v in list_of_variables:
+                    output.append(v + "[" + str(i) + "]")
+            else:
+                output.append(list_of_variables + "[" + str(i) + "]")
         return output
 
     def p_module_item_inout(t):
@@ -156,6 +162,11 @@ def create_parser(gate_types, gid=0):
                        | OUTPUT range list_of_variables SEMI'''
         t[0] = ""
         wl = wire_enumeration(t[2], t[3])
+        if t[2].type is not 'None':
+            if len(t[3]) > 1:
+                print "ERROR: multiple multibit in/outs defined at once"
+                print "=>", t[1], t[2], t[3], t[4]
+            all_wires[t[3][0]] = ["multibit_flag"] + wl
         # import pdb; pdb.set_trace()
         for w in wl:
             g = classes.Gate("io_cell_" + w)
@@ -169,6 +180,11 @@ def create_parser(gate_types, gid=0):
         'module_item : WIRE range list_of_variables SEMI'
         t[0] = ""
         wl = wire_enumeration(t[2], t[3])
+        if t[2].type is not 'None':
+            if len(t[3]) > 1:
+                print "ERROR: multiple multibit wires defined at once"
+                print "=>", t[1], t[2], t[3], t[4]
+            all_wires[t[3][0]] = ["multibit_flag"] + wl
         for w in wl:
             all_wires[w] = []
 
@@ -188,12 +204,17 @@ def create_parser(gate_types, gid=0):
             if type(p[1]) is str:
                 g.addRef(p[0], p[1])
                 all_wires[p[1]].append(g)
+            elif type(p[1]) is int:
+                pass
+            else:
+                print "cell's list of module connections contains tuple", p[0], "and", p[1]
         all_cells[g.name] = g
 
     def p_module_item_module_list(t):
         'module_item : CELL module_instance more_modules SEMI'
         t[0] = ""
         if len(t[3]) > 0: print "ERROR: multiple module definitions for one cell type"
+        print "ERROR: multiple module definition rule for no reason"
 
 # MORE_MODULES / CELLS / CONNECTING PORTS
 

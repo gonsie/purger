@@ -127,6 +127,9 @@ def remove_wires(all_wires, all_gates, gate_types):
 		# note that we want 1 output to a wire (from a gate)
 		#	which can lead to many inputs (to gates)
 		for g in all_wires[w]:
+			if not isinstance(g, classes.Gate):
+				print "Error(w0): could not remove wires from object", g, "of type", type(g)
+				continue
 			d = g.getRefDirection(w)
 			if d == "input":
 				inputs += 1
@@ -148,11 +151,12 @@ def remove_wires(all_wires, all_gates, gate_types):
 			fan = classes.Gate(w)
 			fan.setType(gate_types["fanout"])
 			for g in all_wires[w]:
-				if g.getRefDirection(w) is "output":
-					fan.addRef("in", inref)
-				else:
-					fan.addFanOut(g)
-				g.updateRef(w, fan)
+				if isinstance(g, classes.Gate):
+					if g.getRefDirection(w) is "output":
+						fan.addRef("in", inref)
+					else:
+						fan.addFanOut(g)
+					g.updateRef(w, fan)
 			all_gates[fan.name] = fan
 		else: # outputs = 1, inputs = 1
 			g0 = all_wires[w][0]
@@ -188,7 +192,7 @@ def parse_netlist(netlist_name):
 		remove_wires(result['wires'], result['gates'], g_library)
 		sys.stdout.close()
 		sys.stdout = stdout
-		pkl_dump(fullname, result)
+		# pkl_dump(fullname, result['obj']) ## ???
 	return result
 
 def write_model(prefix=""):
@@ -218,6 +222,15 @@ def write_module(name, netlist):
 	# 		return
 	file_writer.generateRoss(name, g_library, netlist['gates'])
 	file_writer.generateConnections(name, netlist['gates'])
+
+def parse_loop(name_list):
+	load_defaults()
+	print name_list
+	for y in name_list:
+		print "Parsing", y
+		net = parse_netlist(y+'.vSyn')
+		print "Writing", y
+		write_module("../Generated/"+y, net)
 
 def add_megacell(cellname):
 	# must be called AFTER netlist parser is initiated (with cells)
