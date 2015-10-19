@@ -72,13 +72,19 @@ def generateC(filename_prefix, gate_types):
 	write_gate_c(filename_prefix, types_list, gate_types)
 
 def generateRoss(filename_prefix, gate_types, all_gates):
+	import re
+	p = re.compile(r'n2_[\S]+_cust')
 	types_list = gate_types.keys()
 	types_list.sort()
 	types_list.append(None)
 	f = open(filename_prefix+"_gates.txt", "w")
 	for g in all_gates:
 		g = all_gates[g]
-		f.write(str(g.gid)+" "+str(types_list.index(g.type.name))+" ")
+		if p.match(g.type.name):
+			tname = "mega_gate"
+		else:
+			tname = g.type.name
+		f.write(str(g.gid)+" "+str(types_list.index(tname))+" ")
 		inlist = []
 		outlist = []
 		for r in g.ref_pin:
