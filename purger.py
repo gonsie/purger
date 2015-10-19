@@ -11,7 +11,6 @@ ply_default_rtl = "ply_verilog_rtl"
 
 ## GLOBAL VARIABLE
 g_library = None
-g_libname = None
 g_netlist_parser = None
 
 ## FILE SYSTEM SETTINGS
@@ -44,9 +43,11 @@ class PLYPair:
 		return self.result
 
 # OS and PKL FUNCTIONS
-def path_name(filename):
+def path_name(filename, megacell=False):
 	global g_generated_path
 	name = filename.split('.')[0]
+	if megacell:
+		return g_generated_path+"megacell"+'/'
 	return g_generated_path+name+'/'
 
 import os.path
@@ -236,19 +237,22 @@ def parse_loop(name_list):
 		print "Writing", y
 		write_module("../Generated/"+y, net)
 
-def add_megacell(cellname):
+def add_megacell(cellfile):
 	# must be called AFTER netlist parser is initiated (with cells)
-	if pkl_exists(cellname+'.pkl'):
+	gen_path = path_name(cellfile)
+	if pkl_exists(gen_path+cellfile):
 		print "pkl file exists, loading..."
-		h = pkl_load(cellname + '.pkl')
+		h = pkl_load(gen_path+cellfile)
 	else:
 		print "pkl file does not exist, parsing rtl file..."
 		global ply_default_rtl
 		rlib = importlib.import_module(ply_default_rtl)
 		r = PLYPair(rlib.create_lexer(), rlib.create_parser())
-		h = r.parse_file(cellname+'.v')[0]
-		pkl_dump(cellname+'.pkl', h)
+		global g_data_path
+		h = r.parse_file(g_data_path+cellfile)[0]
+		pkl_dump(gen_path+cellfile, h)
 	global g_library
+	cellname = cellfile.split('.')[0]
 	g_library[cellname] = h
 
 def purger_help():
