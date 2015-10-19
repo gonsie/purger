@@ -218,15 +218,6 @@ def parse_netlist(netlist_name):
 		# pkl_dump(fullname, result['obj']) ## ???
 	return result
 
-def parse_loop(name_list):
-	load_defaults()
-	print name_list
-	for y in name_list:
-		print "Parsing", y
-		net = parse_netlist(y+'.vSyn')
-		print "Writing", y
-		write_module("../Generated/"+y, net)
-
 def add_megacell(cellfile):
 	# must be called AFTER netlist parser is initiated (with cells)
 	gen_path = path_name(cellfile)
