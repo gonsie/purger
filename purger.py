@@ -85,6 +85,7 @@ def load_library(filename):
 		print "pkl file does not exist; processing"
 		mlib = importlib.import_module(ply_default_library)
 		plib = PLYPair(mlib.create_lexer(), mlib.create_parser())
+		global g_data_path
 		g_library = plib.parse_file(g_data_path+filename)
 		# boolean expressions
 		mbxp = importlib.import_module(ply_default_boolexp)
