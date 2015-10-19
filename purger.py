@@ -71,6 +71,7 @@ def pkl_dump(name, result):
 		f.close()
 		os.remove(name+'.pkl')
 
+# PLY LOADING FUNCTIONS
 import importlib
 def load_library(filename):
 	global g_library
@@ -103,6 +104,17 @@ def load_library(filename):
 					s.atts['o_'+k] = s.atts[k]
 					s.atts[k] = pbxp.parse(s.atts[k])
 		pkl_dump(gen_path+filename, g_library)
+		fw = importlib.import_module('file_writer')
+		files = fw.modelFiles(gen_path+filename)
+		for f in files:
+			if os.path.isfile(f):
+				print "Error: File", f, "exists"
+				return
+		stdout = sys.stdout
+		sys.stdout = open(gen_path+filename+".errors", "w")
+		fw.generateC(gen_path+filename, g_library)
+		sys.stdout.close()
+		sys.stdout = stdout
 
 def lib_cells(library):
 	return {key : "CELL" for key in library.keys()}
@@ -185,49 +197,26 @@ def remove_wires(all_wires, all_gates, gate_types):
 
 def parse_netlist(netlist_name):
 	result = None
-	if pkl_exists(fullname):
+	gen_path = path_name(netlist_name)
+	if pkl_exists(gen_path+netlist_name):
 		print "pkl file exists; loading..."
-		result = pkl_load(fullname)
+		result = pkl_load(gen_path+netlist_name)
 	else:
 		print "pkl file does not exist; processing..."
 		global g_netlist_parser
-		result = g_netlist_parser.parse_file(netlist_name)
+		global g_data_path
+		result = g_netlist_parser.parse_file(g_data_path+netlist_name)
 		global g_library
 		stdout = sys.stdout
-		sys.stdout = open(netlist_name+"_errors.txt", 'w')
+		sys.stdout = open(netlist_name+".errors", 'w')
 		remove_wires(result['wires'], result['gates'], g_library)
 		sys.stdout.close()
 		sys.stdout = stdout
+		fw = importlib.import_module('file_writer')
+		fw.generateRoss(gen_path+netlist_name, g_library, result['gates'])
+		fw.generateConnections(gen_path, result['gates'])
 		# pkl_dump(fullname, result['obj']) ## ???
 	return result
-
-def write_model(prefix=""):
-	import file_writer
-	global g_library
-	global g_libname
-	if not g_library:
-		print "Error: no library is loaded"
-	files = file_writer.modelFiles(prefix+g_libname)
-	for f in files:
-		if os.path.isfile(f):
-			print "Error: File", f, "exists"
-			return
-	stdout = sys.stdout
-	sys.stdout = open(prefix+g_libname+"_errors.txt", "w")
-	file_writer.generateC(prefix+g_libname, g_library)
-	sys.stdout.close()
-	sys.stdout = stdout
-
-def write_module(name, netlist):
-	import file_writer
-	global g_library
-	# files = file_writer.instanceFiles(name, number)
-	# for f in files:
-	# 	if os.path.isfile(f):
-	# 		print "Error: File", f, "exists"
-	# 		return
-	file_writer.generateRoss(name, g_library, netlist['gates'])
-	file_writer.generateConnections(name, netlist['gates'])
 
 def parse_loop(name_list):
 	load_defaults()
