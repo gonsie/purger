@@ -208,13 +208,13 @@ def parse_netlist(netlist_name):
 		result = g_netlist_parser.parse_file(g_data_path+netlist_name)
 		global g_library
 		stdout = sys.stdout
-		sys.stdout = open(netlist_name+".errors", 'w')
+		sys.stdout = open(gen_path+netlist_name+".errors", 'w')
 		remove_wires(result['wires'], result['gates'], g_library)
 		sys.stdout.close()
 		sys.stdout = stdout
 		fw = importlib.import_module('file_writer')
 		fw.generateRoss(gen_path+netlist_name, g_library, result['gates'])
-		fw.generateConnections(gen_path, result['gates'])
+		fw.generateConnections(gen_path+netlist_name, result['gates'])
 		# pkl_dump(fullname, result['obj']) ## ???
 	return result
 
