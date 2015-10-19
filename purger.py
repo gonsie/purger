@@ -220,7 +220,7 @@ def parse_netlist(netlist_name):
 
 def add_megacell(cellfile):
 	# must be called AFTER netlist parser is initiated (with cells)
-	gen_path = path_name(cellfile)
+	gen_path = path_name(cellfile, True)
 	if pkl_exists(gen_path+cellfile):
 		print "pkl file exists, loading..."
 		h = pkl_load(gen_path+cellfile)
