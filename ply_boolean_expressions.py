@@ -66,57 +66,38 @@ def create_parser():
 		('left', 'OR'),
 		('left', 'AND'),
 		('left', 'XOR'),
-		('left', 'NOT_A', 'NOT_B'),
+		('right', 'NOT_A', 'NOT_B'),
 	)
 
 	def p_many(t):
-		'expressions : expression expressions'
-		t[0] = t[1]
+		'expression : expression expression %prec AND'
 		if t[2] != None:
-			t[0] = "(" + t[0] + " && " + t[2] + ")"
+			t[0] = t[1] + " && " + t[2]
+		else:
+			t[0] = t[1]
 
-	def p_empty(t):
-		'expressions :'
-		pass
+	def p_exp_or(t):
+		'expression : expression OR expression'
+		t[0] = t[1] + " || " + t[3]
 
-	def p_expression(t):
-		'expression : bool'
-		t[0] = t[1]
+	def p_exp_and(t):
+	    'expression : expression AND expression'
+	    t[0] = t[1] + " && " + t[3]
 
-	def p_bool(t):
-		'bool : bool OR join'
-		t[0] = "(" + t[1] + " || " + t[3] + ")"
-
-	def p_bool_s(t):
-		'bool : join'
-		t[0] = t[1]
-
-	def p_join(t):
-		'join : join AND expr'
-		t[0] = "(" + t[1] + " && " + t[3] + ")"
-
-	def p_join_s(t):
-		'join : expr'
-		t[0] = t[1]
-
-	def p_expr(t):
-		'expr : expr XOR unary'
+	def p_exp_xor(t):
+	 	'expression : expression XOR expression'
 		t[0] = "((" + t[1] + " || " + t[3] + ") && !(" + t[1] + " && " + t[3] + "))"
 
-	def p_expr_s(t):
-		'expr : unary'
-		t[0] = t[1]
-
 	def p_unary_not(t):
-		'unary : unary NOT_A'
+		'expression : expression NOT_A'
 		t[0] = "!" + t[1]
 
 	def p_not_unary(t):
-		'unary : NOT_B unary'
+		'expression : NOT_B expression'
 		t[0] = "!" + t[2]
 
 	def p_unary_s(t):
-		'unary : factor'
+		'expression : factor'
 		t[0] = t[1]
 
 	def p_factor_01(t):
@@ -125,11 +106,12 @@ def create_parser():
 		t[0] = t[1]
 
 	def p_factor_pin(t):
-		'factor : PIN'
+		'''factor : PIN
+		   		  | ID'''
 		t[0] = pinmap[t[1]]
 
 	def p_factor_paren(t):
-		'factor : LPAR expressions RPAR'
+		'factor : LPAR expression RPAR'
 		t[0] = "(" + t[2] + ")"
 
 	def p_error(t):
