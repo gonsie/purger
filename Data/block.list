@@ -10,7 +10,6 @@ ncu
 rst
 sii
 sio
-spc
 tcu
 spc_dec
 spc_exu
@@ -24,6 +23,7 @@ spc_mmu
 spc_pku
 spc_pmu
 spc_tlu
+spc
 mcu_bscan_ctl
 mcu_crcn_ctl
 mcu_crcs_ctl
