@@ -147,7 +147,8 @@ def remove_wires(all_wires, all_gates, gate_types):
 		#	which can lead to many inputs (to gates)
 		if 'multibit_flag' in all_wires[w]:
 			continue
-		for g in all_wires[w]:
+		my_gates = list(set(all_wires[w]))
+		for g in my_gates:
 			if not isinstance(g, classes.Gate):
 				print "Error(w0): could not remove wires from object", g, "of type", type(g)
 				continue
