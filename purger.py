@@ -150,7 +150,11 @@ def remove_wires(all_wires, all_gates, gate_types):
 				print "Error(w0): could not remove wires from object", g, "of type", type(g)
 				continue
 			d = g.getRefDirection(w)
-			if d == "input":
+			if d == "both":
+				inputs += 1
+				outputs += 1
+				inref = g
+			elif d == "input":
 				inputs += 1
 			elif d == "output":
 				outputs += 1

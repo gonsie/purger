@@ -476,6 +476,9 @@ class Gate:
             print "ERROR(g6): unknown reference", ref, "for", self.name
             print self.ref_pin
             return None
+        if ref in self.in_pins and ref in self.out_pins:
+            print "BOTH:", ref, self.name
+            return "both"
         return "input" if ref in self.in_pins else "output"
         # return self.type.pin_direction[self.ref_pin[ref]]
 
