@@ -145,6 +145,8 @@ def remove_wires(all_wires, all_gates, gate_types):
 		outputs = 0
 		# note that we want 1 output to a wire (from a gate)
 		#	which can lead to many inputs (to gates)
+		if 'multibit_flag' in all_wires[w]:
+			continue
 		for g in all_wires[w]:
 			if not isinstance(g, classes.Gate):
 				print "Error(w0): could not remove wires from object", g, "of type", type(g)
