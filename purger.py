@@ -165,10 +165,25 @@ def remove_wires(all_wires, all_gates, gate_types):
 			else:
 				print "ERROR(w1): pin with direction", d, "for wire", w
 		if inputs == 0 and outputs == 0:
+			# unused wire
 			pop_list.append(w)
 			continue
-		if inputs == 0 or outputs != 1:
-			print "ERROR(w2): wrong number of inputs (", inputs, ") or outputs (", outputs, ") on wire", w
+		if inputs == 0:
+			# wire goes nowhere
+			print "ERROR(w2a): wire", w, "goes nowhere"
+			error_count += 1
+			error_names.append(w)
+			continue
+		if outputs == 0:
+			# wire comes from nowhere
+			print "ERROR(w2b): wire", w, "comes from nowhere"
+			error_count += 1
+			error_names.append(w)
+			continue
+		if outputs != 1:
+			# wire comes too many places
+			# FANIN
+			print "ERROR(w2c): FANIN on wire", w
 			error_count += 1
 			error_names.append(w)
 			continue
@@ -197,8 +212,11 @@ def remove_wires(all_wires, all_gates, gate_types):
 	for g in all_gates:
 		g = all_gates[g]
 		for k in g.ref_pin:
-			if type(k) is str and g.type.name.find("put_gate") == -1:
-				print "ERROR(w4): Gate", g.name, "references wire", k
+			if type(k) is str and (k not in g.type.multibits) and (g.type.name.find("put_gate") == -1):
+				if k in error_names:
+					print "ALERT: Gate", g.name, "references a known bad wire", k
+				else:
+					print "ERROR(w4): Gate", g.name, "references wire", k
 				error_count += 1
 	print "Total of", error_count, "gate errors"
 
