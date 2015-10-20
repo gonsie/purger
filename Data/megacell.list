@@ -22,6 +22,7 @@ n2_icd_sp_16p5kb_cust
 n2_ict_sp_1920b_cust
 n2_irf_mp_128x72_cust
 n2_l2t_dp_16x160_cust
+n2_pll_core_cust
 n2_stb_cm_64x45_cust
 n2_tlb_tl_128x59_cust
 n2_tlb_tl_64x59_cust
