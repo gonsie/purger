@@ -93,6 +93,11 @@ def generateRoss(filename_prefix, gate_types, all_gates):
 				# always strings for io_cells
 				# print "ERROR(w3): ref is string:", r, "for", g.name
 				continue
+			if g.getRefDirection(r) == "both":
+				p3 = r.getOutIndex(g)
+				inlist.append((g.getRefPin(r), str(r.gid), str(p3)))
+				p3 = r.getInIndex(g)
+				outlist.append((g.getRefPin(r), str(r.gid), str(p3)))
 			if g.getRefDirection(r) == "input":
 				p3 = r.getOutIndex(g)
 				inlist.append((g.getRefPin(r), str(r.gid), str(p3)))
