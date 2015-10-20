@@ -444,7 +444,7 @@ class Gate:
             return
         if self.type.pins[pin]['direction'] == "input":
             self.in_pins[self.type.pins[pin]['order']] = ref
-        else:
+        if self.type.pins[pins]['direction'] == "output":
             self.out_pins[self.type.pins[pin]['order']] = ref
 
     def updateRef(self, old_ref, new_ref):
@@ -457,9 +457,9 @@ class Gate:
         self.ref_pin[new_ref] = self.ref_pin.pop(old_ref)
         if old_ref in self.in_pins:
             self.in_pins[self.in_pins.index(old_ref)] = new_ref
-        elif old_ref in self.out_pins:
+        if old_ref in self.out_pins:
             self.out_pins[self.out_pins.index(old_ref)] = new_ref
-        elif self.type.name == "fanout" and old_ref in self.fan_out:
+        if self.type.name == "fanout" and old_ref in self.fan_out:
             print "ALERT: Updating ref in a fanout"
             self.fan_out[self.fan_out.index(old_ref)] = new_ref
             return
