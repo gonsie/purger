@@ -261,6 +261,14 @@ def add_megacell(cellfile):
 	cellname = cellfile.split('.')[0]
 	g_library[cellname] = h
 
+def load_list(filename, suffix=''):
+	r = []
+	f = open(filename, 'r')
+	for line in f:
+		r.append(line.strip()+suffix)
+	f.close()
+	return r
+
 def purger_help():
 	print "Welcome to PURGER:"
 	print "Parser-Unified ROSS Gates Emission Routine"
