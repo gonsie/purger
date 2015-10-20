@@ -73,14 +73,15 @@ def generateC(filename_prefix, gate_types):
 
 def generateRoss(filename_prefix, gate_types, all_gates):
 	import re
-	p = re.compile(r'n2_[\S]+_cust')
+	pat = re.compile('n2_[\S]+_cust')
 	types_list = gate_types.keys()
 	types_list.sort()
 	types_list.append(None)
 	f = open(filename_prefix+"_gates.txt", "w")
 	for g in all_gates:
 		g = all_gates[g]
-		if p.match(g.type.name):
+		m = pat.match(g.type.name)
+		if m:
 			tname = "mega_gate"
 		else:
 			tname = g.type.name
