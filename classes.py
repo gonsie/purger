@@ -444,7 +444,7 @@ class Gate:
             return
         if self.type.pins[pin]['direction'] == "input":
             self.in_pins[self.type.pins[pin]['order']] = ref
-        if self.type.pins[pins]['direction'] == "output":
+        if self.type.pins[pin]['direction'] == "output":
             self.out_pins[self.type.pins[pin]['order']] = ref
 
     def updateRef(self, old_ref, new_ref):
