@@ -433,8 +433,10 @@ class Gate:
 
     def addRef(self, pin, ref):
         if pin in self.type.multibits:
-            for p in self.type.multibits[pin]['wires']:
-                self.addRef(p, ref)
+            # this REF must be multibit as well!
+            multibit_ref = parse_multibit_wire(ref, len(self.type.multibits[pin]['wires']))
+            for p, r in zip(self.type.multibits[pin]['wires'], multibit_ref):
+                self.addRef(p, r)
             return
         self.ref_pin[ref] = pin
         if self.type.name == "fanout" and pin != "in":
@@ -558,3 +560,11 @@ class Range:
             self.type = 'Single'
             self.value = int(s.strip('[]'))
 
+
+def parse_multibit_wire(wire, size):
+    if '[' in wire:
+        print "ERROR(p): wire", wire, "has bit specification"
+    r = []
+    for i in range(size):
+        r.append(wire+'['+str(i)+']')
+    return r
