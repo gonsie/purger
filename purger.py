@@ -166,14 +166,14 @@ def remove_wires(all_wires, all_gates, gate_types):
 			continue
 		if inputs == 0:
 			# wire goes nowhere
-			print "ERROR(w2a): wire", w, "goes nowhere"
+			# print "ERROR(w2a): wire", w, "goes nowhere"
 			error_count += 1
 			error_names.append(w)
 			processed_list.append(w)
 			continue
 		if outputs == 0:
 			# wire comes from nowhere
-			print "ERROR(w2b): wire", w, "comes from nowhere"
+			# print "ERROR(w2b): wire", w, "comes from nowhere"
 			error_count += 1
 			error_names.append(w)
 			processed_list.append(w)
