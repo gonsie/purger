@@ -216,8 +216,8 @@ def remove_wires(all_wires, all_gates, gate_types):
 		g = all_gates[g]
 		for k in g.ref_pin:
 			if type(k) is str and (k not in g.type.multibits) and (g.type.name.find("put_gate") == -1):
-				if k in error_names:
-					print "ALERT: Gate", g.name, "references a known bad wire", k
+				if k in error_names or k.find('#') == 0:
+					print "ALERT: Gate", g.name, "has a known weird reference on wire", k
 				else:
 					print "ERROR(w4): Gate", g.name, "references wire", k
 				error_count += 1
