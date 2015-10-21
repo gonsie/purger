@@ -166,7 +166,7 @@ def create_parser(gate_types, gid=0):
             if len(t[3]) > 1:
                 print "ERROR: multiple multibit in/outs defined at once"
                 print "=>", t[1], t[2], t[3], t[4]
-            all_wires[t[3][0]] = ["multibit_flag"] + wl
+            all_wires[t[3][0]] = ["multibit_flag", wl]
         # import pdb; pdb.set_trace()
         for w in wl:
             g = classes.Gate("io_cell_" + w)
@@ -184,7 +184,7 @@ def create_parser(gate_types, gid=0):
             if len(t[3]) > 1:
                 print "ERROR: multiple multibit wires defined at once"
                 print "=>", t[1], t[2], t[3], t[4]
-            all_wires[t[3][0]] = ["multibit_flag"] + wl
+            all_wires[t[3][0]] = ["multibit_flag", wl]
         for w in wl:
             all_wires[w] = []
 
