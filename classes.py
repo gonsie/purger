@@ -498,15 +498,22 @@ class Gate:
         return self.ref_pin[ref]
 
     def getRefDirection(self, ref):
-        ref = self.validateRef(ref)
-        if ref not in self.ref_pin:
+        in_flag = False
+        out_flag = False
+        r = get_name(ref)
+        for p in self.pin_ref:
+            if self.pin_ref[p] and get_name(self.pin_ref[p]) == r:
+                if self.type.pins[p]['direction'] == "input":
+                    in_flag = True
+                if self.type.pins[p]['direction'] == "output":
+                    out_flag = True
+        if not in_flag and not out_flag:
             print "ERROR(g6): unknown reference", ref, "for", self.name
-            print self.ref_pin
+            print self.pin_ref
             return None
-        if ref in self.in_pins and ref in self.out_pins:
+        if in_flag and out_flag:
             return "both"
-        return "input" if ref in self.in_pins else "output"
-        # return self.type.pin_direction[self.ref_pin[ref]]
+        return "input" if in_flag else "output"
 
     def addFanOut(self, ref):
         if self.type.name != "fanout":
