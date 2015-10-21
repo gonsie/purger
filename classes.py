@@ -431,10 +431,18 @@ class Gate:
         else:
             print "ERROR(io): IOref for unknown type:", self.type.name
 
-    def addRef(self, pin, ref):
+    def addRef(self, pin, ref, multiref_flag=False):
+        if multiref_flag and pin not in self.type.multibits:
+            print "ERROR(mb): bad multibit ref construction in", self.name, "of type", self.type.name
         if pin in self.type.multibits:
-            # this REF must be multibit as well!
-            multibit_ref = parse_multibit_wire(ref, len(self.type.multibits[pin]['wires']))
+            if multiref_flag:
+                # many wires already passed
+                if len(ref) != self.type.multibits[pin]['width']:
+                    print "ERROR(mb): wrong ref size:", len(ref), "for wire", pin, "width", self.type.multibits[pin]['width']
+                multibit_ref = ref
+            else:
+                # this REF must be multibit as well!
+                multibit_ref = parse_multibit_wire(ref, self.type.multibits[pin]['width'])
             for p, r in zip(self.type.multibits[pin]['wires'], multibit_ref):
                 self.addRef(p, r)
             return
