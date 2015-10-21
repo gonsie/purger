@@ -86,38 +86,34 @@ def generateRoss(filename_prefix, gate_types, all_gates):
 		else:
 			tname = g.type.name
 		f.write(str(g.gid)+" "+str(types_list.index(tname))+" ")
-		inlist = []
-		outlist = []
-		for r in g.ref_pin:
-			if type(r) is str:
-				# always strings for io_cells
-				# print "ERROR(w3): ref is string:", r, "for", g.name
-				continue
-			if g.getRefDirection(r) == "both":
-				p3 = r.getOutIndex(g)
-				inlist.append((g.getRefPin(r), str(r.gid), str(p3)))
-				p3 = r.getInIndex(g)
-				outlist.append((g.getRefPin(r), str(r.gid), str(p3)))
-			if g.getRefDirection(r) == "input":
-				p3 = r.getOutIndex(g)
-				inlist.append((g.getRefPin(r), str(r.gid), str(p3)))
-			if g.getRefDirection(r) == "output":
-				p3 = r.getInIndex(g)
-				outlist.append((g.getRefPin(r), str(r.gid), str(p3)))
-		inlist.sort()
-		outlist.sort()
-		while len(inlist) < g.type.counts['input']:
-			inlist.append((-1, '-1', '-1'))
-		while len(outlist) < g.type.counts['output']:
-			outlist.append((-1, '-1', '-1'))
-		instr = ' '.join([p[1] for p in inlist])
-		outstr = ' '.join([' '.join(p[1:]) for p in outlist])
-		f.write(instr)
-		# fanout special case
-		if g.type.name == 'fanout':
-			f.write(" "+str(len(g.fan_out)))
+		wstr = ""
+		if g.type.name == "fanout":
+			orders = ['input']
 		else:
-			f.write(" "+outstr)
+			orders = ['input', 'output']
+		for o in orders:
+			l = g.type.getOrder(o)
+			for p in l:
+				r = g.pin_ref[p]
+				if not r:
+					# None entry
+					wstr += "-1 "
+				elif type(r) is str:
+					if r.find('#') == 0:
+						# CONST
+						wstr += r + " "
+					else:
+						# always strings for io_cells
+						# print "ERROR(w3): ref is string:", r, "for", g.name
+						# could also be an error wire
+						continue
+				else:
+					# SHOULD BE GATE INSTANCE
+					wstr += str(r.gid) + " "
+		f.write(wstr)
+		# fanout special case
+		if g.type.name == "fanout":
+			f.write(" "+str(len(g.fan_out)))
 		f.write("\n")
 	f.close()
 
