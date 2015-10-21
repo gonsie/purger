@@ -444,9 +444,15 @@ class Gate:
                 # this REF must be multibit as well!
                 multibit_ref = parse_multibit_wire(ref, self.type.multibits[pin]['width'])
             for p, r in zip(self.type.multibits[pin]['wires'], multibit_ref):
-                self.addRef(p, r)
+                if type(r) is int:
+                    self.addConstRef(p, r)
+                else:
+                    self.addRef(p, r)
             return
         self.ref_pin[ref] = pin
+        if type(ref) is int:
+            print "ERROR(##): Constant value on pin", pin
+            return
         if self.type.name == "fanout" and pin != "in":
             print "ERROR(g3): don't use .addRef on a fanout gate"
             return
@@ -454,6 +460,12 @@ class Gate:
             self.in_pins[self.type.pins[pin]['order']] = ref
         if self.type.pins[pin]['direction'] == "output":
             self.out_pins[self.type.pins[pin]['order']] = ref
+
+    def addConstRef(self, pin, ref):
+        # self.ref_pin['const'+str(ref)] = pin
+        if self.pin_ref[pin]:
+            print "ERROR(b#): Overwriting ref", self.pin_ref[pin], "on pin", pin, "with new ref", ref
+        self.pin_ref[pin] = '#'+str(ref)
 
     def updateRef(self, old_ref, new_ref):
         old_ref = self.validateRef(old_ref)
