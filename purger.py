@@ -136,7 +136,7 @@ def remove_wires(all_wires, all_gates, gate_types):
 	import classes
 	error_count = 0
 	error_names = []
-	pop_list = []
+	processed_list = []
 	for w in all_wires:
 		# import pdb; pdb.set_trace()
 		# all_wires[w] is a list of gate objects
@@ -146,6 +146,7 @@ def remove_wires(all_wires, all_gates, gate_types):
 		# note that we want 1 output to a wire (from a gate)
 		#	which can lead to many inputs (to gates)
 		if 'multibit_flag' in all_wires[w]:
+			processed_list.append(w)
 			continue
 		my_gates = list(set(all_wires[w]))
 		for g in my_gates:
@@ -161,19 +162,21 @@ def remove_wires(all_wires, all_gates, gate_types):
 			print "ERROR(w1): wire", w, "has wrong input+output count", input+output,"!=", all_wires[w]
 		if inputs == 0 and outputs == 0:
 			# unused wire
-			pop_list.append(w)
+			processed_list.append(w)
 			continue
 		if inputs == 0:
 			# wire goes nowhere
 			print "ERROR(w2a): wire", w, "goes nowhere"
 			error_count += 1
 			error_names.append(w)
+			processed_list.append(w)
 			continue
 		if outputs == 0:
 			# wire comes from nowhere
 			print "ERROR(w2b): wire", w, "comes from nowhere"
 			error_count += 1
 			error_names.append(w)
+			processed_list.append(w)
 			continue
 		if outputs != 1:
 			# wire comes too many places
@@ -181,6 +184,7 @@ def remove_wires(all_wires, all_gates, gate_types):
 			print "ERROR(w2c): FANIN on wire", w
 			error_count += 1
 			error_names.append(w)
+			processed_list.append(w)
 			continue
 		if inputs > 1:
 			# print "WARNING: wire", w, "has fannout", outputs
@@ -202,19 +206,28 @@ def remove_wires(all_wires, all_gates, gate_types):
 			g1 = all_wires[w][1]
 			g0.updateRef(w, g1)
 			g1.updateRef(w, g0)
-	for w in pop_list:
-		all_wires.pop(w)
+		processed_list.append(w)
+	if len(processed_list) != len(all_wires.keys()):
+		print "ALERT: SOMETHING STRANGE HAPPENED", len(processed_list), "!=", len(all_wires.keys())
 	print "Total of", error_count, "wire errors"
 	# gate checker
 	error_count = 0
 	for g in all_gates:
 		g = all_gates[g]
-		for k in g.ref_pin:
-			if type(k) is str and (k not in g.type.multibits) and (g.type.name.find("put_gate") == -1):
+		for j in g.pin_ref:
+			k = g.pin_ref[j]
+			if k and type(k) is str and (k not in g.type.multibits) and (g.type.name.find("put_gate") == -1):
 				if k in error_names or k.find('#') == 0:
-					print "ALERT: Gate", g.name, "has a known weird reference on wire", k
+					# print "ALERT: Gate", g.name, "has a known weird reference on wire", k
+					pass
 				else:
-					print "ERROR(w4): Gate", g.name, "references wire", k
+					if k in all_wires:
+						if k in processed_list:
+							print "ERROR(w4c): Gate", g.name, "references pop'd wire", k
+						else:
+							print "ERROR(w4a): Gate", g.name, "references known wire", k
+					else:
+						print "ERROR(w4b): Gate", g.name, "references unknown wire", k
 				error_count += 1
 	print "Total of", error_count, "gate errors"
 
