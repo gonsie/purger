@@ -190,14 +190,10 @@ def remove_wires(all_wires, all_gates, gate_types):
 			# print "WARNING: wire", w, "has fannout", outputs
 			fan = classes.Gate(w)
 			fan.setType(gate_types["fanout"])
-			for g in all_wires[w]:
+			fan.addRef("in", inref)
+			for g in my_gates:
 				if isinstance(g, classes.Gate):
-					if g.getRefDirection(w) is "both":
-						fan.addRef("in", inref)
-						fan.addFanOut(g)
-					elif g.getRefDirection(w) is "output":
-						fan.addRef("in", inref)
-					else:
+					if g.isInput(w):
 						fan.addFanOut(g)
 					g.updateRef(w, fan)
 			all_gates[fan.name] = fan
