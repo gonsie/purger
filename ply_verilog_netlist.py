@@ -259,6 +259,8 @@ def create_parser(gate_types, gid=0):
 
     def p_port_connection_curly(t):
         'port_connection : DOT ID LPAREN LCURLY list_of_primaries RCURLY RPAREN'
+        # many wires connecting to a single multibit pin
+        # print "ALERT: Multibit construction"
         t[0] = [(t[2], t[5])]
 
     def p_port_connection_e(t):
