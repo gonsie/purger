@@ -403,18 +403,6 @@ class Gate:
         self.out_pins = [0] * t.counts['output']
         if self.type.name == "fanout":
             self.fan_out = []
-
-    def validateRef(self, ref):
-        if ref not in self.ref_pin:
-            for r in self.ref_pin:
-                if type(ref) is str and isinstance(r, Gate) and r.name == ref:
-                    return r
-                if isinstance(ref, Gate) and type(r) is str and ref.name == r:
-                    return r
-            print "==> ERROR: could not find", ref, "in", self.name
-            return None
-        else:
-            return ref
         for p in self.type.pins:
             self.pin_ref[p] = None
 
@@ -600,3 +588,17 @@ def parse_multibit_wire(wire, size):
     for i in range(size):
         r.append(wire+'['+str(i)+']')
     return r
+
+def get_name(obj):
+    if type(obj) is str:
+        if obj.find('#') == 0:
+            # TODO: should I do something special here??
+            return obj
+        else:
+            return obj
+    elif isinstance(obj, Gate):
+        return obj.name
+    else:
+        print "ALERT: can't name", obj
+        import pdb; pdb.set_trace()
+        return None
