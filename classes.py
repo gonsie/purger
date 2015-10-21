@@ -456,6 +456,8 @@ class Gate:
             if self.pin_ref[p] and get_name(self.pin_ref[p]) == old_name:
                 self.pin_ref[p] = new_ref
         if self.type.name == "fanout" and old_ref in self.fan_out:
+            if self.fan_out.count(old_ref) > 1:
+                print "ERROR(mr): fanout with multiple", old_ref, "REFS :(", self.fan_out
             print "ALERT: Updating ref in a fanout"
             self.fan_out[self.fan_out.index(old_ref)] = new_ref
             return
