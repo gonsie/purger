@@ -207,7 +207,16 @@ def create_parser(gate_types, gid=0):
             elif type(p[1]) is int:
                 pass
             else:
-                print "cell's list of module connections contains tuple", p[0], "and", p[1]
+                enum_p = []
+                for q in p[1]:
+                    if q in all_wires and 'multibit_flag' in all_wires[q]:
+                        enum_p += all_wires[q][1]
+                    else:
+                        enum_p.append(q)
+                g.addRef(p[0], enum_p, True)
+                for q in enum_p:
+                    if type(q) is str:
+                        all_wires[q].append(g)
         all_cells[g.name] = g
 
     def p_module_item_module_list(t):
