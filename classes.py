@@ -392,6 +392,7 @@ class Gate:
         self.in_pins = []
         self.out_pins = []
         self.const_assign = False
+        self.pin_ref = {}
 
     def __repr__(self):
         return self.name+"_gate"
@@ -414,6 +415,8 @@ class Gate:
             return None
         else:
             return ref
+        for p in self.type.pins:
+            self.pin_ref[p] = None
 
     def addIORef(self, ref):
         if self.type.name == "fanout":
@@ -424,9 +427,11 @@ class Gate:
             return
         if self.type.name == "input_gate":
             self.ref_pin[ref] = "out"
+            self.pin_ref["out"] = ref
             self.out_pins[0] = ref
         elif self.type.name == "output_gate":
             self.ref_pin[ref] = "in"
+            self.pin_ref["in"] = ref
             self.in_pins[0] = ref
         else:
             print "ERROR(io): IOref for unknown type:", self.type.name
