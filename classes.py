@@ -388,7 +388,6 @@ class Gate:
         self.gid = Gate.newid()
         self.name = name
         self.type = None
-        self.ref_pin = {}
         self.in_pins = []
         self.out_pins = []
         self.const_assign = False
@@ -414,11 +413,9 @@ class Gate:
             print "ERROR(g2): expecting one IO pin"
             return
         if self.type.name == "input_gate":
-            self.ref_pin[ref] = "out"
             self.pin_ref["out"] = ref
             self.out_pins[0] = ref
         elif self.type.name == "output_gate":
-            self.ref_pin[ref] = "in"
             self.pin_ref["in"] = ref
             self.in_pins[0] = ref
         else:
@@ -442,10 +439,16 @@ class Gate:
                 else:
                     self.addRef(p, r)
             return
-        self.ref_pin[ref] = pin
         if type(ref) is int:
             print "ERROR(##): Constant value on pin", pin
             return
+        if pin not in self.pin_ref:
+            print "ERROR(b0): Adding ref", ref, "on unknown pin", pin
+        if self.pin_ref[pin]:
+            if get_name(self.pin_ref[pin]) == get_name(ref):
+                return
+            print "ERROR(b2): Overwriting ref", self.pin_ref[pin], "on pin", pin, "with new ref", ref
+        self.pin_ref[pin] = ref
         if self.type.name == "fanout" and pin != "in":
             print "ERROR(g3): don't use .addRef on a fanout gate"
             return
@@ -455,19 +458,17 @@ class Gate:
             self.out_pins[self.type.pins[pin]['order']] = ref
 
     def addConstRef(self, pin, ref):
-        # self.ref_pin['const'+str(ref)] = pin
         if self.pin_ref[pin]:
             print "ERROR(b#): Overwriting ref", self.pin_ref[pin], "on pin", pin, "with new ref", ref
         self.pin_ref[pin] = '#'+str(ref)
 
     def updateRef(self, old_ref, new_ref):
-        old_ref = self.validateRef(old_ref)
-        if old_ref not in self.ref_pin:
-            print "ERROR(g4): updating", old_ref, "with", new_ref, "but it doesn't exist in", self.name
-            print self.ref_pin
-            self.ref_pin[new_ref] = []
-            return
-        self.ref_pin[new_ref] = self.ref_pin.pop(old_ref)
+        old_name = get_name(old_ref)
+        # must LOOP in case of multiple refs
+        for p in self.pin_ref:
+            if self.pin_ref[p] and get_name(self.pin_ref[p]) == old_name:
+                self.pin_ref[p] = new_ref
+        # TODO: multiple refs on I/O!!!!
         if old_ref in self.in_pins:
             self.in_pins[self.in_pins.index(old_ref)] = new_ref
         if old_ref in self.out_pins:
@@ -476,14 +477,6 @@ class Gate:
             print "ALERT: Updating ref in a fanout"
             self.fan_out[self.fan_out.index(old_ref)] = new_ref
             return
-
-    def getRefPin(self, ref):
-        ref = self.validateRef(ref)
-        if ref not in self.ref_pin:
-            print "ERROR(g5): unknown reference", ref, "for", self.name
-            print self.ref_pin
-            return None
-        return self.ref_pin[ref]
 
     def getRefDirection(self, ref):
         in_flag = False
@@ -507,31 +500,7 @@ class Gate:
         if self.type.name != "fanout":
             print "ERROR(g7): fanout gate type expected, instead:", self.type.name
             return
-        self.ref_pin[ref] = "out"
         self.fan_out.append(ref)
-
-    def getOutIndex(self, ref):
-        ref = self.validateRef(ref)
-        if ref not in self.ref_pin:
-            print "ERROR(g8): unknown reference", ref, "for", self.name
-            print self.ref_pin
-            return None
-        if self.type.name == "fanout":
-            if ref in self.fan_out:
-                return 0
-        if ref in self.out_pins:
-            return self.out_pins.index(ref)
-        return -1
-
-    def getInIndex(self, ref):
-        ref = self.validateRef(ref)
-        if ref not in self.ref_pin:
-            print "ERROR(g9): unknown reference", ref, "for", self.name
-            print self.ref_pin
-            return None
-        if ref in self.in_pins:
-            return self.in_pins.index(ref)
-        return -1
 
     def setAssign(self, constval):
         try:
