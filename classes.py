@@ -477,6 +477,14 @@ class Gate:
             print self.pin_ref
         return (in_count, out_count)
 
+    def isInput(self, ref):
+        r = get_name(ref)
+        for p in self.pin_ref:
+            if self.pin_ref[p] and get_name(self.pin_ref[p]) == r:
+                if self.type.pins[p]['direction'] == "input":
+                    return True
+        return False
+
     def addFanOut(self, ref):
         if self.type.name != "fanout":
             print "ERROR(g7): fanout gate type expected, instead:", self.type.name
