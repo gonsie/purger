@@ -388,8 +388,6 @@ class Gate:
         self.gid = Gate.newid()
         self.name = name
         self.type = None
-        self.in_pins = []
-        self.out_pins = []
         self.const_assign = False
         self.pin_ref = {}
 
@@ -398,8 +396,6 @@ class Gate:
 
     def setType(self, t):
         self.type = t
-        self.in_pins = [0] * t.counts['input']
-        self.out_pins = [0] * t.counts['output']
         if self.type.name == "fanout":
             self.fan_out = []
         for p in self.type.pins:
@@ -409,15 +405,10 @@ class Gate:
         if self.type.name == "fanout":
             print "ERROR(g1): don't use .addIORef on a fanout gate"
             return
-        if len(self.in_pins) + len(self.out_pins) > 1:
-            print "ERROR(g2): expecting one IO pin"
-            return
         if self.type.name == "input_gate":
             self.pin_ref["out"] = ref
-            self.out_pins[0] = ref
         elif self.type.name == "output_gate":
             self.pin_ref["in"] = ref
-            self.in_pins[0] = ref
         else:
             print "ERROR(io): IOref for unknown type:", self.type.name
 
@@ -452,10 +443,6 @@ class Gate:
         if self.type.name == "fanout" and pin != "in":
             print "ERROR(g3): don't use .addRef on a fanout gate"
             return
-        if self.type.pins[pin]['direction'] == "input":
-            self.in_pins[self.type.pins[pin]['order']] = ref
-        if self.type.pins[pin]['direction'] == "output":
-            self.out_pins[self.type.pins[pin]['order']] = ref
 
     def addConstRef(self, pin, ref):
         if self.pin_ref[pin]:
@@ -468,11 +455,6 @@ class Gate:
         for p in self.pin_ref:
             if self.pin_ref[p] and get_name(self.pin_ref[p]) == old_name:
                 self.pin_ref[p] = new_ref
-        # TODO: multiple refs on I/O!!!!
-        if old_ref in self.in_pins:
-            self.in_pins[self.in_pins.index(old_ref)] = new_ref
-        if old_ref in self.out_pins:
-            self.out_pins[self.out_pins.index(old_ref)] = new_ref
         if self.type.name == "fanout" and old_ref in self.fan_out:
             print "ALERT: Updating ref in a fanout"
             self.fan_out[self.fan_out.index(old_ref)] = new_ref
