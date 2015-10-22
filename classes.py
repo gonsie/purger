@@ -538,6 +538,12 @@ class Range:
             self.type = 'Single'
             self.value = int(s.strip('[]'))
 
+    def wire_enumeration(self, wire):
+        r = []
+        for v in self.enumeration():
+            r.append(wire+'['+str(v)+']')
+        return r
+
 
 def parse_multibit_wire(wire, size):
     if '[' in wire:

@@ -343,12 +343,18 @@ def create_parser(gate_types, gid=0):
 
     def p_list_of_primaries(t):
         'list_of_primaries : primary more_primaries'
-        t[0] = [t[1]]
+        if type(t[1]) is not list:
+            t[0] = [t[1]]
+        else:
+            t[0] = t[1]
         if t[2] != None: t[0].extend(t[2])
 
     def p_more_primaries(t):
         'more_primaries : COMMA primary more_primaries'
-        t[0] = [t[2]]
+        if type(t[2]) is not list:
+            t[0] = [t[2]]
+        else:
+            t[0] = t[2]
         if t[3] != None: t[0].extend(t[3])
 
     def p_more_primaries_e(t):
@@ -361,7 +367,10 @@ def create_parser(gate_types, gid=0):
 
     def p_primary(t):
         'primary : identifier range'
-        t[0] = t[1] + str(t[2])
+        if t[2].type is 'Range':
+            t[0] = t[2].wire_enumeration(t[1])
+        else:
+            t[0] = t[1] + str(t[2])
 
     def p_range_r(t):
         'range : LSQUARE number COLON number RSQUARE'
