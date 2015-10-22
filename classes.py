@@ -421,6 +421,8 @@ class Gate:
                 multibit_ref = ref
             else:
                 # this REF must be multibit as well!
+                # BUT it should have been detected earlier!!
+                print "ALERT: Undetected multibit ref in", self.name, "on pin", pin, "for ref", ref
                 multibit_ref = parse_multibit_wire(ref, self.type.multibits[pin]['width'])
             for p, r in zip(self.type.multibits[pin]['wires'], multibit_ref):
                 if type(r) is int:

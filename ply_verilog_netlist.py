@@ -202,11 +202,12 @@ def create_parser(gate_types, gid=0):
         g.setType(gate_types[t[1]])
         for p in t[4]:
             if type(p[1]) is str:
-                g.addRef(p[0], p[1])
                 if 'multibit_flag' in all_wires[p[1]]:
+                    g.addRef(p[0], all_wires[p[1]][1], True)
                     for w in all_wires[p[1]][1]:
                         all_wires[w].append(g)
                 else:
+                    g.addRef(p[0], p[1])
                     all_wires[p[1]].append(g)
             elif type(p[1]) is int:
                 g.addConstRef(p[0], p[1])
