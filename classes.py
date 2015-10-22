@@ -249,8 +249,6 @@ class Special_Group:
         output += "\t\t" + v1 + " = " + self.atts['next_state'] + ";\n"
         output += "\t\t" + v2 + " = LOGIC_NOT(" + v1 + ");\n"
         output += "\t\treturn 1;\n\t}\n"
-        if 'internal' in self.atts['next_state']:
-            print "ALERT: reverse needed for", self.parent
         return output
 
     def generateFuncCall(self, cell, pin):
