@@ -26,3 +26,10 @@ n2_pll_core_cust
 n2_stb_cm_64x45_cust
 n2_tlb_tl_128x59_cust
 n2_tlb_tl_64x59_cust
+n2_com_cm_32x40_cust
+n2_com_cm_64x64_cust
+n2_com_cm_8x40_cust
+n2_l2t_dp_16x160_cust
+n2_l2t_dp_32x128_cust
+n2_l2t_dp_32x160_cust
+n2_l2t_sp_28kb_cust
