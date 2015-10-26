@@ -79,7 +79,7 @@ def create_parser():
 
     def p_module(t):
         'module : MODULE ID list_of_ports SEMI module_items ENDMODULE'
-        g = classes.Gate_Type(t[2])
+        g = classes.Gate_Type(t[2], "mega_gate")
         for p in t[5]:
             g.add(p[0], p[1])
         g.setOrders()

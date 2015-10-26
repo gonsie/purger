@@ -290,12 +290,16 @@ class Special_Group:
         self.atts['table'] = table
 
 class Gate_Type:
-    def __init__(self, name):
+    def __init__(self, name, lname=None):
         self.name = name
         self.pins = {}
         self.specials = {}
         self.counts = {'input' : 0, 'output' : 0, 'internal' : 0}
         self.multibits = {}
+        if lname:
+            self.libname = lname
+        else:
+            self.libname = name
 
     def add(self, name, entry):
         if name == 'pin':
