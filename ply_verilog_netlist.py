@@ -17,7 +17,7 @@ re_tokens = [
     'SEMI', 'COMMA', 'DOT', 'COLON',
     'EQ', 'BASE', 'SIGN',
     'LPAREN', 'RPAREN',  'LSQUARE', 'RSQUARE', 'LCURLY', 'RCURLY',
-    'SFLOAT', 'UNSIGNED', 'MEGACELL', 'ID',
+    'SFLOAT', 'UNSIGNED', 'ID',
 ]
 
 def create_lexer(nets={}):
@@ -46,10 +46,6 @@ def create_lexer(nets={}):
 
     # NOTE: functionally defined tokens are added first
     #       in the same order in which they are defined
-
-    def t_MEGACELL(t):
-        r'n2_[\S]+_cust'
-        return t
 
     def t_ID(t):
         r'[a-zA-Z_][\w$]*|\\[\S]+'
@@ -194,7 +190,8 @@ def create_parser(gate_types, gid=0):
 
     def p_module_item_module_single(t):
         '''module_item : CELL ID LPAREN list_of_module_connections RPAREN SEMI
-                       | MEGACELL ID LPAREN list_of_module_connections RPAREN SEMI'''
+                       | MEGACELL ID LPAREN list_of_module_connections RPAREN SEMI
+                       | SUBMODULE ID LPAREN list_of_module_connections RPAREN SEMI'''
         t[0] = ""
         if t[1] not in gate_types:
             raise Exception("Could not find megacell gate type " + t[1])
