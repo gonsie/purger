@@ -33,3 +33,7 @@ n2_l2t_dp_16x160_cust
 n2_l2t_dp_32x128_cust
 n2_l2t_dp_32x160_cust
 n2_l2t_sp_28kb_cust
+n2_mcu_32x72async_dp_cust
+clkgen_mcu_cmp
+clkgen_mcu_dr
+clkgen_mcu_io
