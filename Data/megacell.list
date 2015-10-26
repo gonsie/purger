@@ -37,3 +37,4 @@ n2_mcu_32x72async_dp_cust
 clkgen_mcu_cmp
 clkgen_mcu_dr
 clkgen_mcu_io
+mcu_addrdp_dp
