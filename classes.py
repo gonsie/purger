@@ -548,6 +548,73 @@ class Range:
             r.append(wire+'['+str(v)+']')
         return r
 
+class Routing_Object:
+    def __init__(self, module_type, module_name, port, wire, index=0):
+        (self.local_id, self.dir) = lookup_submodule_connection(module_type, port, index)
+        self.name = wire
+        self.port = port
+        self.module_type = module_type
+        self.module_name = module_name
+        self.module_id = guess_instance(module_name)
+        self.ref = wire
+
+    def __repr__(self):
+        return self.name+" in "+self.module_type+"#"+str(self.module_id)+"("+self.module_name+")"
+
+    def __str__(self):
+        return self.name+" in "+self.module_type+"#"+str(self.module_id)+"("+self.module_name+")"
+
+    def __hash__(self):
+        return id(self)
+
+    def __nonzero__(self):
+        return True
+
+    def __eq__(self, other):
+        if isinstance(other, Routing_Object):
+            if self.name == other.name and self.module_type == other.module_type and self.module_name == other.module_name and self.port == other.port:
+                return True
+        return False
+
+    def __getattr__(self, name):
+        if name == 'gid':
+            return str(self.module_type)+'.'+str(self.module_id)+'.'+str(self.local_id)
+        else:
+            print "Routing_Object ALERT: can't __getattr__", name
+
+    def getRefDirectionCounts(self, w):
+        if self.dir == "input":
+            return (1, 0)
+        elif self.dir == "output":
+            return (0, 1)
+        else:
+            return (0, 0)
+
+    def updateRef(self, old_ref, new_ref):
+        self.ref = new_ref
+
+submodule_map = {}
+
+def lookup_submodule_connection(module_type, port, index):
+    global submodule_map
+    if module_type not in submodule_map:
+        print "ERROR: module", module_type, "not loaded"
+        return -1
+    if port not in submodule_map[module_type]:
+        print "ERROR: can't find connection", port, "to submodule", module_type
+        return -1
+    if type(submodule_map[module_type][port]) is not tuple:
+        # could also test if 'multibit_flag' in submodule_map[module_type][port]
+        new_port = submodule_map[module_type][port][1][index]
+        return submodule_map[module_type][new_port]
+    return submodule_map[module_type][port]
+
+def guess_instance(name):
+    import string
+    if name[-1] in string.digits:
+        return int(name[-1])
+    else:
+        return 0
 
 def parse_multibit_wire(wire, size):
     if '[' in wire:
@@ -564,7 +631,7 @@ def get_name(obj):
             return obj
         else:
             return obj
-    elif isinstance(obj, Gate):
+    elif isinstance(obj, Gate) or isinstance(obj, Routing_Object):
         return obj.name
     else:
         print "ALERT: can't name", obj

@@ -75,7 +75,7 @@ def generateRoss(filename_prefix, gate_types, all_gates):
 	types_list = gate_types.keys()
 	types_list.sort()
 	types_list.append(None)
-	f = open(filename_prefix+"_gates.txt", "w")
+	f = open(filename_prefix+".gates", "w")
 	for g in all_gates:
 		g = all_gates[g]
 		f.write(str(g.gid)+" "+str(types_list.index(g.type.libname))+" ")
@@ -111,7 +111,7 @@ def generateRoss(filename_prefix, gate_types, all_gates):
 	f.close()
 
 def generateDirectedConnections(filename_prefix, direction, all_gates):
-	f = open(filename_prefix+"_"+direction+"_connections.txt", "w")
+	f = open(filename_prefix+"."+direction, "w")
 	p = [x for x in all_gates if all_gates[x].type.name == direction+"_gate"]
 	p.sort()
 	for i in p:
