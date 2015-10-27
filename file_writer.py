@@ -118,9 +118,15 @@ def generateDirectedConnections(filename_prefix, direction, all_gates):
 		f.write(str(all_gates[i].gid) + " " + i[8:]+"\n")
 	f.close()
 
-def generateConnections(filename_prefix, all_gates):
+def generateConnections(filename_prefix, all_gates, all_wires):
 	generateDirectedConnections(filename_prefix, "input", all_gates)
 	generateDirectedConnections(filename_prefix, "output", all_gates)
+	q = [x for x in all_wires if 'multibit_flag' in all_wires[x]]
+	f = open(filename_prefix+".multibit",'w')
+	for i in q:
+		wl = ' '.join(all_wires[i][1])
+		f.write(i+" "+wl+"\n")
+	f.close()
 
 def modelFiles(prefix):
 	return [prefix+".txt", prefix+".c", prefix+".h"]
