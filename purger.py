@@ -12,6 +12,7 @@ ply_default_rtl = "ply_verilog_rtl"
 ## GLOBAL VARIABLE
 g_library = None
 g_netlist_parser = None
+g_tokens = {}
 
 ## FILE SYSTEM SETTINGS
 g_data_path = "Data/"
@@ -75,6 +76,7 @@ def pkl_dump(name, result):
 import importlib
 def load_library(filename):
 	global g_library
+	global g_tokens
 	if g_library:
 		print "Alert: Library", filename, "is already loaded"
 		return
@@ -82,6 +84,7 @@ def load_library(filename):
 	if pkl_exists(gen_path+filename):
 		print "pkl file exist; loading..."
 		g_library = pkl_load(gen_path+filename)
+		g_tokens.update(lib_cells(g_library))
 	else:
 		print "pkl file does not exist; processing"
 		mlib = importlib.import_module(ply_default_library)
@@ -104,6 +107,7 @@ def load_library(filename):
 					s.atts['o_'+k] = s.atts[k]
 					s.atts[k] = pbxp.parse(s.atts[k])
 		pkl_dump(gen_path+filename, g_library)
+		g_tokens.update(lib_cells(g_library))
 		fw = importlib.import_module('file_writer')
 		files = fw.modelFiles(gen_path+filename)
 		for f in files:
@@ -119,13 +123,35 @@ def load_library(filename):
 def lib_cells(library):
 	return {key : "CELL" for key in library.keys()}
 
-def load_netlist_parser(library):
+def load_netlist_parser():
 	global g_netlist_parser
+	global g_library
+	global g_tokens
 	if g_netlist_parser:
 		print "Alert: Default netlist parser already loaded"
 		return
 	mnet = importlib.import_module(ply_default_netlist)
-	g_netlist_parser = PLYPair(mnet.create_lexer(lib_cells(library)), mnet.create_parser(library))
+	g_netlist_parser = PLYPair(mnet.create_lexer(g_tokens), mnet.create_parser(g_library))
+
+def load_megacells(filename):
+	global g_tokens
+	global g_data_path
+	mc = load_list(g_data_path+filename)
+	for m in mc:
+		add_megacell(m+'.v')
+		g_tokens[m] = 'MEGACELL'
+
+def load_submodules(module_name):
+	global g_tokens
+	global g_data_path
+	mc = load_list(g_data_path+module_name+'.list')
+	if module_name == "mcu":
+		tok = "mcu_"
+	else:
+		tok = ""
+	for m in mc:
+		add_submodule(module_name+'_'+m+'.vSyn')
+		g_tokens[tok+m] = 'SUBMODULE'
 
 def load_defaults():
 	load_library("lsi_10k.lib")
@@ -249,6 +275,30 @@ def parse_netlist(netlist_name):
 		fw.generateConnections(gen_path+netlist_name, result['gates'])
 		# pkl_dump(fullname, result['obj']) ## ???
 	return result
+
+def add_submodule(modfile):
+	gen_path = path_name(modfile)
+	if pkl_exists(gen_path+modfile):
+		h = pkl_load(gen_path+modfile)
+	else:
+		print modfile, "pkl does nto exist, parsing input/output files..."
+		h = {}
+		dirs = ["input", "output"]
+		for d in dirs:
+			f = open(gen_path+modfile+"."+d,'r')
+			for line in f:
+				line = line.strip().split(' ')
+				h[line[1]] = (int(line[0]), d)
+			f.close()
+		f = open(gen_path+modfile+".multibit",'r')
+		for line in f:
+			line = line.strip().split(' ')
+			h[line[0]] = ['multibit_flag', line[1:]]
+		f.close()
+		pkl_dump(gen_path+modfile, h)
+	import classes
+	mod_name = modfile.split('.')[0]
+	classes.submodule_map[mod_name] = h
 
 def add_megacell(cellfile):
 	# must be called AFTER netlist parser is initiated (with cells)
