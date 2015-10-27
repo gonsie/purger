@@ -192,10 +192,9 @@ def create_parser(gate_types, gid=0):
         'module_item : ASSIGN list_of_assignments SEMI'
         t[0] = ""
 
-    def p_module_item_module_single(t):
+    def p_module_item_module_local_instantiation(t):
         '''module_item : CELL ID LPAREN list_of_module_connections RPAREN SEMI
-                       | MEGACELL ID LPAREN list_of_module_connections RPAREN SEMI
-                       | SUBMODULE ID LPAREN list_of_module_connections RPAREN SEMI'''
+                       | MEGACELL ID LPAREN list_of_module_connections RPAREN SEMI'''
         t[0] = ""
         if t[1] not in gate_types:
             raise Exception("Could not find megacell gate type " + t[1])
