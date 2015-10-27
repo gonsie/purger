@@ -224,6 +224,39 @@ def create_parser(gate_types, gid=0):
                         all_wires[q].append(g)
         all_cells[g.name] = g
 
+    def p_module_item_module_routing(t):
+        'module_item : SUBMODULE ID LPAREN list_of_module_connections RPAREN SEMI'
+        # scan ID to see if this is going to a particular instance
+        # lookup routing, and connect wires?
+        t[0] = ""
+        for p in t[4]:
+            if type(p[1]) is str:
+                if 'multibit_flag' in all_wires[p[1]]:
+                    for i, w in enumerate(all_wires[p[1]][1]):
+                        x = classes.Routing_Object(t[1], t[2], p[0], w, i)
+                        all_wires[w].append(x)
+                    # print "SUBMODULE multibit connection detected", p[1]
+                else:
+                    x = classes.Routing_Object(t[1], t[2], p[0], p[1])
+                    all_wires[p[1]].append(x)
+                    # print "SUBMODULE direct connection detected", p[1]
+            elif type(p[1]) is int:
+                # x = classes.Routing_Object(t[1], t[2], p[0], w)
+                print "SUBMODULE constant value detected", p[1], "line", t.lexer.lineno
+                continue
+            else:
+                enum_p = []
+                for q in p[1]:
+                    if q in all_wires and 'multibit_flag' in all_wires[q]:
+                        enum_p += all_wires[q][1]
+                    else:
+                        enum_p.append(q)
+                for i, q in enumerate(enum_p):
+                    if type(q) is str:
+                        x = classes.Routing_Object(t[1], t[2], p[0], q, i)
+                        all_wires[q].append(x)
+                # print "SUBMODULE list detected", p[1]
+
     def p_module_item_module_list(t):
         'module_item : CELL module_instance more_modules SEMI'
         t[0] = ""
