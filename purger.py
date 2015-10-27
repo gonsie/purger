@@ -158,6 +158,13 @@ def load_defaults():
 	load_megacells("megacell.list")
 	# load_netlist_parser()
 
+def do_shit(filename):
+	load_defaults()
+	global g_tokens
+	g_tokens['PLACE_HOLDER'] = 'SUBMODULE'
+	load_netlist_parser()
+	n = parse_netlist(filename)
+
 def remove_wires(all_wires, all_gates, gate_types):
 	import classes
 	error_count = 0
@@ -308,13 +315,12 @@ def add_submodule(modfile):
 	classes.submodule_map[mod_name] = h
 
 def add_megacell(cellfile):
-	# must be called AFTER netlist parser is initiated (with cells)
 	gen_path = path_name(cellfile, True)
 	if pkl_exists(gen_path+cellfile):
-		print "pkl file exists, loading..."
+		#print "pkl file exists, loading..."
 		h = pkl_load(gen_path+cellfile)
 	else:
-		print "pkl file does not exist, parsing rtl file..."
+		print cellfile, "pkl does not exist, parsing rtl file..."
 		global ply_default_rtl
 		rlib = importlib.import_module(ply_default_rtl)
 		r = PLYPair(rlib.create_lexer(), rlib.create_parser())
@@ -348,8 +354,11 @@ def purger_help():
 import sys
 if __name__ == "__main__":
 	if not sys.flags.interactive:
-		print "Load PURGER functions into an interactive python shell:"
-		print "$ python -i", sys.argv[0]
+		if len(sys.argv) < 2:
+			print "Load PURGER functions into an interactive python shell:"
+			print "$ python -i", sys.argv[0]
+		else:
+			do_shit(sys.argv[1])
 	else:
 		print "Find out more about PURGER with the command"
 		print "> purger_help()"
