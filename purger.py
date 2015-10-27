@@ -82,11 +82,11 @@ def load_library(filename):
 		return
 	gen_path = path_name(filename)
 	if pkl_exists(gen_path+filename):
-		print "pkl file exist; loading..."
+		#print "pkl file exist; loading..."
 		g_library = pkl_load(gen_path+filename)
 		g_tokens.update(lib_cells(g_library))
 	else:
-		print "pkl file does not exist; processing"
+		print filename, "pkl does not exist; processing"
 		mlib = importlib.import_module(ply_default_library)
 		plib = PLYPair(mlib.create_lexer(), mlib.create_parser())
 		global g_data_path
@@ -250,6 +250,7 @@ def remove_wires(all_wires, all_gates, gate_types):
 				error_count += 1
 	print "Total of", error_count, "gate errors"
 
+from time import time
 def parse_netlist(netlist_name):
 	result = None
 	gen_path = path_name(netlist_name)
@@ -257,19 +258,28 @@ def parse_netlist(netlist_name):
 		print "pkl file exists; loading..."
 		result = pkl_load(gen_path+netlist_name)
 	else:
-		print "pkl file does not exist; processing..."
+		print netlist_name, "pkl does not exist; processing..."
 		global g_netlist_parser
 		global g_data_path
+		start = time()
 		result = g_netlist_parser.parse_file(g_data_path+netlist_name)
+		total = time()-start
+		print "\tParsing file took", total, "s"
 		global g_library
-		stdout = sys.stdout
-		sys.stdout = open(gen_path+netlist_name+".errors", 'w')
+		start = time()
+		# stdout = sys.stdout
+		# sys.stdout = open(gen_path+netlist_name+".errors", 'w')
 		remove_wires(result['wires'], result['gates'], g_library)
-		sys.stdout.close()
-		sys.stdout = stdout
+		# sys.stdout.close()
+		# sys.stdout = stdout
+		total = time()-start
+		print "\tWire removal took", total, "s"
+		start = time()
 		fw = importlib.import_module('file_writer')
 		fw.generateRoss(gen_path+netlist_name, g_library, result['gates'])
-		fw.generateConnections(gen_path+netlist_name, result['gates'])
+		fw.generateConnections(gen_path+netlist_name, result['gates'], result['wires'])
+		total = time()-start
+		print "\tFile writing took", total, "s"
 		# pkl_dump(fullname, result['obj']) ## ???
 	return result
 
