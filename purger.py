@@ -155,8 +155,8 @@ def load_submodules(module_name):
 
 def load_defaults():
 	load_library("lsi_10k.lib")
-	global g_library
-	load_netlist_parser(g_library)
+	load_megacells("megacell.list")
+	# load_netlist_parser()
 
 def remove_wires(all_wires, all_gates, gate_types):
 	import classes
