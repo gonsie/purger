@@ -54,6 +54,10 @@ def create_lexer(nets={}):
 
     t_ignore = " \t"
 
+    def t_ignore_COMMENT(t):
+        r'//.*\n'
+        t.lexer.lineno += 1
+
     # Define a rule to track line numbers (\n tokens otherwise discarded)
     def t_newline(t):
         r'\n+'
