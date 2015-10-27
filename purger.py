@@ -176,9 +176,6 @@ def remove_wires(all_wires, all_gates, gate_types):
 			continue
 		my_gates = list(set(all_wires[w]))
 		for g in my_gates:
-			if not isinstance(g, classes.Gate):
-				print "Error(w0): could not remove wires from object", g, "of type", type(g)
-				continue
 			d = g.getRefDirectionCounts(w)
 			inputs += d[0]
 			outputs+= d[1]
@@ -190,21 +187,21 @@ def remove_wires(all_wires, all_gates, gate_types):
 			# unused wire
 			processed_list.append(w)
 			continue
-		if inputs == 0:
+		elif inputs == 0:
 			# wire goes nowhere
 			# print "ERROR(w2a): wire", w, "goes nowhere"
 			error_count += 1
 			error_names.append(w)
 			processed_list.append(w)
 			continue
-		if outputs == 0:
+		elif outputs == 0:
 			# wire comes from nowhere
 			# print "ERROR(w2b): wire", w, "comes from nowhere"
 			error_count += 1
 			error_names.append(w)
 			processed_list.append(w)
 			continue
-		if outputs != 1:
+		elif outputs != 1:
 			# wire comes too many places
 			# FANIN
 			print "ERROR(w2c): FANIN on wire", w
@@ -212,7 +209,7 @@ def remove_wires(all_wires, all_gates, gate_types):
 			error_names.append(w)
 			processed_list.append(w)
 			continue
-		if inputs > 1:
+		elif inputs > 1:
 			# print "WARNING: wire", w, "has fannout", outputs
 			fan = classes.Gate(w)
 			fan.setType(gate_types["fanout"])
