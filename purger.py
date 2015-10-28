@@ -145,13 +145,9 @@ def load_submodules(module_name):
 	global g_tokens
 	global g_data_path
 	mc = load_list(g_data_path+module_name+'.list')
-	if module_name == "mcu":
-		tok = "mcu_"
-	else:
-		tok = ""
 	for m in mc:
-		add_submodule(module_name+'_'+m+'.vSyn')
-		g_tokens[tok+m] = 'SUBMODULE'
+		add_submodule(m+'.vSyn')
+		g_tokens[m] = 'SUBMODULE'
 
 def load_defaults():
 	load_library("lsi_10k.lib")
