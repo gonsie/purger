@@ -38,3 +38,10 @@ clkgen_mcu_cmp
 clkgen_mcu_dr
 clkgen_mcu_io
 mcu_addrdp_dp
+n2_l2d_sp_512kb_cust
+n2_pcmb_cust
+n2_pcma_cust
+n2_rng_cust
+n2_revid_cust
+n2_clk_gl_cust
+spu.v
