@@ -152,12 +152,15 @@ def load_submodules(module_name):
 def load_defaults():
 	load_library("lsi_10k.lib")
 	load_megacells("megacell.list")
-	# load_netlist_parser()
+	global g_tokens
+	g_tokens['PURGER_PLACE_HOLDER'] = 'SUBMODULE'
 
 def do_shit(filename):
 	load_defaults()
-	global g_tokens
-	g_tokens['PLACE_HOLDER'] = 'SUBMODULE'
+	global g_data_path
+	mname = filename.split('.')[0]
+	if os.path.isfile(g_data_path+mname+'.list'):
+		load_submodules(mname)
 	load_netlist_parser()
 	n = parse_netlist(filename)
 
