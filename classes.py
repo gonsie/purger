@@ -449,6 +449,11 @@ class Gate:
             return
 
     def addConstRef(self, pin, ref):
+        if pin in self.type.multibits:
+            mbr = splitBits(ref, self.type.multibits[pin]['width'])
+            for p, r in zip(self.type.multibits[pin]['wires'], mbr):
+                self.addConstRef(p, r)
+            return
         if self.pin_ref[pin]:
             print "ERROR(b#): Overwriting ref", self.pin_ref[pin], "on pin", pin, "with new ref", ref
         self.pin_ref[pin] = '#'+str(ref)
@@ -615,6 +620,12 @@ def guess_instance(name):
         return int(name[-1])
     else:
         return 0
+
+def splitBits(num, width):
+    bits = list(bin(num)[2:][::-1])
+    bits += ['0' for i in range(width - len(bits))]
+    bits = [int(bits[i]) for i in range(len(bits))]
+    return bits
 
 def parse_multibit_wire(wire, size):
     if '[' in wire:
