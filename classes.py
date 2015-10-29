@@ -560,6 +560,7 @@ class Routing_Object:
         self.port = port
         self.module_type = module_type
         self.module_name = module_name
+        self.index = index
         self.module_id = guess_instance(module_name)
         self.ref = wire
 
@@ -574,6 +575,9 @@ class Routing_Object:
 
     def __nonzero__(self):
         return True
+
+    def __getinitargs__(self):
+        return (self.module_type, self.module_name, self.port, self.wire, self.index)
 
     def __eq__(self, other):
         if isinstance(other, Routing_Object):
