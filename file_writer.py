@@ -80,10 +80,7 @@ def generateRoss(filename_prefix, gate_types, all_gates):
 		g = all_gates[g]
 		f.write(str(g.gid)+" "+str(types_list.index(g.type.libname))+" ")
 		wstr = ""
-		if g.type.name == "fanout":
-			orders = ['input']
-		else:
-			orders = ['input', 'output']
+		orders = ['input', 'output']
 		for o in orders:
 			l = g.type.getOrder(o)
 			for p in l:
@@ -104,9 +101,6 @@ def generateRoss(filename_prefix, gate_types, all_gates):
 					# SHOULD BE GATE INSTANCE
 					wstr += str(r.gid) + " "
 		f.write(wstr)
-		# fanout special case
-		if g.type.name == "fanout":
-			f.write(" "+str(len(g.fan_out)))
 		f.write("\n")
 	f.close()
 
