@@ -103,7 +103,7 @@ def create_parser():
 
     def additional_types():
         gi = classes.Gate_Type("input_gate")
-        gi.add('pin', {"in" : {'direction' : "input"})})
+        gi.add('pin', {"in" : {'direction' : "input"}})
         gi.add('pin', {"out" : {'direction' : "output", 'function' : "in"}})
         gi.setOrders()
         gate_types[gi.name] = gi
