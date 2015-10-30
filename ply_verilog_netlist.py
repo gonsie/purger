@@ -81,6 +81,7 @@ def create_parser(gate_types, gid=0):
 
     all_wires = {}
     all_cells = {}
+    all_routing_objects = []
 
     precedence = ()
 
@@ -94,6 +95,7 @@ def create_parser(gate_types, gid=0):
         t[0]['obj'] = classes.Module(t[2])
         t[0]['obj'].connections(all_cells)
         t[0]['obj'].pkl()
+        t[0]['route'] = all_routing_objects
 
 # LIST_OF_PORTS
 
@@ -234,15 +236,18 @@ def create_parser(gate_types, gid=0):
                 if 'multibit_flag' in all_wires[p[1]]:
                     for i, w in enumerate(all_wires[p[1]][1]):
                         x = classes.Routing_Object(t[1], t[2], p[0], w, i)
+                        all_routing_objects.append(x)
                         all_wires[w].append(x)
                     # print "SUBMODULE multibit connection detected", p[1]
                 else:
                     x = classes.Routing_Object(t[1], t[2], p[0], p[1])
+                    all_routing_objects.append(x)
                     all_wires[p[1]].append(x)
                     # print "SUBMODULE direct connection detected", p[1]
             elif type(p[1]) is int:
-                # x = classes.Routing_Object(t[1], t[2], p[0], w)
-                print "SUBMODULE constant value detected", p[1], "line", t.lexer.lineno
+                x = classes.Routing_Object(t[1], t[2], p[0], "__placeholder__")
+                all_routing_objects.append(x)
+                print "SUBMODULE constant value detected (", t.lexer.lineno, "):", x.gid, "=", p[1]
                 continue
             else:
                 enum_p = []
@@ -254,6 +259,7 @@ def create_parser(gate_types, gid=0):
                 for i, q in enumerate(enum_p):
                     if type(q) is str:
                         x = classes.Routing_Object(t[1], t[2], p[0], q, i)
+                        all_routing_objects.append(x)
                         all_wires[q].append(x)
                 # print "SUBMODULE list detected", p[1]
 
