@@ -96,7 +96,7 @@ def load_md(mod_name):
 
 def printRouting(top_mod):
     # .h file
-    fname = "Current/"+top_mod.name+"-routing.h"
+    fname = g_prefix+"/"+top_mod.name+"-routing.h"
     f = open(fname, 'w')
     f.write(header+"\n")
     f.write("#ifndef _"+top_mod.name+"_routing_h\n")
@@ -107,7 +107,7 @@ def printRouting(top_mod):
     f.write("\n#endif\n")
     f.close()
     # .c file
-    fname = "Current/"+top_mod.name+"-routing.c"
+    fname = g_prefix+"/"+top_mod.name+"-routing.c"
     f = open(fname, 'w')
     f.write(header+"\n")
     (ostr, offset) = top_mod.arrayStr("", 0)
