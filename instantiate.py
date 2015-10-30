@@ -2,6 +2,9 @@
 import os.path
 
 g_prefix = "Current"
+header = '''//Elsa Gonsiorowski
+//Rensselaer Polytechnic Institute
+'''
 
 class Module:
     def __init__(self, name, count):
@@ -22,23 +25,34 @@ class Module:
             c.load()
         self.gate_count = load_md(self.name)
 
-    def printRouteCount(self, offset):
+    def printRouteCount(self, index, offset):
         route = self.route + (' '*(22-len(self.route)))
-        ostr = '\t'.join([route, str(self.route_count), str(offset), str(self.gate_count)])
+        ostr = '\t'.join([route, str(self.count), str(self.route_count), str(index), str(offset), str(self.gate_count)])
         print ostr
+        for i in range(self.route_count-1):
+            j = i+1
+            ostr = ' '*22 + '\t\t\t\t'
+            print ostr+str(offset+(j*self.gate_count))
         offset += self.route_count * self.gate_count
+        index += self.route_count
         for c in self.children:
-            offset = c.printRouteCount(offset)
-        return offset
+            (index, offset) = c.printRouteCount(index, offset)
+        return index, offset
 
     def poundDef(self, ostr, index):
         ostr +=  "#define RO_"+self.name+"\t("+str(index)+")\n"
+        index += self.route_count
         for c in self.children:
-            (ostr, index) = c.poundDef(ostr, index+1)
+            (ostr, index) = c.poundDef(ostr, index)
         return (ostr, index)
 
-    def printArray(self):
-        return 0
+    def arrayStr(self, ostr, offset):
+        for i in range(self.route_count):
+            ostr += str(offset)+", "
+            offset += self.gate_count
+        for c in self.children:
+            (ostr, offset) = c.arrayStr(ostr, offset)
+        return ostr, offset
 
     def printDepth(self, depth):
         ostr = "\t"*depth
@@ -84,6 +98,7 @@ def printRouting(top_mod):
     # .h file
     fname = "Current/"+top_mod.name+"-routing.h"
     f = open(fname, 'w')
+    f.write(header+"\n")
     f.write("#ifndef _"+top_mod.name+"_routing_h\n")
     f.write("#define _"+top_mod.name+"_routing_h\n\n")
     (ostr, total) = top_mod.poundDef("", 0)
@@ -91,40 +106,16 @@ def printRouting(top_mod):
     f.write(ostr)
     f.write("\n#endif\n")
     f.close()
-
-def calc_offsets(top_level):
-    offset_list = []
-    offset = 0
-    r = [(1, top_level)]
-    for i, n in r:
-        #i, n = r.pop(0)
-        d = "Data/"+n+".clist"
-        if os.path.isfile(d):
-            r += load_clist(d)
-        md = "Generated/"+n+"/"+n+".metadata"
-        count = load_md(md)
-        for j in range(i):
-            offset_list.append((offset, n))
-            offset += count
-    return offset_list
-
-def calc_routing(offset_list):
-    routing_table = []
-    prev_n = ""
-    n_count = 0
-    for i, n in offset_list:
-        if n == prev_n:
-            n_count += 1
-        else:
-            n_count = 0
-        prev_n = n
-        route = n+"."+str(n_count)+"."
-        routing_table.append((n, i, route))
-    return routing_table
-
-def main(top_level):
-    ol = calc_offsets(top_level)
-    rt = calc_routing(ol)
+    # .c file
+    fname = "Current/"+top_mod.name+"-routing.c"
+    f = open(fname, 'w')
+    f.write(header+"\n")
+    (ostr, offset) = top_mod.arrayStr("", 0)
+    f.write("#include \""+top_mod.name+"-routing.h\"\n\n")
+    f.write("int routing_table[RO_TOTAL] = {\n")
+    f.write(ostr)
+    f.write("\n\t};\n")
+    f.close()
 
 def process(top_level):
     top = Module(top_level, 1)
@@ -132,7 +123,7 @@ def process(top_level):
     # top.printDepth(0)
     # top.printOffsets(0)
     # top.printRoute()
-    # top.printRouteCount(0)
+    top.printRouteCount(0, 0)
     printRouting(top)
 
 import sys
@@ -141,6 +132,5 @@ if __name__ == "__main__":
         print "Usage:", sys.argv[0], "top_level_name [prefix]"
     else:
         if len(sys.argv) == 3:
-            global g_prefix
             g_prefix = sys.argv[2]
         process(sys.argv[1])
