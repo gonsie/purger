@@ -256,6 +256,12 @@ def remove_wires(all_wires, all_gates, gate_types):
 				error_count += 1
 	print "Total of", error_count, "gate errors"
 
+def calc_routing(filename, routing_object_list):
+	f = open(filename+".connections", 'w')
+	for r in routing_object_list:
+		f.write(r.gid+" "+r.dir+"\n")
+	f.close()
+
 from time import time
 def parse_netlist(netlist_name):
 	result = None
@@ -287,6 +293,8 @@ def parse_netlist(netlist_name):
 		total = time()-start
 		print "\tFile writing took", total, "s"
 		# pkl_dump(fullname, result['obj']) ## ???
+		if len(result['route']) > 0:
+			calc_routing(gen_path+netlist_name, result['route'])
 	return result
 
 def add_submodule(modfile):
