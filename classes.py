@@ -392,6 +392,7 @@ class Gate:
         self.type = None
         self.const_assign = False
         self.pin_ref = {}
+        self.pin_ref_index = {}
 
     def __repr__(self):
         return self.name+"_gate"
@@ -400,8 +401,10 @@ class Gate:
         self.type = t
         if self.type.name == "fanout":
             self.fan_out = []
+            self.fan_out_index = []
         for p in self.type.pins:
             self.pin_ref[p] = None
+            self.pin_ref_index[p] = None
 
     def addIORef(self, ref):
         if self.type.name == "fanout":
@@ -448,6 +451,15 @@ class Gate:
             print "ERROR(g3): don't use .addRef on a fanout gate"
             return
 
+    def getPin(self, ref):
+        r = get_name(ref)
+        for p in self.pin_ref:
+            if self.pin_ref[p] and get_name(self.pin_ref[p]) == r:
+                if self.type.pins[p]['direction'] == "input":
+                    return self.type.pins[p]['order']
+                elif self.type.pins[p]['direction'] == "output":
+                    return self.type.pins[p]['order']
+
     def addConstRef(self, pin, ref):
         if pin in self.type.multibits:
             mbr = splitBits(ref, self.type.multibits[pin]['width'])
@@ -458,12 +470,13 @@ class Gate:
             print "ERROR(b#): Overwriting ref", self.pin_ref[pin], "on pin", pin, "with new ref", ref
         self.pin_ref[pin] = '#'+str(ref)
 
-    def updateRef(self, old_ref, new_ref):
+    def updateRef(self, old_ref, new_ref, index=0):
         old_name = get_name(old_ref)
         # must LOOP in case of multiple refs
         for p in self.pin_ref:
             if self.pin_ref[p] and get_name(self.pin_ref[p]) == old_name:
                 self.pin_ref[p] = new_ref
+                self.pin_ref_index[p] = index
         if self.type.name == "fanout" and old_ref in self.fan_out:
             if self.fan_out.count(old_ref) > 1:
                 print "ERROR(mr): fanout with multiple", old_ref, "REFS :(", self.fan_out
@@ -486,19 +499,30 @@ class Gate:
             print self.pin_ref
         return (in_count, out_count)
 
-    def isInput(self, ref):
+    def inputCountPins(self, ref):
         r = get_name(ref)
+        count = 0
+        pns = []
         for p in self.pin_ref:
             if self.pin_ref[p] and get_name(self.pin_ref[p]) == r:
                 if self.type.pins[p]['direction'] == "input":
-                    return True
-        return False
+                    count += 1
+                    pns.append(self.type.pins[p]['order'])
+        return (count, pns)
 
-    def addFanOut(self, ref):
+    def pIndex(self, pin):
+        if self.type.name == "fanout":
+            print "ERROR: asking for pIndex on fanout"
+            return -1
+        else:
+            return self.pin_ref_index[pin]
+
+    def addFanOut(self, ref, index):
         if self.type.name != "fanout":
             print "ERROR(g7): fanout gate type expected, instead:", self.type.name
             return
         self.fan_out.append(ref)
+        self.fan_out_index.append(index)
 
     def setAssign(self, constval):
         try:
@@ -563,6 +587,7 @@ class Routing_Object:
         self.index = index
         self.module_id = guess_instance(module_name)
         self.ref = wire
+        self.pin_ref_index
 
     def __repr__(self):
         return self.name+" in "+self.module_type+"#"+str(self.module_id)+"("+self.module_name+")"

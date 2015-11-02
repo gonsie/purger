@@ -226,15 +226,19 @@ def remove_wires(all_wires, all_gates, gate_types):
 			fan.addRef("in", inref)
 			for g in my_gates:
 				if isinstance(g, classes.Gate):
-					if g.isInput(w):
-						fan.addFanOut(g)
+					(c, ps) = g.inputCountPins(w)
+					if c > 0:
+						for psi in ps:
+							fan.addFanOut(g, psi)
 					g.updateRef(w, fan)
 			all_gates[fan.name] = fan
 		else: # outputs = 1, inputs = 1
 			g0 = all_wires[w][0]
 			g1 = all_wires[w][1]
-			g0.updateRef(w, g1)
-			g1.updateRef(w, g0)
+			p0 = g0.getPin(w)
+			p1 = g1.getPin(w)
+			g0.updateRef(w, g1, p1)
+			g1.updateRef(w, g0, p0)
 		processed_list.append(w)
 	if len(processed_list) != len(all_wires.keys()):
 		print "ALERT: SOMETHING STRANGE HAPPENED", len(processed_list), "!=", len(all_wires.keys())

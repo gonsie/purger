@@ -78,27 +78,41 @@ def generateRoss(filename_prefix, types_list, all_gates):
 	for g in all_gates:
 		g = all_gates[g]
 		f.write(str(g.gid)+" "+str(types_list.index(g.type.libname))+" ")
+		if g.type.name == "fanout":
+			f.write(str(len(g.fan_out))+" ")
+			for x, y in zip(g.fan_out, g.fan_out_index):
+				f.write(str(x.gid)+" "+str(y)+" ")
+			f.write("\n")
+			continue
 		wstr = ""
-		orders = ['input', 'output']
-		for o in orders:
+		orders = [('input', "-1 "), ('output', "-1 -1 ")]
+		for o, err in orders:
 			l = g.type.getOrder(o)
 			for p in l:
 				r = g.pin_ref[p]
 				if not r:
 					# None entry
-					wstr += "-1 "
+					wstr += err
+					continue
 				elif type(r) is str:
 					if r.find('#') == 0:
 						# CONST
 						wstr += r + " "
+						if o == "output":
+							wstr += "-1 "
+						continue
 					else:
 						# always strings for io_cells
 						# print "ERROR(w3): ref is string:", r, "for", g.name
 						# could also be an error wire
+						wstr += err
 						continue
 				else:
 					# SHOULD BE GATE INSTANCE
 					wstr += str(r.gid) + " "
+				# ADD PIN INFORMATION
+				if o == "output":
+					wstr += str(g.pIndex(p)) + " "
 		f.write(wstr)
 		f.write("\n")
 	f.close()
