@@ -80,6 +80,7 @@ def generateRoss(filename_prefix, types_list, all_gates):
 		f.write(str(g.gid)+" "+str(types_list.index(g.type.libname))+" ")
 		if g.type.name == "fanout":
 			f.write(str(len(g.fan_out))+" ")
+			f.write(str(g.pin_ref['in'].gid)+" ")
 			for x, y in zip(g.fan_out, g.fan_out_index):
 				f.write(str(x.gid)+" "+str(y)+" ")
 			f.write("\n")
