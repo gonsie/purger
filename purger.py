@@ -13,6 +13,7 @@ ply_default_rtl = "ply_verilog_rtl"
 g_library = None
 g_netlist_parser = None
 g_tokens = {}
+g_gate_type_order = None
 
 ## FILE SYSTEM SETTINGS
 g_data_path = "Data/"
@@ -77,6 +78,7 @@ import importlib
 def load_library(filename):
 	global g_library
 	global g_tokens
+	global g_gate_type_order
 	if g_library:
 		print "Alert: Library", filename, "is already loaded"
 		return
@@ -85,6 +87,8 @@ def load_library(filename):
 		#print "pkl file exist; loading..."
 		g_library = pkl_load(gen_path+filename)
 		g_tokens.update(lib_cells(g_library))
+		g_gate_type_order = g_library.keys()
+		g_gate_type_order.sort()
 	else:
 		print filename, "pkl does not exist; processing"
 		mlib = importlib.import_module(ply_default_library)
@@ -116,7 +120,7 @@ def load_library(filename):
 				return
 		stdout = sys.stdout
 		sys.stdout = open(gen_path+filename+".errors", "w")
-		fw.generateC(gen_path+filename, g_library)
+		g_gate_type_order = fw.generateC(gen_path+filename, g_library)
 		sys.stdout.close()
 		sys.stdout = stdout
 
@@ -288,7 +292,7 @@ def parse_netlist(netlist_name):
 		print "\tWire removal took", total, "s"
 		start = time()
 		fw = importlib.import_module('file_writer')
-		fw.generateRoss(gen_path+netlist_name, g_library, result['gates'])
+		fw.generateRoss(gen_path+netlist_name, g_gate_type_order, result['gates'])
 		fw.generateConnections(gen_path+netlist_name, result['gates'], result['wires'])
 		total = time()-start
 		print "\tFile writing took", total, "s"

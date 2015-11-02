@@ -70,10 +70,9 @@ def generateC(filename_prefix, gate_types):
 	f.close()
 	write_gate_h(filename_prefix, types_list)
 	write_gate_c(filename_prefix, types_list, gate_types)
+	return types_list
 
-def generateRoss(filename_prefix, gate_types, all_gates):
-	types_list = gate_types.keys()
-	types_list.sort()
+def generateRoss(filename_prefix, types_list, all_gates):
 	types_list.append(None)
 	f = open(filename_prefix+".gates", "w")
 	for g in all_gates:
