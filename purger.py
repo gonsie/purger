@@ -216,7 +216,7 @@ def remove_wires(all_wires, all_gates, gate_types):
 			processed_list.append(w)
 			continue
 		elif inputs > 1:
-			# print "WARNING: wire", w, "has fannout", outputs
+			# print "WARNING: wire", w, "has fannout", inputs
 			fan = classes.Gate(w)
 			fan.setType(gate_types["fanout"])
 			fan.addRef("in", inref)
