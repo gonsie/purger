@@ -587,7 +587,7 @@ class Routing_Object:
         self.index = index
         self.module_id = guess_instance(module_name)
         self.ref = wire
-        self.pin_ref_index
+        self.pin_ref_index = {}
 
     def __repr__(self):
         return self.name+" in "+self.module_type+"#"+str(self.module_id)+"("+self.module_name+")"
@@ -624,8 +624,11 @@ class Routing_Object:
         else:
             return (0, 0)
 
-    def updateRef(self, old_ref, new_ref):
+    def updateRef(self, old_ref, new_ref, index=0):
         self.ref = new_ref
+
+    def getPin(self, wire):
+        return 0;
 
 submodule_map = {}
 
