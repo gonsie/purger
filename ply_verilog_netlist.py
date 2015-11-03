@@ -247,7 +247,7 @@ def create_parser(gate_types, gid=0):
             elif type(p[1]) is int:
                 x = classes.Routing_Object(t[1], t[2], p[0], "__placeholder__")
                 all_routing_objects.append(x)
-                print "SUBMODULE constant value detected (", t.lexer.lineno, "):", x.gid, "=", p[1]
+                print x.gid, "=", p[1]
                 continue
             else:
                 enum_p = []
