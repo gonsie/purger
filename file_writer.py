@@ -85,6 +85,8 @@ def generateRoss(filename_prefix, types_list, all_gates):
 				f.write(str(x.gid)+" "+str(y)+" ")
 			f.write("\n")
 			continue
+		if g.type.libname == "mega_gate":
+			f.write(str(g.type.counts['input']) + " " + str(g.type.counts['output']) + " ")
 		wstr = ""
 		orders = [('input', "-1 "), ('output', "-1 -1 ")]
 		for o, err in orders:
