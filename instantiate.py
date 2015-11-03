@@ -112,8 +112,9 @@ def printRouting(top_mod):
     f.write(header+"\n")
     (ostr, offset) = top_mod.arrayStr("", 0)
     f.write("#include \""+top_mod.name+"-routing.h\"\n\n")
-    f.write("int routing_table[RO_TOTAL] = {\n")
+    f.write("int routing_table[RO_TOTAL+1] = {\n")
     f.write(ostr)
+    f.write(str(offset)+",")
     f.write("\n\t};\n")
     f.close()
 
@@ -123,7 +124,9 @@ def process(top_level):
     # top.printDepth(0)
     # top.printOffsets(0)
     # top.printRoute()
-    top.printRouteCount(0, 0)
+    i, o = top.printRouteCount(0, 0)
+    ostr = ' '*22 + '\t\t\t\t'
+    print ostr + str(o)
     printRouting(top)
 
 import sys
