@@ -92,10 +92,10 @@ def create_parser(gate_types, gid=0):
         t[0] = {}
         t[0]['wires'] = all_wires
         t[0]['gates'] = all_cells
-        t[0]['obj'] = classes.Module(t[2])
-        t[0]['obj'].connections(all_cells)
-        t[0]['obj'].pkl()
         t[0]['route'] = all_routing_objects
+        # t[0]['obj'] = classes.Module(t[2])
+        # t[0]['obj'].connections(all_cells)
+        # t[0]['obj'].pkl()
 
 # LIST_OF_PORTS
 
