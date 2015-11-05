@@ -9,6 +9,7 @@ header = '''//Elsa Gonsiorowski
 class Module:
     def __init__(self, name, count):
         self.name = name
+        self.fname = name+".vSyn.gates."
         self.count = count
         self.parent = None
         self.route = self.name
@@ -24,10 +25,14 @@ class Module:
             c.route_count = self.route_count * c.route_count
             c.load()
         self.gate_count = load_md(self.name)
+        self.index = -1
+        self.offset = -1
 
     def printRouteCount(self, index, offset):
         route = self.route + (' '*(22-len(self.route)))
         ostr = '\t'.join([route, str(self.count), str(self.route_count), str(index), str(offset), str(self.gate_count)])
+        self.index = index
+        self.offset = offset
         print ostr
         for i in range(self.route_count-1):
             j = i+1
@@ -73,6 +78,16 @@ class Module:
             for c in self.children:
                 offset = c.printOffsets(offset)
         return offset
+
+    def printCmds(self):
+        # print self.name, self.count, self.route_count, self.index, self.offset, self.gate_count
+        for i in range(self.count):
+            print "mv", self.fname+str(i), self.fname+str(self.index+i)
+            for j in range((self.route_count / self.count)-1):
+                k = j+1
+                print "cp", self.fname+str(self.index+i), self.fname+str(self.index+k)
+        for c in self.children:
+            c.printCmds()
 
 def load_clist(mod_name):
     fname = "Data/"+mod_name+".clist"
@@ -128,6 +143,7 @@ def process(top_level):
     ostr = ' '*22 + '\t\t\t\t'
     print ostr + str(o)
     printRouting(top)
+    #top.printCmds()
 
 import sys
 if __name__ == "__main__":
