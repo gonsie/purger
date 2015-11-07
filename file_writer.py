@@ -46,10 +46,10 @@ def write_gate_c(filename_prefix, types_list, gate_types):
 	# internal size
 	f.write("\nint gate_internal_size[GATE_TYPE_COUNT] = {\n\t")
 	for t in types_list:
-		if t == "fanout_gate" or t == "mega_gate":
+		if t == "fanout" or t == "mega_gate":
 			f.write("2, ")
 		else:
-		f.write(str(gate_types[t].counts['internal']) + ", ")
+			f.write(str(gate_types[t].counts['internal']) + ", ")
 	f.write("\n\t};\n")
 	# output size
 	f.write("\nint gate_output_size[GATE_TYPE_COUNT] = {\n\t")
