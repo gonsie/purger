@@ -53,22 +53,22 @@ class Module:
             (ostr, index) = c.poundDef(ostr, index)
         return (ostr, index)
 
-    def arrayLP(self, ostr, offset):
+    def arrayLP(self, arr, offset):
         for i in range(self.route_count):
-            ostr += str(offset)+", "
+            arr.append(offset)
             offset += self.gate_count
         for c in self.children:
-            (ostr, offset) = c.arrayLP(ostr, offset)
-        return ostr, offset
+            (arr, offset) = c.arrayLP(arr, offset)
+        return arr, offset
 
-    def arrayKP(self, ostr, offset):
+    def arrayKP(self, arr, offset):
         global lps_per_kp
         for i in range(self.route_count):
-            ostr += str(offset)+", "
+            arr.append(offset)
             offset += (self.gate_count / lps_per_kp)
         for c in self.children:
-            (ostr, offset) = c.arrayKP(ostr, offset)
-        return ostr, offset
+            (arr, offset) = c.arrayKP(arr, offset)
+        return arr, offset
 
     def printDepth(self, depth):
         ostr = "\t"*depth
@@ -120,6 +120,36 @@ def load_md(mod_name):
     f.close()
     return int(line)
 
+def calcRankRouting(top_mod, np):
+    global lps_per_kp
+    (a, o) = top_mod.arrayLP([], 0)
+    a.append(o)
+    d = [a[i+1]-a[i] for i in range(len(a)-1)]
+    b = [i/lps_per_kp for i in d]
+    c = [x - (y*lps_per_kp) for x,y in zip(d,b)]
+    lp_in_part = []
+    for i in range(len(b)):
+        for j in range(b[i]):
+                lp_in_part.append(lps_per_kp)
+                if j < c[i]:
+                        lp_in_part[-1]+=1
+    total_parts = sum(b)
+    parts_per_rank = total_parts / np
+    parts_per_rank_extra = total_parts - (parts_per_rank * np)
+    parts_on_rank = [parts_per_rank for i in range(np)]
+    for i in range(parts_per_rank_extra):
+        parts_on_rank[i] += 1
+    e = [0]
+    for i in range(np):
+        e.append(parts_on_rank[i] + e[i])
+    lps_on_rank = []
+    for i in range(np):
+        lps_on_rank.append(sum(lp_in_part[e[i]:e[i+1]]))
+    gid_offset = [0]
+    for i in range(np):
+        gid_offset.append(lps_on_rank[i] + gid_offset[i])
+    return gid_offset
+
 def printRouting(top_mod):
     # .h file
     fname = g_prefix+"/"+top_mod.name+"-routing.h"
@@ -140,17 +170,30 @@ def printRouting(top_mod):
     f.write(header+"\n")
     f.write("#include \"routing.h\"\n\n")
     # lps per module table
-    (ostr, offset) = top_mod.arrayLP("", 0)
+    (arr, offset) = top_mod.arrayLP([], 0)
+    sarr = [str(i) for i in arr] + [str(offset)]
     f.write("int routing_table_lp[RO_TOTAL+1] = {\n")
-    f.write(ostr)
-    f.write(str(offset)+",")
+    f.write(", ".join(sarr))
     f.write("\n\t};\n")
     # parts per module table
-    (ostr, offset) = top_mod.arrayKP("", 0)
+    (arr, offset) = top_mod.arrayKP([], 0)
+    sarr = [str(i) for i in arr] + [str(offset)]
     f.write("int routing_table_kp[RO_TOTAL+1] = {\n")
-    f.write(ostr)
-    f.write(str(offset)+",")
+    f.write(", ".join(sarr))
     f.write("\n\t};\n")
+    # pre-calculate MPI-rank routing
+    np = 1024
+    mapstr = "\nint ** rounting_table_mapper(int np) {\n\tswitch np {\n"
+    while np > 0:
+        arr = calcRankRouting(top_mod, np)
+        sarr = [str(i) for i in arr]
+        f.write("int routing_map_"+str(np)+"["+str(np+1)+"] = {\n")
+        f.write(", ".join(sarr))
+        f.write("\n\t};\n")
+        mapstr += "\tcase "+str(np)+":\n\t\treturn &routing_map_"+str(np)+";\n"
+        np = np/2
+    mapstr += "\tdefault:\n\t\ttw_error(TW_LOC, \"ERROR: no mapping for %d nodes\", np);\n\t}\n}\n"
+    f.write(mapstr)
     f.close()
 
 def process(top_level):
