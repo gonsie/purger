@@ -1,10 +1,12 @@
 
 import os.path
 
+# GLOBAL SETTINGS
 g_prefix = "Current"
 header = '''//Elsa Gonsiorowski
 //Rensselaer Polytechnic Institute
 '''
+lps_per_kp = 18
 
 class Module:
     def __init__(self, name, count):
@@ -51,12 +53,21 @@ class Module:
             (ostr, index) = c.poundDef(ostr, index)
         return (ostr, index)
 
-    def arrayStr(self, ostr, offset):
+    def arrayLP(self, ostr, offset):
         for i in range(self.route_count):
             ostr += str(offset)+", "
             offset += self.gate_count
         for c in self.children:
-            (ostr, offset) = c.arrayStr(ostr, offset)
+            (ostr, offset) = c.arrayLP(ostr, offset)
+        return ostr, offset
+
+    def arrayKP(self, ostr, offset):
+        global lps_per_kp
+        for i in range(self.route_count):
+            ostr += str(offset)+", "
+            offset += (self.gate_count / lps_per_kp)
+        for c in self.children:
+            (ostr, offset) = c.arrayKP(ostr, offset)
         return ostr, offset
 
     def printDepth(self, depth):
@@ -119,15 +130,24 @@ def printRouting(top_mod):
     (ostr, total) = top_mod.poundDef("", 0)
     f.write("#define RO_TOTAL ("+str(total)+")\n")
     f.write(ostr)
+    global lps_per_kp
+    f.write("\n#define LPS_PER_KP ("+str(lps_per_kp)+")\n")
     f.write("\n#endif\n")
     f.close()
     # .c file
     fname = g_prefix+"/"+top_mod.name+"-routing.c"
     f = open(fname, 'w')
     f.write(header+"\n")
-    (ostr, offset) = top_mod.arrayStr("", 0)
     f.write("#include \"routing.h\"\n\n")
-    f.write("int routing_table[RO_TOTAL+1] = {\n")
+    # lps per module table
+    (ostr, offset) = top_mod.arrayLP("", 0)
+    f.write("int routing_table_lp[RO_TOTAL+1] = {\n")
+    f.write(ostr)
+    f.write(str(offset)+",")
+    f.write("\n\t};\n")
+    # parts per module table
+    (ostr, offset) = top_mod.arrayKP("", 0)
+    f.write("int routing_table_kp[RO_TOTAL+1] = {\n")
     f.write(ostr)
     f.write(str(offset)+",")
     f.write("\n\t};\n")
