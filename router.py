@@ -169,7 +169,8 @@ def printRouting(top_mod):
     f = open(fname, 'w')
     f.write(header+"\n")
     f.write("#include \"ross.h\"\n")
-    f.write("#include \"routing.h\"\n\n")
+    f.write("#include \"routing.h\"\n")
+    f.write("#include \"generic-model.h\"\n\n")
     # lps per module table
     (arr, offset) = top_mod.arrayLP([], 0)
     sarr = [str(i) for i in arr] + [str(offset)]
@@ -183,15 +184,15 @@ def printRouting(top_mod):
     f.write(", ".join(sarr))
     f.write("\n\t};\n")
     # pre-calculate MPI-rank routing
-    np = 1024
-    mapstr = "\nint ** routing_table_mapper(int np) {\n\tswitch (np) {\n"
+    np = 4096
+    mapstr = "\nintarrptr routing_table_mapper(int np) {\n\tswitch (np) {\n"
     while np > 0:
         arr = calcRankRouting(top_mod, np)
         sarr = [str(i) for i in arr]
         f.write("int routing_map_"+str(np)+"["+str(np+1)+"] = {\n")
         f.write(", ".join(sarr))
         f.write("\n\t};\n")
-        mapstr += "\tcase "+str(np)+":\n\t\treturn (int **) &routing_map_"+str(np)+";\n"
+        mapstr += "\tcase "+str(np)+":\n\t\treturn &routing_map_"+str(np)+";\n"
         np = np/2
     mapstr += "\tdefault:\n\t\ttw_error(TW_LOC, \"ERROR: no mapping for %d nodes\", np);\n\t}\n}\n"
     f.write(mapstr)
