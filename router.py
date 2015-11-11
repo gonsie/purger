@@ -30,6 +30,14 @@ class Module:
         self.index = -1
         self.offset = -1
 
+    def parts(self):
+        global lps_per_kp
+        r = 0
+        for c in self.children:
+            r += c.parts()
+        r += ((self.gate_count / lps_per_kp) * self.route_count)
+        return r
+
     def printRouteCount(self, index, offset):
         route = self.route + (' '*(22-len(self.route)))
         ostr = '\t'.join([route, str(self.count), str(self.route_count), str(index), str(offset), str(self.gate_count)])
@@ -162,6 +170,8 @@ def printRouting(top_mod):
     f.write(ostr)
     global lps_per_kp
     f.write("\n#define LPS_PER_KP ("+str(lps_per_kp)+")\n")
+    t_parts = top_mod.parts()
+    f.write("\n#define TOTAL_PARTS (329474)\n")
     f.write("\n#endif\n")
     f.close()
     # .c file
