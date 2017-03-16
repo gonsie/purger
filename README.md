@@ -16,11 +16,7 @@
    ```
 
 ## Running
-   The parsers can be run from `production.sh`. The scripts generate code in the `current` directory.
-
-## Todo
-   - gate functions should take input, output, and current_state vectors
-   - ablity to print stats for gates/library
+   Look at `run_example.sh`.
 
 ## Branches
   - Master: this represents the branch currently integrated with the [ROSS/gates](https://github.com/gonsie/gates) project
