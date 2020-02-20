@@ -171,7 +171,7 @@ def printRouting(top_mod):
     global lps_per_kp
     f.write("\n#define LPS_PER_KP ("+str(lps_per_kp)+")\n")
     t_parts = top_mod.parts()
-    f.write("\n#define TOTAL_PARTS (329474)\n")
+    f.write("\n#define TOTAL_PARTS (6604)\n")
     f.write("\n#endif\n")
     f.close()
     # .c file
@@ -194,7 +194,7 @@ def printRouting(top_mod):
     f.write(", ".join(sarr))
     f.write("\n\t};\n")
     # pre-calculate MPI-rank routing
-    np = 4096
+    np = 16384
     mapstr = "\nintarrptr routing_table_mapper(int np) {\n\tswitch (np) {\n"
     while np > 0:
         arr = calcRankRouting(top_mod, np)
