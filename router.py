@@ -18,6 +18,7 @@ class Module:
         self.route_count = count
         self.children = []
         self.gate_count = 0
+        self.part_count = 0
 
     def load(self):
         self.children = load_clist(self.name)
@@ -27,6 +28,7 @@ class Module:
             c.route_count = self.route_count * c.route_count
             c.load()
         self.gate_count = load_md(self.name)
+        self.part_count = self.gate_count / 18
         self.index = -1
         self.offset = -1
 
@@ -38,21 +40,21 @@ class Module:
         r += ((self.gate_count / lps_per_kp) * self.route_count)
         return r
 
-    def printRouteCount(self, index, offset):
+    def printRouteCount(self, index, offset, parts):
         route = self.route + (' '*(22-len(self.route)))
-        ostr = '\t'.join([route, str(self.count), str(self.route_count), str(index), str(offset), str(self.gate_count)])
+        ostr = '\t'.join([route, str(self.count), str(self.route_count), str(index), str(offset), str(self.gate_count), str(self.part_count)])
         self.index = index
         self.offset = offset
         print ostr
         for i in range(self.route_count-1):
             j = i+1
             ostr = ' '*22 + '\t\t\t\t'
-            print ostr+str(offset+(j*self.gate_count))
+            print ostr+str(offset+(j*self.gate_count))+'\t\t'+str(self.part_count)
         offset += self.route_count * self.gate_count
         index += self.route_count
         for c in self.children:
-            (index, offset) = c.printRouteCount(index, offset)
-        return index, offset
+            (index, offset, parts) = c.printRouteCount(index, offset, parts)
+        return index, offset, parts
 
     def poundDef(self, ostr, index):
         ostr +=  "#define RO_"+self.name+"\t("+str(index)+")\n"
@@ -158,7 +160,7 @@ def calcRankRouting(top_mod, np):
         gid_offset.append(lps_on_rank[i] + gid_offset[i])
     return gid_offset
 
-def printRouting(top_mod):
+def printRouting(top_mod, total_parts):
     # .h file
     fname = g_prefix+"/"+top_mod.name+"-routing.h"
     f = open(fname, 'w')
@@ -171,7 +173,7 @@ def printRouting(top_mod):
     global lps_per_kp
     f.write("\n#define LPS_PER_KP ("+str(lps_per_kp)+")\n")
     t_parts = top_mod.parts()
-    f.write("\n#define TOTAL_PARTS (6604)\n")
+    f.write("\n#define TOTAL_PARTS ("+str(total_parts)+")\n")
     f.write("\n#endif\n")
     f.close()
     # .c file
@@ -194,7 +196,7 @@ def printRouting(top_mod):
     f.write(", ".join(sarr))
     f.write("\n\t};\n")
     # pre-calculate MPI-rank routing
-    np = 16384
+    np = 524288 # 2^19
     mapstr = "\nintarrptr routing_table_mapper(int np) {\n\tswitch (np) {\n"
     while np > 0:
         arr = calcRankRouting(top_mod, np)
@@ -214,10 +216,12 @@ def process(top_level):
     # top.printDepth(0)
     # top.printOffsets(0)
     # top.printRoute()
-    i, o = top.printRouteCount(0, 0)
+    print "Calling top.printRouteCount"
+    i, o, p = top.printRouteCount(0, 0, 0)
     ostr = ' '*22 + '\t\t\t\t'
-    print ostr + str(o)
-    printRouting(top)
+    print ostr + str(o) + '\tParts: ' + str(p)
+    print "Calling printRouting(top)"
+    printRouting(top, p)
     #top.printCmds()
 
 import sys
