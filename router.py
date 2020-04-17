@@ -46,12 +46,16 @@ class Module:
         self.index = index
         self.offset = offset
         print ostr
+        link_str = self.name+".0 "+str(self.offset)+"\n"
         for i in range(self.route_count-1):
             j = i+1
             ostr = ' '*22 + '\t\t\t\t'
             print ostr+str(offset+(j*self.gate_count))+'\t\t'+str(self.part_count)
+            link_str += self.name+"."+str(j)+" "+str(offset+(j*self.gate_count))+"\n"
+        #print link_str # used to generate the cpu.links file
         offset += self.route_count * self.gate_count
         index += self.route_count
+        parts += self.route_count * self.part_count
         for c in self.children:
             (index, offset, parts) = c.printRouteCount(index, offset, parts)
         return index, offset, parts
