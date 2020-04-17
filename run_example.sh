@@ -7,19 +7,21 @@
 ## cpu below
 ## Possible options: [spc, mcu, cpu]
 
-COMPONENT=mcu
+COMPONENT=cpu
 
 ## All files are put into "Generated" folder
 if [ ! -e Generated/ ]; then
     mkdir Generated
     mkdir Generated/lsi_10k
     mkdir Generated/megacell
-	cat Data/$COMPONENT.clist | cut -d' ' -f 2 > Generated/block.list
-	mkdir Generated/$COMPONENT
-	for i in `cat Generated/block.list`; do
-		mkdir Generated/$i
-	done
 fi
+
+cat Data/$COMPONENT.clist | cut -d' ' -f 2 > Generated/block.list
+mkdir Generated/$COMPONENT
+for i in `cat Generated/block.list`; do
+    echo Setting up for component $i
+    mkdir Generated/$i
+done
 
 # LIBRARY AND NETLIST PARSING
 
