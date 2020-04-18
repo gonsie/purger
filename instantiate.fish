@@ -73,9 +73,27 @@ if false
     end
 end
 
-cd Generated/mcu
-fish mcu-instantiate.fish
-cd ../..
+## fixup multiple instantiations of mcu (4) and spc (8)
+## with the caveat that there are multiples subcomponents
+## spc: 2 exu
+## mcu:
+##      2 mcu_fbd_dp
+##      2 mcu_l2if_ctl
+##      2 mcu_lndskw_dp
+##      2 mcu_readdp_dp
+## fix to make:
+## spc.vSyn.gates.0 has dec.0
+## spc.vSyn.gates.1 should have dec.1
+
+if false
+    cd Generated/spc
+    fish ../../spc-fixup.fish
+    cd ../..
+
+    cd Generated/mcu
+    fish ../../mcu-fixup.fish
+    cd ../..
+end
 
 ## use router.py to generate cpu.links file
 
