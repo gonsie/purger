@@ -96,22 +96,32 @@ if false
 end
 
 ## use router.py to generate cpu.links file
-
-
 if false
-    exit
     # for each possbile link
-    for _l in (cat cpu.links)
+    cd Generated
+    for _l in (cat ../cpu.links)
         set -l _route (echo $_l | cut -d' ' -f1)
         set -l _offset (echo $_l | cut -d' ' -f2)
         echo "Performing replacement: $_route -> $_offset"
-        for i in cpu mcu spc
-            #sed -E -i.BAK s/"$_n.$k"/"$_t"/g mcu.vSyn.gates.(math $i+23)
+
+        # cpu
+        sed -E -i '' s/"$_route\."/"$_offset\."/g cpu/cpu.vSyn.gates.0
+
+        # spc
+        for i in (seq 0 7)
+            sed -E -i '' s/"$_route\."/"$_offset\."/g spc/spc.vSyn.gates.$i
         end
+
+        # mcu
+        for i in (seq 0 3)
+            sed -E -i '' s/"$_route\."/"$_offset\."/g mcu/mcu.vSyn.gates.$i
+        end
+
     end
+    cd ..
 end
 
-
+### STOP!!!!
 exit
 
 ## Unknown fixup for l2t component
